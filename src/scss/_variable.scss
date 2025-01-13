@@ -1,0 +1,67 @@
+@use "sass:math";
+
+@function round($number) {
+	@return calc(math.round($number * 50) / 50); //lam tron den 5 chu so
+}
+@function cal-font-size($base-size, $step) {
+	//base size * (ti le scale)^step
+	$result: $base-size * math.pow($scale-ratio, $step);
+	@return round($result);
+}
+
+@function font-to-rem($size) {
+	$result: calc($size / 16 * 1rem);
+	@return round($result);
+}
+
+@function scaling-factor($min, $max, $step) {
+	//tinh toan bien do dao dong scale cho tung tag -> tu dong responsive font size
+	$result: calc(($max - $min) / ($max-width - $min-width) * 1200vw);
+	@return round($result);
+}
+
+@function clamp-font-size($step) {
+	$min: cal-font-size($base-min-size, $step);
+	$max: cal-font-size($base-max-size, $step);
+	$scaling: scaling-factor($min, $max, $step);
+	//responsive font size
+	@return clamp(font-to-rem($min), scaling-factor($min, $max, $step), font-to-rem($max));
+}
+
+$base-min-size: 14; //for mobile
+$base-max-size: 16; //for desktop
+$scale-ratio: 1.067; //ti le font scale
+$min-width: 320;
+$max-width: 1440;
+
+$fs-xsm: clamp-font-size(-2);
+$fs-sm: clamp-font-size(-1);
+$fs-base: clamp-font-size(0);
+$fs-lg: clamp-font-size(1);
+$fs-xl: clamp-font-size(2);
+$fs-2xl: clamp-font-size(3);
+$fs-3xl: clamp-font-size(4);
+$fs-4xl: clamp-font-size(5);
+$fs-5xl: clamp-font-size(6);
+
+:root {
+	--primary-clr: #ec7322;
+	--primary-hover-clr: #ef8843;
+	--priamry-active-clr: #e16613;
+	--primary-ghost-clr: #fdf3ec;
+	--secondary-clr: #f7f7f7;
+	--secondary-hover-clr: #f0f0f0;
+	--lower-backround-clr: #f2f4f7;
+	--background-clr: #fcfcfc;
+	--gray-clr: #737373;
+	--gray-light-clr: #adadad;
+	--gray-extra-light-clr: #e6e6e6;
+	--text-black-clr: #2e2e2e;
+	--text-white-clr: #ffffff;
+
+	--ff: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+}
+body.dark {
+	//ghi de dark mode o day
+	--background-clr: #000;
+}
