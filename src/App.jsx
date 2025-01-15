@@ -6,15 +6,18 @@ import Home from "./pages/Home";
 import UserLayout from "./UserLayout";
 import NotFound from "./pages/NotFound";
 import Login from "./pages/Login";
+import Signup from "./pages/Signup";
 
 function App() {
 	return (
 		<BrowserRouter basename={import.meta.env.BASE_URL}>
 			<Routes>
 				<Route path="/login" element={<Login />} />
+				<Route path="/signup" element={<Signup />} />
 
 				<Route path="/" element={<UserLayout />}>
 					<Route index element={<Home />} />
+					<Route path="/home" element={<Home />} />
 					<Route path="*" element={<NotFound />} />
 				</Route>
 			</Routes>

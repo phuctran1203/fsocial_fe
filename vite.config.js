@@ -1,8 +1,11 @@
 import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react";
 
-// https://vite.dev/config/
 export default defineConfig({
 	plugins: [react()],
-	base: "fsocial_fe",
+	base: "/fsocial_fe",
+	server: {
+		host: "0.0.0.0", // Lắng nghe trên tất cả các địa chỉ IP
+		port: 3000,
+	},
 });
