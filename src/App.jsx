@@ -21,9 +21,10 @@ function App() {
 				<Route path="/" element={<UserLayout />}>
 					<Route index element={<Home />} />
 					<Route path="/home" element={<Home />} />
+					<Route path="/friends" element={<Friends />} />
 					<Route path="*" element={<NotFound />} />
 				</Route>
-				<Route path="/friends" element={<Friends />} />
+				<Route pat="/admin"></Route>
 			</Routes>
 		</BrowserRouter>
 	);
