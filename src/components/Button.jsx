@@ -14,11 +14,15 @@ const transparentButton =
 
 const ghostButton = "bg-[--primary-ghost-clr] text-[--primary-clr]";
 
+const disabledMask =
+	"relative overflow-hidden pointer-events-none before:absolute before:inset-0 before:bg-white before:opacity-25";
+
 // Button đảm nhận cả a tag và button tag, chỉ nên truyền vào "to" hoặc "onClick"
 //"type" nhận vào các key giống trong "styleMap"
 // Sử dụng: <Button key=value>children</Button>
 
 export default function Button({
+	disabled = false,
 	type = "",
 	to,
 	onClick = () => {},
@@ -34,7 +38,7 @@ export default function Button({
 			transparent: transparentButton,
 			ghost: ghostButton,
 		};
-		return `${styleMap[type]} ${baseStyle} ${className}`;
+		return `${styleMap[type]} ${baseStyle} ${className} ${disabled ? disabledMask : ""}`;
 	};
 
 	if (to) {

@@ -3,11 +3,14 @@ import Button from "../components/Button";
 import { Field, Select } from "../components/Field";
 import { useSignupStore } from "../store/signupStore";
 import { useEffect, useRef, useState } from "react";
+import EnterOTPCode from "../components/EnterOTPCode";
 
 export default function Signup() {
 	const navigate = useNavigate();
 
 	const { form, updateField } = useSignupStore();
+
+	const getFormData = useSignupStore.getState().getFormData;
 
 	// Handle animation cho các step
 	const formContainer = useRef();
@@ -24,25 +27,23 @@ export default function Signup() {
 
 	useEffect(() => {
 		const parent = formContainer.current;
-		if (parent) {
-			const resizeObserver = new ResizeObserver(() => {
-				// Cập nhật lại width cho stepsWrapper
-				const parentWidth = parent.offsetWidth;
-				stepsWrapper.current.style.gridTemplateColumns = `repeat(3, ${parentWidth}px)`;
-				// Cập nhật lại height cho stepsWrapper
-				const stepHeight = stepsRef.current[currentStep].offsetHeight;
-				stepsWrapper.current.style.height = `${stepHeight + 4}px`;
-				// Cập nhật lại translate X cho stepWrapper
-				stepsWrapper.current.style.transform = `translateX(-${
-					formContainer.current.offsetWidth * (currentStep - 1)
-				}px)`;
-			});
-			resizeObserver.observe(parent);
-			return () => {
-				resizeObserver.disconnect();
-			};
-		}
-	}, [currentStep, stepsRef.current[currentStep]?.offsetHeight]);
+		if (!parent) return;
+
+		const resizeObserver = new ResizeObserver(() => {
+			// Cập nhật lại width cho stepsWrapper
+			const parentWidth = parent.offsetWidth;
+			stepsWrapper.current.style.gridTemplateColumns = `repeat(3, ${parentWidth}px)`;
+			// Cập nhật lại height cho stepsWrapper
+			const stepHeight = stepsRef.current[currentStep].offsetHeight;
+			stepsWrapper.current.style.height = `${stepHeight + 4}px`;
+			// Cập nhật lại translate X cho stepWrapper
+			stepsWrapper.current.style.transform = `translateX(-${formContainer.current.offsetWidth * (currentStep - 1)}px)`;
+		});
+		resizeObserver.observe(parent);
+		return () => {
+			resizeObserver.disconnect();
+		};
+	}, [currentStep, form.ten.isTouched, form.ho.isTouched, stepsRef.current[currentStep]?.offsetHeight]);
 
 	// Check điều kiện vượt qua step 1 và sinh username mặc định
 	const hoten = useRef(form.ten.value + form.ho.value);
@@ -64,7 +65,7 @@ export default function Signup() {
 
 	// Check điều kiện vượt qua step 2
 	const handleStep2 = () => {
-		if (!form.username.isValid || !form.email.isValid || !form.password.isValid) {
+		if (!form.username.isValid || !form.email.isValid || !form.password.isValid || !form.rePassword.isValid) {
 			setCountStepPassed((prev) => ({ ...prev, s2: false }));
 		} else {
 			setCountStepPassed((prev) => ({ ...prev, s2: true }));
@@ -75,24 +76,38 @@ export default function Signup() {
 		handleStep2();
 	}, [form.username.isValid, form.email.isValid, form.password.isValid, form.rePassword.isValid]);
 
-	const gotoStep1 = () => setCurrentStep(1);
+	const gotoStep1 = () => {
+		setCurrentStep(1);
+	};
 
-	const goToStep2 = () => setCurrentStep(2);
+	const goToStep2 = () => {
+		setCurrentStep(2);
+		autoFocusOTP.current = false;
+	};
 
+	const [errMessageEmail, setErrMessageEmail] = useState("Email không đúng định dạng");
+	const autoFocusOTP = useRef(false);
 	const goToStep3 = () => {
-		setCurrentStep(3);
-		setTimeout(() => {
-			inputsOTPRef.current[0].focus();
-		}, 200);
 		// call request gửi code
+		const resp = true;
+		if (resp) {
+			autoFocusOTP.current = true;
+			setCurrentStep(3);
+		} else {
+			updateField("email", { isValid: false });
+			setErrMessageEmail("Email đã tồn tại");
+		}
 	};
 
 	const goToStep4 = () => {
 		// sending post tạo account
+		const data = getFormData();
+		console.log(data);
+
 		setCurrentStep(4);
 		setTimeout(() => {
 			navigate("/home");
-		}, 3000);
+		}, 2000);
 	};
 
 	// Handle ẩn hiện mật khẩu
@@ -112,66 +127,10 @@ export default function Signup() {
 	}, [form.password.value, form.rePassword.value]);
 
 	// Handle nhập mã OTP xác minh email
-	const inputsOTPRef = useRef([]);
-
 	const [OTPValue, setOTPValue] = useState(["", "", "", ""]);
 
-	const setInputsOTPRef = (index) => (element) => {
-		inputsOTPRef.current[index] = element;
-	};
-
-	const jump = (index) => {
-		inputsOTPRef.current[index]?.focus();
-	};
-
-	const handleInputOTPChange = (e, currentInputIndex) => {
-		const nextInputIndex = currentInputIndex + 1;
-		const oldValue = OTPValue[currentInputIndex];
-		const currentValue = e.target.value;
-
-		if (currentValue === "") {
-			// có kí tự vừa bị xóa trong input
-			setOTPValue((prev) => {
-				const arr = [...prev];
-				arr[currentInputIndex] = "";
-				return arr;
-			});
-			return;
-		}
-		// có kí tự vừa được nhập vào input
-		// Input trước đấy đã có giá trị -> nhảy đến input kế tiếp
-		if (oldValue !== "") {
-			e.target.value = oldValue;
-			jump(nextInputIndex);
-			return;
-		}
-		// Input trước đấy chưa có giá trị -> update giá trị mới
-		setOTPValue((prev) => {
-			const arr = [...prev];
-			arr[currentInputIndex] = currentValue;
-			return arr;
-		});
-		jump(nextInputIndex);
-	};
-
-	const handleInputOTPKeyDown = (e, currentInputIndex) => {
-		// Xóa giá trị mà input hiện tại đang rỗng -> tự lùi về + xóa luôn giá trị input đằng trước
-		if (e.key === "Backspace" && OTPValue[currentInputIndex] === "") {
-			e.preventDefault(); // ngăn onChange chạy ngay sau
-			const previousInputIndex = currentInputIndex - 1;
-			if (previousInputIndex < 0) return;
-			inputsOTPRef.current[previousInputIndex].value = "";
-			setOTPValue((prev) => {
-				const arr = [...prev];
-				arr[previousInputIndex] = "";
-				return arr;
-			});
-			jump(previousInputIndex);
-		}
-	};
-
 	return (
-		<div className="lg:w-[min(85%,1440px)] mx-auto relative bg-[--background-clr] lg:my-6 pt-9 pb-20 xl:px-20 lg:px-12 md:px-4 p-0 rounded-md">
+		<div className="lg:w-[min(85%,1440px)] md:h-fit h-screen mx-auto relative bg-[--background-clr] xl:px-20 lg:px-12 lg:my-6 md:px-4  py-8 rounded-md">
 			<img className="w-[max(72px,8%)] absolute bottom-0 left-0" src="./decor/form_decor.svg" alt="" />
 			<div className="md:w-10/12 md:mx-auto mx-4 md:mb-2 grid grid-cols-[repeat(15,minmax(0,1fr))] grid-rows-2 items-center">
 				<h3 className="z-0 col-start-2 justify-self-center bg-[--primary-clr] text-[--text-white-clr] font-semibold md:w-12 w-10 aspect-square rounded-full grid place-content-center">
@@ -246,7 +205,7 @@ export default function Signup() {
 				>
 					<div ref={stepsWrapper} className="grid" style={{ transition: "transform 0.3s, height 0.2s" }}>
 						{/* step 1 */}
-						<div ref={setStepsRef(1)} className="md:px-8 px-4 h-fit">
+						<div ref={setStepsRef(1)} className={`md:px-8 px-4 h-fit ${currentStep === 1 ? "" : "invisible"}`}>
 							<div className="mb-4">
 								<h2>Thông tin cơ bản</h2>
 								<p className="text-[--gray-clr]">Hãy điền vào form bên dưới để hoàn tất quá trình đăng ký nhé</p>
@@ -322,16 +281,16 @@ export default function Signup() {
 								/>
 
 								<Button
-									className={!countStepPassed.s1 ? "cursor-not-allowed" : ""}
 									onClick={!countStepPassed.s1 ? () => {} : goToStep2}
 									allowTab={currentStep === 1}
+									disabled={!countStepPassed.s1}
 								>
 									Tiếp theo
 								</Button>
 							</div>
 						</div>
 						{/* step 2 */}
-						<div ref={setStepsRef(2)} className={`md:px-8 px-4 h-fit`}>
+						<div ref={setStepsRef(2)} className={`md:px-8 px-4 h-fit ${currentStep === 2 ? "" : "invisible"}`}>
 							<div className="mb-4">
 								<h2>Thông tin đăng nhập</h2>
 								<p className="text-[--gray-clr]">Đây là thông tin quan trọng. Hãy luôn giữ bảo mật nhé!</p>
@@ -363,7 +322,7 @@ export default function Signup() {
 									store={useSignupStore}
 									required={true}
 									pattern="^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$"
-									errorMessage="Điền đúng định dạng email"
+									errorMessage={errMessageEmail}
 									allowTab={currentStep === 2}
 								>
 									<svg className="w-full" viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -409,9 +368,9 @@ export default function Signup() {
 								<div className="space-y-4">
 									<Button
 										type="primary"
-										className={!countStepPassed.s2 ? "cursor-not-allowed" : ""}
 										onClick={!countStepPassed.s2 ? () => {} : goToStep3}
 										allowTab={currentStep === 2}
+										disabled={!countStepPassed.s2}
 									>
 										Tiếp theo
 									</Button>
@@ -422,65 +381,31 @@ export default function Signup() {
 							</div>
 						</div>
 						{/* step 3 */}
-						<div ref={setStepsRef(3)} className="md:px-8 px-4 h-fit">
+						<div
+							ref={setStepsRef(3)}
+							className={`space-y-5 md:px-8 px-4 h-fit ${currentStep === 3 ? "" : "invisible"}`}
+						>
 							<div className="mb-4">
 								<h2>Xác minh tài khoản</h2>
 								<p className="text-[--gray-clr]">Yeah! Chỉ còn một bước cuối cùng thôi</p>
 							</div>
-							<p>Hãy kiểm tra email để nhận mã xác minh gồm 4 số và điền vào bên dưới nhé</p>
-							<div className="px-6 my-6 flex justify-center lg:gap-6 gap-4">
-								<input
-									ref={setInputsOTPRef(0)}
-									type="text"
-									tabIndex={currentStep === 3 ? 0 : -1}
-									className="bg-transparent text-xl border-2 border-[--gray-light-clr] md:size-14 size-12 text-center rounded-md focus:border-[--gray-clr] outline-none"
-									inputMode="numeric"
-									autoComplete="off"
-									onChange={(e) => handleInputOTPChange(e, 0)}
-									onKeyDown={(e) => handleInputOTPKeyDown(e, 0)}
-									onPaste={(e) => e.preventDefault()}
-								/>
-								<input
-									ref={setInputsOTPRef(1)}
-									type="text"
-									tabIndex={currentStep === 3 ? 0 : -1}
-									className="bg-transparent text-xl border-2 border-[--gray-light-clr] md:size-14 size-12 text-center rounded-md focus:border-[--gray-clr] outline-none"
-									inputMode="numeric"
-									autoComplete="off"
-									onChange={(e) => handleInputOTPChange(e, 1)}
-									onKeyDown={(e) => handleInputOTPKeyDown(e, 1)}
-									onPaste={(e) => e.preventDefault()}
-								/>
-								<input
-									ref={setInputsOTPRef(2)}
-									type="text"
-									tabIndex={currentStep === 3 ? 0 : -1}
-									className="bg-transparent text-xl border-2 border-[--gray-light-clr] md:size-14 size-12 text-center rounded-md focus:border-[--gray-clr] outline-none"
-									inputMode="numeric"
-									autoComplete="off"
-									onChange={(e) => handleInputOTPChange(e, 2)}
-									onKeyDown={(e) => handleInputOTPKeyDown(e, 2)}
-									onPaste={(e) => e.preventDefault()}
-								/>
-								<input
-									ref={setInputsOTPRef(3)}
-									type="text"
-									tabIndex={currentStep === 3 ? 0 : -1}
-									className="bg-transparent text-xl border-2 border-[--gray-light-clr] md:size-14 size-12 text-center rounded-md focus:border-[--gray-clr] outline-none"
-									inputMode="numeric"
-									autoComplete="off"
-									onChange={(e) => handleInputOTPChange(e, 3)}
-									onKeyDown={(e) => handleInputOTPKeyDown(e, 3)}
-									onPaste={(e) => e.preventDefault()}
-								/>
-							</div>
 
-							<p className="hidden mb-1 text-red-600">*Mã không đúng, hãy kiểm tra lại</p>
+							<p>Hãy kiểm tra email để nhận mã xác minh gồm 4 số và điền vào bên dưới nhé</p>
+
+							<EnterOTPCode
+								OTPValue={OTPValue}
+								setOTPValue={setOTPValue}
+								allowTab={currentStep === 1}
+								autoFocus={autoFocusOTP.current}
+							/>
 
 							<div className="space-y-4">
-								<Button type="primary" allowTab={currentStep === 3} onClick={goToStep4}>
-									Xác nhận
-								</Button>
+								<div>
+									<p className="hidden text-red-600">*Mã không đúng, hãy kiểm tra lại</p>
+									<Button type="primary" allowTab={currentStep === 3} onClick={goToStep4}>
+										Xác nhận
+									</Button>
+								</div>
 								<Button type="secondary" className="gap-2" allowTab={currentStep === 3} onClick={goToStep2}>
 									<img src="./icon/arrow_left.svg" alt="" /> Quay lại
 								</Button>
@@ -533,14 +458,12 @@ export default function Signup() {
 						src="./decor/signup_step_3_decor.svg"
 						alt=""
 					/>
-					<div className={currentStep === 4 ? "flex flex-col items-center text-center mt-8 px-4" : "hidden"}>
+					<div className={currentStep === 4 ? "flex flex-col items-center text-center mt-4 px-4" : "hidden"}>
 						<h1 className="lg:text-4xl md:text-3xl text-2xl text-[--primary-clr] mb-2">
 							Đã tạo tài khoản thành công
 							<br /> 🎉🎉🎉
 						</h1>
-						<h3>
-							Bạn sẽ sớm được chuyển hướng về <br /> trang chủ
-						</h3>
+						<h3 className="text-[--primary-clr]">Đang chuyển hướng về trang chủ...</h3>
 						<img src="./decor/signup_step_4_decor.svg" alt="" />
 					</div>
 				</div>

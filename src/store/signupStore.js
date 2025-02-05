@@ -20,4 +20,13 @@ export const useSignupStore = create((set) => ({
 				[id]: { ...state.form[id], ...props },
 			},
 		})),
+	getFormData: () => {
+		let data = Object.keys(useSignupStore.getState().form)
+			.filter((key) => key != "rePassword")
+			.reduce((acc, key) => {
+				acc[key] = useSignupStore.getState().form[key].value;
+				return acc;
+			}, {});
+		return data;
+	},
 }));

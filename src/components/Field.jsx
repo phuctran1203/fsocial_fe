@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 
 export function Field({
 	type = "text",
@@ -21,13 +21,8 @@ export function Field({
 	const validate = (value) => {
 		let compareResult = false;
 		compareResult = required ? value !== "" : true;
-		console.log(1, compareResult);
 		compareResult = compareResult ? new RegExp(pattern).test(value) : false;
-		console.log(2, compareResult);
-
 		compareResult = compareResult ? compareFunction(value) : false;
-		console.log(3, compareResult);
-
 		return compareResult;
 	};
 
@@ -38,7 +33,7 @@ export function Field({
 	};
 
 	const handleFocusField = (e) => {
-		if (form[id].isValid) return;
+		if (form[id].isValid || form[id].isTouched) return;
 		let value = e.target.value;
 		let compareResult = validate(value);
 		updateField(id, { value: value, isValid: compareResult, isTouched: true });
