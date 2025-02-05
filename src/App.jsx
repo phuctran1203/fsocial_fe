@@ -8,6 +8,7 @@ import NotFound from "./pages/NotFound";
 import Login from "./pages/Login";
 import Signup from "./pages/Signup";
 import ForgotPassword from "./pages/ForgotPassword";
+import Friends from "./pages/Friends";
 
 function App() {
 	return (
@@ -22,6 +23,7 @@ function App() {
 					<Route path="/home" element={<Home />} />
 					<Route path="*" element={<NotFound />} />
 				</Route>
+				<Route path="/friends" element={<Friends />} />
 			</Routes>
 		</BrowserRouter>
 	);
