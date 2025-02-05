@@ -1,4 +1,5 @@
 @use "sass:math";
+@import url("https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100..900;1,100..900&display=swap");
 
 @function round($number) {
 	@return calc(math.round($number * 50) / 50); //lam tron den 5 chu so
@@ -16,7 +17,7 @@
 
 @function scaling-factor($min, $max, $step) {
 	//tinh toan bien do dao dong scale cho tung tag -> tu dong responsive font size
-	$result: calc(($max - $min) / ($max-width - $min-width) * 1200vw);
+	$result: calc(($max - $min) / ($max-width - $min-width) * 1000vw);
 	@return round($result);
 }
 
@@ -45,21 +46,23 @@ $fs-4xl: clamp-font-size(5);
 $fs-5xl: clamp-font-size(6);
 
 :root {
-	--primary-clr: #ec7322;
-	--primary-hover-clr: #ef8843;
-	--priamry-active-clr: #e16613;
-	--primary-ghost-clr: #fdf3ec;
-	--secondary-clr: #f7f7f7;
-	--secondary-hover-clr: #f0f0f0;
+	--primary-clr: hsl(23, 80%, 52%);
+	--primary-hover-clr: hsl(23, 80%, 47%);
+	--primary-active-clr: hsl(23, 80%, 44%);
+	--primary-ghost-clr: #fdf3ed;
+	--secondary-clr: #f2f2f2;
+	--secondary-hover-clr: #e8e8e8;
+	--secondary-active-clr: #d9d9d9;
 	--lower-backround-clr: #f2f4f7;
 	--background-clr: #fcfcfc;
 	--gray-clr: #737373;
 	--gray-light-clr: #adadad;
 	--gray-extra-light-clr: #e6e6e6;
-	--text-black-clr: #2e2e2e;
+	--text-black-clr: hsl(0, 0%, 25%);
 	--text-white-clr: #ffffff;
 
 	--ff: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+	--ff: "Roboto", serif;
 }
 body.dark {
 	//ghi de dark mode o day
