@@ -22,7 +22,10 @@ export default function Login() {
 		<div className="w-3/6 h-full flex justify-center">
 			<div className="w-[481px] h-[500px] rounded-lg bg-[var(--background-clr)] shadow-md absolute top-[131px] left-[180px] p-8">
 				<div className="mb-4">
-					<h2 className="font-medium">Chào mừng đến với <span className="font-bold text-2xl text-[var(--primary-clr)]">FSocial</span></h2>
+				<h2 className="font-medium">
+  Chào mừng đến với <span className="font-bold text-2xl text-[var(--primary-clr)]">FSocial</span> 👋
+</h2>
+
 					<span>Nền tảng mạng xã hội giới trẻ mới</span>
 				</div>
 				<div className="mb-4">
