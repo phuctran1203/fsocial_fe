@@ -13,23 +13,23 @@ export default function Login() {
 			avatar: 'https://res.cloudinary.com/dwf2vqohm/image/upload/v1736494136/c1297e51-9141-4a6f-95df-b2b12122fa4a_FPT_Polytechnic.png',
 			name: "Ngô Tấn Cang"
 		},
-		
-		
+
+
 		undefined
 	]
 
 	return <div className="flex p-24 h-screen bg-[var(--lower-backround-clr)]">
 		<div className="w-3/6 h-full flex justify-center">
-			<div className="wrapper w-[80%] bg-[var(--background-clr)] p-10">
+			<div className="w-[481px] h-[500px] rounded-lg bg-[var(--background-clr)] shadow-md absolute top-[131px] left-[180px] p-8">
 				<div className="mb-4">
 					<h2 className="font-medium">Chào mừng đến với <span className="font-bold text-2xl text-[var(--primary-clr)]">FSocial</span></h2>
 					<span>Nền tảng mạng xã hội giới trẻ mới</span>
 				</div>
 				<div className="mb-4">
-					<TextField name={"usename"} type={"text"}></TextField>
+					<TextField name={"Email"} type={"text"}></TextField>
 				</div>
 				<div className="mb-4">
-					<TextField name={"password"} type={"password"}></TextField>
+					<TextField name={"Mật Khẩu"} type={"password"}></TextField>
 				</div>
 				<div className="flex justify-between mb-2">
 					<div className="flex justify-center items-center text-[var(--gray-clr)]">
@@ -38,7 +38,7 @@ export default function Login() {
 						<label htmlFor="remmeberme" className="text-[14px]">Ghi nhớ đăng nhập</label>
 					</div>
 					<div>
-						<button className="underline cursor-pointer ">Quên mật khẩu</button>
+						<button className="underline cursor-pointer ">Quên mật khẩu ?</button>
 					</div>
 				</div>
 				<div className="mb-4">
@@ -51,8 +51,8 @@ export default function Login() {
 					<div className="border-t border-gray-300 flex-grow"></div>
 				</div>
 				<div className="mb-4">
-					<button className="h-[48px] w-full bg-[var(--gray-light-clr)] hover:bg-[var(--gray-clr)] 
-	   									transition-colors text-white rounded-sm flex items-center justify-center gap-2">
+					<button className="h-[48px] w-full bg-[#F2F2F2] hover:bg-[var(--gray-clr)] 
+	   									transition-colors text-blackblack rounded-sm flex items-center justify-center gap-2">
 						<svg width="27" height="28" viewBox="0 0 27 28" fill="none" xmlns="http://www.w3.org/2000/svg">
 							<path fillRule="evenodd" clipRule="evenodd" d="M5.60795 13.6889C5.60795 12.7997 5.75563 11.9473 6.0192 11.1477L1.40573 7.62469C0.506585 9.45029 0 11.5074 0 13.6889C0 15.8685 0.505962 17.9243 1.40386 19.7487L6.01484 16.2188C5.75376 15.423 5.60795 14.5737 5.60795 13.6889Z" fill="#FBBC05" />
 							<path fillRule="evenodd" clipRule="evenodd" d="M13.7084 5.6C15.64 5.6 17.3847 6.28444 18.7555 7.40444L22.7434 3.42222C20.3133 1.30667 17.1978 0 13.7084 0C8.29108 0 3.63523 3.09804 1.40576 7.62471L6.01924 11.1477C7.08226 7.92089 10.1124 5.6 13.7084 5.6Z" fill="#EB4335" />
