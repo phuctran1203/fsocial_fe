@@ -93,12 +93,11 @@ export default function Notification() {
 		<div
 			className={` 
 			close-target-zone
-			z-0 bg-black bg-opacity-25 h-screen
+			z-0 bg-black bg-opacity-25 h-screen overflow-hidden
 			lg:block lg:relative lg:left-auto lg:border-l-[1px] lg:w-fit lg:visible 
 			md:left-[260px] md:w-[calc(100%-260px)]
 			sm:left-[210px] sm:w-[calc(100%-210px)]
 			left-0 absolute w-full
-			overflow-hidden
 			${isVisible ? "" : "invisible bg-opacity-0"}
 			ct-transition
 			`}
