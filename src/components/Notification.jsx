@@ -98,6 +98,7 @@ export default function Notification() {
 			md:left-[260px] md:w-[calc(100%-260px)]
 			sm:left-[210px] sm:w-[calc(100%-210px)]
 			left-0 absolute w-full
+			overflow-hidden
 			${isVisible ? "" : "invisible bg-opacity-0"}
 			ct-transition
 			`}
@@ -109,7 +110,6 @@ export default function Notification() {
 				lg:translate-x-0 lg:translate-y-0
 				md:min-w-[340px] md:max-w-[340px]
 				sm:min-w-[310px] sm:max-w-[310px]
-
 				w-full
 				${isVisible ? "drop-shadow-[1px_0px_4px_hsla(0,0%,0%,0.15)]" : "sm:-translate-x-full sm:translate-y-0 translate-y-full"}
 				ct-transition
