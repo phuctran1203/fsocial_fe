@@ -92,9 +92,15 @@ export default function Home() {
 	};
 
 	return (
-		<div className="bg-[--background-clr] flex flex-grow h-screen">
+		<div className=" bg-[--background-clr] flex flex-grow h-screen">
 			<div className="overflow-y-auto scrollable-div w-full">
-				<div className="space-y-4 w-full lg:max-w-[600px] lg:pe-0 pe-4 mx-auto">
+				<div
+					className="
+						space-y-1 w-full pb-12 mt-12 mx-auto
+						lg:max-w-[600px]
+						md:space-y-4 md:pb-0
+						sm:mt-0"
+				>
 					{posts.map((post) => (
 						<Post key={post.id} post={post} openModal={openModal} />
 					))}

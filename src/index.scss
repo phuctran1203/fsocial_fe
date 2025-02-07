@@ -12,10 +12,6 @@ body {
 }
 
 /* Toàn bộ thanh scrollbar */
-::-webkit-scrollbar {
-	width: 8px; /* Độ rộng */
-	height: 8px; /* Dùng cho thanh cuộn ngang */
-}
 
 /* Track (background của scrollbar) */
 ::-webkit-scrollbar-track {
@@ -32,6 +28,17 @@ body {
 /* Hover vào thanh kéo */
 ::-webkit-scrollbar-thumb:hover {
 	background: var(--gray-clr);
+}
+
+::-webkit-scrollbar {
+	width: 0px; /* Độ rộng */
+	height: 0px; /* Dùng cho thanh cuộn ngang */
+}
+@media screen and (min-width: 1025px) {
+	::-webkit-scrollbar {
+		width: 8px; /* Độ rộng */
+		height: 8px; /* Dùng cho thanh cuộn ngang */
+	}
 }
 
 ::-ms-reveal {

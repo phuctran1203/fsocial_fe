@@ -10,9 +10,9 @@ export default function Friends() {
 			id: 1,
 			userID: "1",
 			user: "Phúc Trần",
-			avatar: "/fsocial_fe/icon/user.svg",
+			avatar: "user_1.png",
 			content: "Tôi dẫn vợ tôi đi chơi. Hihi",
-			image: "/fsocial_fe/post_img.svg",
+			image: "post_image_1.png",
 			time: "1 giờ trước",
 			likes: 123,
 			comments: [
@@ -52,9 +52,9 @@ export default function Friends() {
 			id: 2,
 			userID: "1",
 			user: "Phúc Trần",
-			avatar: "/fsocial_fe/icon/user.svg",
+			avatar: "user_1.png",
 			content: "Hihi",
-			image: "/fsocial_fe/post_img2.svg",
+			image: "post_image_2.png",
 			time: "1 giờ trước",
 			likes: 9999,
 			comments: [
@@ -91,9 +91,15 @@ export default function Friends() {
 	};
 
 	return (
-		<div className="bg-[--background-clr] flex flex-grow h-screen">
+		<div className=" bg-[--background-clr] flex flex-grow h-screen">
 			<div className="overflow-y-auto scrollable-div w-full">
-				<div className="space-y-4 w-full max-w-[600px] mx-auto">
+				<div
+					className="
+								space-y-1 w-full pb-12 mt-12 mx-auto
+								lg:max-w-[600px]
+								md:space-y-4 md:pb-0
+								sm:mt-0"
+				>
 					{posts.map((post) => (
 						<Post key={post.id} post={post} openModal={openModal} />
 					))}
