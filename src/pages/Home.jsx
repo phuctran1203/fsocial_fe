@@ -1,20 +1,19 @@
 import React, { useState } from "react";
 import { Link } from "react-router-dom";
-import Post from '../components/Post';
-import CommentModal from '../components/CommentModal';
-import Nav from '../components/Nav';
-import '../index.scss';
+import Post from "../components/Post";
+import CommentModal from "../components/CommentModal";
+import Nav from "../components/Nav";
+import "../index.scss";
 
 export default function Home() {
-
 	const posts = [
 		{
 			id: 1,
 			userID: "1",
 			user: "Phúc Trần",
-			avatar: "/fsocial_fe/icon/user.svg",
+			avatar: "user_1.png",
 			content: "Tôi dẫn vợ tôi đi chơi. Hihi",
-			image: "/fsocial_fe/post_img.svg",
+			image: "post_image_1.png",
 			time: "1 giờ trước",
 			likes: 123,
 			comments: [
@@ -54,9 +53,9 @@ export default function Home() {
 			id: 2,
 			userID: "1",
 			user: "Phúc Trần",
-			avatar: "/fsocial_fe/icon/user.svg",
+			avatar: "user_1.png",
 			content: "Hihi",
-			image: "/fsocial_fe/post_img2.svg",
+			image: "post_image_2.png",
 			time: "1 giờ trước",
 			likes: 9999,
 			comments: [
@@ -93,21 +92,19 @@ export default function Home() {
 	};
 
 	return (
-		<div className="bg-[--background-clr] flex h-screen">
-
-			<Nav />
-			
-			<div className="w-3/5 p-5 overflow-y-auto h-full scrollable-div">
-				{posts.map((post) => (
-					<Post key={post.id} post={post} openModal={openModal} />
-				))}
-			</div>
-
-			<div className="w-1/5 bg-white p-5 shadow-md">
-				<h2 className="text-lg font-semibold">Thông báo</h2>
-				<ul className="mt-3 space-y-2">
-					<li className="text-sm">Phương Nam đã bình luận về bài viết của bạn</li>
-				</ul>
+		<div className=" bg-[--background-clr] flex flex-grow h-screen">
+			<div className="overflow-y-auto scrollable-div w-full">
+				<div
+					className="
+						space-y-1 w-full pb-12 mt-12 mx-auto
+						lg:max-w-[600px]
+						md:space-y-4 md:pb-0
+						sm:mt-0"
+				>
+					{posts.map((post) => (
+						<Post key={post.id} post={post} openModal={openModal} />
+					))}
+				</div>
 			</div>
 
 			{isModalOpen && <CommentModal post={selectedPost} setIsModalOpen={setIsModalOpen} />}
