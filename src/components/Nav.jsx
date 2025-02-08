@@ -22,12 +22,12 @@ export default function Nav() {
 	return (
 		<nav
 			className={`
-				z-10 bg-[--background-clr] border-[--gray-extra-light-clr]
-				md:min-w-[260px] md:max-w-[260px]
-				sm:min-w-[210px] sm:max-w-[210px] sm:static sm:flex sm:flex-col sm:justify-between sm:h-screen sm:py-6 sm:border-r-[1px]
-				absolute bottom-0 w-full border-t-[1px]
-				ct-transition
-				${styles.transitionNav}`}
+			z-10 bg-[--background-clr] border-[--gray-extra-light-clr]
+			md:min-w-[260px] md:max-w-[260px]
+			sm:min-w-[210px] sm:max-w-[210px] sm:static sm:flex sm:flex-col sm:justify-between sm:h-screen sm:py-6 sm:border-r-[1px]
+			absolute bottom-0 w-full border-t-[1px]
+			ct-transition
+			${styles.transitionNav}`}
 		>
 			<div className="sm:space-y-8 sm:block w-full">
 				{/* logo */}

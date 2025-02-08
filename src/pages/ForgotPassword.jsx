@@ -4,6 +4,7 @@ import { useForgotPasswordStore } from "../store/forgotPwStore";
 import Button from "../components/Button";
 import EnterOTPCode from "../components/EnterOTPCode";
 import { useNavigate } from "react-router-dom";
+import { ArrowLeftIcon, EyeIcon, EyeSplashIcon } from "../components/Icon";
 
 export default function ForgotPassword() {
 	const navigate = useNavigate();
@@ -246,8 +247,8 @@ export default function ForgotPassword() {
 									allowTab={currentStep === 2}
 								>
 									<div onClick={() => setIsShowPassword(!isShowPassword)}>
-										<img src="./icon/eye.svg" className={`w-full ${isShowPassword ? "hidden" : "block"}`} />
-										<img src="./icon/eye_splash.svg" className={`w-full ${isShowPassword ? "block" : "hidden"}`} />
+										<EyeIcon className={`w-full ${isShowPassword ? "hidden" : "block"}`} />
+										<EyeSplashIcon className={`w-full ${!isShowPassword ? "hidden" : "block"}`} />
 									</div>
 								</Field>
 
@@ -263,8 +264,8 @@ export default function ForgotPassword() {
 									allowTab={currentStep === 2}
 								>
 									<div onClick={() => setIsShowRePassword(!isShowRePassword)}>
-										<img src="./icon/eye.svg" className={`w-full ${isShowRePassword ? "hidden" : "block"}`} />
-										<img src="./icon/eye_splash.svg" className={`w-full ${isShowRePassword ? "block" : "hidden"}`} />
+										<EyeIcon className={`w-full ${isShowRePassword ? "hidden" : "block"}`} />
+										<EyeSplashIcon className={`w-full ${!isShowRePassword ? "hidden" : "block"}`} />
 									</div>
 								</Field>
 
@@ -280,7 +281,7 @@ export default function ForgotPassword() {
 									</div>
 
 									<Button type="secondary" onClick={gotoStep1}>
-										<img src="./icon/arrow_left.svg" alt="" /> Quay lại
+										<ArrowLeftIcon /> Quay lại
 									</Button>
 								</div>
 							</div>

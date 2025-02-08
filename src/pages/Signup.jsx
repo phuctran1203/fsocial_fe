@@ -4,6 +4,7 @@ import { Field, Select } from "../components/Field";
 import { useSignupStore } from "../store/signupStore";
 import { useEffect, useRef, useState } from "react";
 import EnterOTPCode from "../components/EnterOTPCode";
+import { ArrowLeftIcon, AtIcon, EyeIcon, EyeSplashIcon } from "../components/Icon";
 
 export default function Signup() {
 	const navigate = useNavigate();
@@ -86,7 +87,9 @@ export default function Signup() {
 	};
 
 	const [errMessageEmail, setErrMessageEmail] = useState("Email không đúng định dạng");
+
 	const autoFocusOTP = useRef(false);
+
 	const goToStep3 = () => {
 		// call request gửi code
 		const resp = true;
@@ -122,6 +125,7 @@ export default function Signup() {
 			updateField(rePassword, { isValid: true });
 		}
 	};
+
 	useEffect(() => {
 		handleshowHidePassword();
 	}, [form.password.value, form.rePassword.value]);
@@ -289,6 +293,7 @@ export default function Signup() {
 								</Button>
 							</div>
 						</div>
+
 						{/* step 2 */}
 						<div ref={setStepsRef(2)} className={`md:px-8 px-4 h-fit ${currentStep === 2 ? "" : "invisible"}`}>
 							<div className="mb-4">
@@ -325,12 +330,7 @@ export default function Signup() {
 									errorMessage={errMessageEmail}
 									allowTab={currentStep === 2}
 								>
-									<svg className="w-full" viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg">
-										<path
-											d="M14 27C17.4729 27 20.7372 25.648 23.1929 23.1923L21.3541 21.3541C19.3898 23.3184 16.7781 24.4 14 24.4C8.2657 24.4 3.6 19.7343 3.6 14C3.6 8.2657 8.2657 3.6 14 3.6C19.7343 3.6 24.4 8.2657 24.4 14C24.4 15.4339 23.2339 16.6 21.8 16.6C20.3661 16.6 19.2 15.4339 19.2 14V8.8H16.6V9.50135C15.8343 9.05805 14.9483 8.8 14 8.8C11.1283 8.8 8.8 11.1283 8.8 14C8.8 16.8717 11.1283 19.2 14 19.2C15.5561 19.2 16.9484 18.5129 17.9019 17.43C18.8555 18.5123 20.2471 19.2 21.8 19.2C24.6671 19.2 27 16.8671 27 14C27 6.8318 21.1682 1 14 1C6.8318 1 1 6.8318 1 14C1 21.1682 6.8318 27 14 27ZM14 16.6C12.5661 16.6 11.4 15.4339 11.4 14C11.4 12.5661 12.5661 11.4 14 11.4C15.4339 11.4 16.6 12.5661 16.6 14C16.6 15.4339 15.4339 16.6 14 16.6Z"
-											fill="#2E2E2E"
-										/>
-									</svg>
+									<AtIcon />
 								</Field>
 								<Field
 									type={isShowPassword ? "text" : "password"}
@@ -344,8 +344,8 @@ export default function Signup() {
 									allowTab={currentStep === 2}
 								>
 									<div onClick={() => setIsShowPassword(!isShowPassword)}>
-										<img src="./icon/eye.svg" className={`w-full ${isShowPassword ? "hidden" : "block"}`} />
-										<img src="./icon/eye_splash.svg" className={`w-full ${isShowPassword ? "block" : "hidden"}`} />
+										<EyeIcon className={`w-full ${isShowPassword ? "hidden" : "block"}`} />
+										<EyeSplashIcon className={`w-full ${!isShowPassword ? "hidden" : "block"}`} />
 									</div>
 								</Field>
 
@@ -361,8 +361,8 @@ export default function Signup() {
 									allowTab={currentStep === 2}
 								>
 									<div onClick={() => setIsShowRePassword(!isShowRePassword)}>
-										<img src="./icon/eye.svg" className={`w-full ${isShowRePassword ? "hidden" : "block"}`} />
-										<img src="./icon/eye_splash.svg" className={`w-full ${isShowRePassword ? "block" : "hidden"}`} />
+										<EyeIcon className={`w-full ${isShowRePassword ? "hidden" : "block"}`} />
+										<EyeSplashIcon className={`w-full ${!isShowRePassword ? "hidden" : "block"}`} />
 									</div>
 								</Field>
 								<div className="space-y-4">
@@ -375,7 +375,7 @@ export default function Signup() {
 										Tiếp theo
 									</Button>
 									<Button type="secondary" className="gap-2" onClick={gotoStep1} allowTab={currentStep === 2}>
-										<img src="./icon/arrow_left.svg" alt="" /> Quay lại
+										<ArrowLeftIcon /> Quay lại
 									</Button>
 								</div>
 							</div>
@@ -407,7 +407,7 @@ export default function Signup() {
 									</Button>
 								</div>
 								<Button type="secondary" className="gap-2" allowTab={currentStep === 3} onClick={goToStep2}>
-									<img src="./icon/arrow_left.svg" alt="" /> Quay lại
+									<ArrowLeftIcon /> Quay lại
 								</Button>
 							</div>
 						</div>
