@@ -6,6 +6,7 @@
 
 //global style
 body {
+	font-size: $fs-base;
 	font-family: var(--ff);
 	background-color: var(--lower-backround-clr);
 	color: var(--text-black-clr);
@@ -81,13 +82,18 @@ span,
 a,
 button,
 input,
-select {
+select,
+textarea {
 	font-size: $fs-base;
 	font-weight: 400;
 }
 
 label {
 	font-size: $fs-sm;
+}
+
+.textarea-comment {
+	height: calc((var(--i) + 0.6) * $fs-base);
 }
 
 //class custom

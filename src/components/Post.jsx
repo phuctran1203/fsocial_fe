@@ -1,18 +1,32 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { Glyph } from "./Icon";
+import { popupCommentStore } from "../store/popupStore";
+import { postsStore } from "../store/postsStore";
+import { dateTimeToNotiTime } from "../utils/convertDateTime";
 
-export default function Post({ post, openModal }) {
-	//init state từ BE
-	const [isLiked, setIsLiked] = useState(false);
+export default function Post({ post, className = "" }) {
+	const { isVisible, setIsVisible, setId } = popupCommentStore();
+
+	const likes = post.likes;
+
+	const liked = post.liked;
+
+	const updatePost = postsStore((state) => state.updatePost);
+
+	const showCommentPopup = () => {
+		if (isVisible) return;
+		setIsVisible(true);
+		setId(post.id);
+	};
 
 	const handleLike = () => {
 		//call API
-		setIsLiked((prev) => !prev);
+		updatePost(post.id, { liked: !liked, likes: liked ? likes - 1 : likes + 1 });
 	};
 
 	return (
-		<div className="rounded ct-shadow-y md:py-5 py-3 space-y-3">
+		<div className={`md:py-4 py-3 space-y-3 ${className}`}>
 			<div className="flex items-center justify-between px-4">
 				<div className="flex space-x-2">
 					<Link to="">
@@ -20,16 +34,16 @@ export default function Post({ post, openModal }) {
 					</Link>
 					<div className="flex flex-col justify-center">
 						<Link to="" className="font-semibold">
-							{post.user}
+							{post.displayName}
 						</Link>
-						<span className="text-[--gray-clr] fs-xsm">{post.time}</span>
+						<span className="text-[--gray-clr] fs-xsm">{dateTimeToNotiTime(post.time).textTime}</span>
 					</div>
 				</div>
 				<Glyph />
 			</div>
 
 			<div className="space-y-2">
-				<p className="px-4">{post.content}</p>
+				<div className="px-4" dangerouslySetInnerHTML={{ __html: post.content }}></div>
 
 				{/* assets post */}
 				<div className="max-h-[200vh] overflow-hidden">
@@ -44,7 +58,7 @@ export default function Post({ post, openModal }) {
 						{/* stroke */}
 						<path
 							className={
-								isLiked
+								liked
 									? "fill-[--primary-clr] stroke-[--primary-clr]"
 									: "fill-[--text-black-clr] stroke-[--text-black-clr]"
 							}
@@ -53,16 +67,16 @@ export default function Post({ post, openModal }) {
 						/>
 						{/* inside */}
 						<path
-							className={isLiked ? "fill-[--primary-clr] stroke-[--primary-clr]" : ""}
+							className={liked ? "fill-[--primary-clr] stroke-[--primary-clr]" : ""}
 							d="M12.4877 4.97138C12.2698 4.97138 12.0613 4.88268 11.9102 4.7257C9.71103 2.44083 7.39683 2.23234 5.67453 3.01961C3.9017 3.82997 2.60293 5.75745 2.60293 8.05592C2.60293 10.4041 3.56385 12.214 4.94138 13.7652C6.34638 15.3473 8.11742 16.5942 9.73709 17.871C10.2992 18.3141 10.8006 18.703 11.284 18.9854C11.7675 19.2681 12.1568 19.3971 12.4877 19.3971C12.8185 19.3971 13.2078 19.2681 13.6914 18.9854C14.1747 18.703 14.6761 18.3141 15.2383 17.871C16.8579 16.5942 18.6289 15.3473 20.0339 13.7652C21.4115 12.214 22.3724 10.4041 22.3724 8.05592C22.3724 5.75745 21.0736 3.82997 19.3008 3.01961C17.5785 2.23234 15.2643 2.44083 13.0651 4.7257C12.914 4.88268 12.7056 4.97138 12.4877 4.97138Z"
 							strokeWidth={1}
 						/>
 					</svg>
-					<span className={isLiked ? "text-[--primary-clr]" : ""}>{post.likes > 0 ? post.likes : "Tim"}</span>
+					<span className={liked ? "text-[--primary-clr]" : ""}>{likes > 0 ? likes : "Tim"}</span>
 				</div>
 
 				{/* comment button */}
-				<div className="flex items-center sm:gap-2 gap-1 cursor-pointer" onClick={() => openModal(post)}>
+				<div className="flex items-center sm:gap-2 gap-1 cursor-pointer" onClick={showCommentPopup}>
 					<svg className="sm:h-6 h-5" width="22" height="22" viewBox="0 0 22 22" fill="none">
 						<path
 							className="fill-[--text-black-clr] stroke-[--text-black-clr]"
@@ -70,7 +84,7 @@ export default function Post({ post, openModal }) {
 							strokeWidth="0.6"
 						/>
 					</svg>
-					<span>{post.comments.length > 0 ? post.comments.length : "Bình luận"}</span>
+					<span>{post.comments > 0 ? post.comments : "Bình luận"}</span>
 				</div>
 
 				{/* re post button */}
@@ -83,7 +97,9 @@ export default function Post({ post, openModal }) {
 						/>
 					</svg>
 
-					<span className="sm:inline hidden">Đăng lại</span>
+					<span className={post.repost === 0 ? "sm:inline hidden" : "inline"}>
+						{post.repost > 0 ? post.repost : "Đăng lại"}
+					</span>
 				</div>
 
 				{/* share */}

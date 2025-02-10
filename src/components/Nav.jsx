@@ -3,28 +3,34 @@ import { NavLink, useLocation } from "react-router-dom";
 import styles from "../scss/navbar.module.scss";
 import { Bell, FriendsIcon, HomeIcon, LogoNoBG, SearchIcon } from "./Icon";
 import { popupNotificationtStore } from "../store/popupStore";
+import { ownerAccountStore } from "../store/ownerAccountStore";
 
 const navStyle = `w-full flex items-center gap-4 px-2 py-3 rounded-md 
 				  hover:bg-[--gray-extraaa-light-clr] active:bg-[--gray-extra-light-clr]
 				  sm:justify-start justify-center`;
 
 export default function Nav() {
+	const user = ownerAccountStore((state) => state.user);
+
 	const location = useLocation();
 
 	const isInHome = ["/", "/home"].includes(location.pathname);
 
 	const { isVisible, setIsVisible } = popupNotificationtStore();
 
-	const toggleShowNoti = () => {
+	const toggleShowNotification = () => {
 		setIsVisible(!isVisible);
 	};
+
+	const closeNotification = () => setIsVisible(false);
 
 	return (
 		<nav
 			className={`
 			z-10 bg-[--background-clr] border-[--gray-extra-light-clr]
-			md:min-w-[260px] md:max-w-[260px]
-			sm:min-w-[210px] sm:max-w-[210px] sm:static sm:flex sm:flex-col sm:justify-between sm:h-screen sm:py-6 sm:border-r-[1px]
+			lg:border-r-[1px]
+			md:min-w-[260px] md:max-w-[260px] 
+			sm:min-w-[210px] sm:max-w-[210px] sm:static sm:flex sm:flex-col sm:justify-between sm:h-screen sm:py-6 
 			absolute bottom-0 w-full border-t-[1px]
 			ct-transition
 			${styles.transitionNav}`}
@@ -36,21 +42,21 @@ export default function Nav() {
 				</NavLink>
 
 				<div className="sm:space-y-3 sm:mx-4 sm:block flex justify-evenly">
-					<NavLink to="/home" className={navStyle}>
+					<NavLink to="/home" className={navStyle} onClick={closeNotification}>
 						<HomeIcon compareVar={isInHome} />
 						<span className={`sm:inline hidden ${isInHome ? "font-semibold" : ""}`}> Trang chủ </span>
 					</NavLink>
 
-					<NavLink to="/friends" className={navStyle}>
+					<NavLink to="/follow" className={navStyle} onClick={closeNotification}>
 						{({ isActive }) => (
 							<>
 								<FriendsIcon compareVar={isActive} />
-								<span className={`sm:inline hidden ${isActive ? "font-semibold" : ""}`}> Vòng bạn bè </span>
+								<span className={`sm:inline hidden ${isActive ? "font-semibold" : ""}`}> Theo dõi </span>
 							</>
 						)}
 					</NavLink>
 
-					<NavLink to="/search" className={navStyle}>
+					<NavLink to="/search" className={navStyle} onClick={closeNotification}>
 						{({ isActive }) => (
 							<>
 								<SearchIcon compareVar={isActive} />
@@ -59,7 +65,7 @@ export default function Nav() {
 						)}
 					</NavLink>
 
-					<NavLink to="/message" className={navStyle}>
+					<NavLink to="/message" className={navStyle} onClick={closeNotification}>
 						{({ isActive }) => (
 							<>
 								<svg className="size-[26px]" viewBox="0 0 26 26" fill="none">
@@ -80,7 +86,7 @@ export default function Nav() {
 						)}
 					</NavLink>
 
-					<button className={`${navStyle} lg:hidden sm:flex hidden`} onClick={toggleShowNoti}>
+					<button className={`${navStyle} lg:hidden sm:flex hidden`} onClick={toggleShowNotification}>
 						<div className="relative">
 							<Bell />
 							<div className="absolute size-2.5 -top-[1px] right-[1px]  bg-[--primary-clr] rounded-full " />
@@ -88,7 +94,7 @@ export default function Nav() {
 						<span className={`sm:inline hidden`}>Thông báo</span>
 					</button>
 
-					<button className={navStyle}>
+					<button className={navStyle} onClick={closeNotification}>
 						<svg className="size-[26px]" viewBox="0 0 26 26" fill="none">
 							<path
 								className="fill-[--text-black-clr]"
@@ -98,13 +104,13 @@ export default function Nav() {
 						<span className={`sm:inline hidden`}>Tạo bài viết</span>
 					</button>
 
-					<NavLink to="/profile?id=12345" className={navStyle}>
+					<NavLink to={`/profile?id=${user.id}`} className={navStyle} onClick={closeNotification}>
 						{({ isActive }) => (
 							<>
 								<div className="size-6 rounded-full overflow-hidden">
 									<img
 										className="size-full object-cover object-center"
-										src="./temp/user_1.png"
+										src={`./temp/${user.avatar}`}
 										alt="navbar avatar account"
 									/>
 								</div>
@@ -116,7 +122,7 @@ export default function Nav() {
 			</div>
 
 			<div className="space-y-3 mx-4 sm:block hidden">
-				<NavLink to="/setting" className={navStyle}>
+				<NavLink to="/setting" className={navStyle} onClick={closeNotification}>
 					{({ isActive }) => (
 						<>
 							<svg className="size-[26px]" viewBox="0 0 26 26" fill="none">
@@ -149,7 +155,7 @@ export default function Nav() {
 					)}
 				</NavLink>
 
-				<button className={navStyle}>
+				<button className={navStyle} onClick={closeNotification}>
 					<svg className="size-[26px]" viewBox="0 0 26 26" fill="none">
 						<path
 							className="fill-[--text-black-clr]"

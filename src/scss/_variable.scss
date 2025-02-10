@@ -64,10 +64,11 @@ $fs-5xl: clamp-font-size(6);
 	--text-white-clr: #ffffff;
 
 	--shadow-y: 0px -1px 2px 0px hsla(0, 0%, 0%, 8%), 0px 1px 2px 0px hsla(0, 0%, 0%, 8%);
-
 	--transition: all 0.12s ease-out;
 
-	--ff: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+	--fs-base: $fs-base;
+
+	// --ff: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
 	--ff: "Roboto", serif;
 }
 body.dark {

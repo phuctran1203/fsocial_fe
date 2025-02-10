@@ -100,7 +100,7 @@ export default function Login() {
 						</div>
 					</div>
 					<div className="mb-4">
-						<Button onClick={() => (isDisable ? handleSubmitLogin() : "")} disabled={isDisable}>
+						<Button className="py-3" onClick={() => (isDisable ? handleSubmitLogin() : "")} disabled={isDisable}>
 							Đăng nhập
 						</Button>
 					</div>
@@ -110,38 +110,10 @@ export default function Login() {
 						<div className="border-t border-gray-300 flex-grow"></div>
 					</div>
 					<div className="mb-4">
-						<button
-							className="h-[48px] w-full bg-[#F2F2F2] hover:bg-[var(--gray-clr)] 
-	   									transition-colors text-blackblack rounded-sm flex items-center justify-center gap-2"
-						>
-							<svg width="27" height="28" viewBox="0 0 27 28" fill="none" xmlns="http://www.w3.org/2000/svg">
-								<path
-									fillRule="evenodd"
-									clipRule="evenodd"
-									d="M5.60795 13.6889C5.60795 12.7997 5.75563 11.9473 6.0192 11.1477L1.40573 7.62469C0.506585 9.45029 0 11.5074 0 13.6889C0 15.8685 0.505962 17.9243 1.40386 19.7487L6.01484 16.2188C5.75376 15.423 5.60795 14.5737 5.60795 13.6889Z"
-									fill="#FBBC05"
-								/>
-								<path
-									fillRule="evenodd"
-									clipRule="evenodd"
-									d="M13.7084 5.6C15.64 5.6 17.3847 6.28444 18.7555 7.40444L22.7434 3.42222C20.3133 1.30667 17.1978 0 13.7084 0C8.29108 0 3.63523 3.09804 1.40576 7.62471L6.01924 11.1477C7.08226 7.92089 10.1124 5.6 13.7084 5.6Z"
-									fill="#EB4335"
-								/>
-								<path
-									fillRule="evenodd"
-									clipRule="evenodd"
-									d="M13.7084 21.7778C10.1124 21.7778 7.08226 19.4569 6.01924 16.23L1.40576 19.7524C3.63524 24.2797 8.29108 27.3778 13.7084 27.3778C17.052 27.3778 20.2441 26.1906 22.64 23.9661L18.2608 20.5806C17.0252 21.359 15.4693 21.7778 13.7084 21.7778Z"
-									fill="#34A853"
-								/>
-								<path
-									fillRule="evenodd"
-									clipRule="evenodd"
-									d="M26.7937 13.6889C26.7937 12.88 26.6691 12.0089 26.4822 11.2H13.7085V16.4889H21.0611C20.6935 18.2921 19.6928 19.6784 18.2609 20.5806L22.6401 23.9661C25.1568 21.6303 26.7937 18.1509 26.7937 13.6889Z"
-									fill="#4285F4"
-								/>
-							</svg>
+						<Button type="secondary" className="mb-5 gap-3 py-3">
+							<img className="size-6" src="./decor/google_icon.svg" alt="" />
 							Đăng nhập với Google
-						</button>
+						</Button>
 					</div>
 					<div className="flex justify-center items-center">
 						<span className="text-[--gray-clr]">

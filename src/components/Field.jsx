@@ -105,7 +105,9 @@ export function Select({
 	const { form, updateField } = store();
 	const handleChange = (e) => {
 		const value = e.target.value;
-		updateField(id, value, true, true);
+		console.log(value);
+
+		updateField(id, { value });
 	};
 	return (
 		<div className={`relative ${className} group`}>

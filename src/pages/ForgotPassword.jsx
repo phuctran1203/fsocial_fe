@@ -224,7 +224,9 @@ export default function ForgotPassword() {
 								<EnterOTPCode OTPValue={OTPValue} setOTPValue={setOTPValue} allowTab={currentStep === 1} />
 								<div>
 									<p className="mb-1 text-red-600">{OTPErrMessage}</p>
-									<Button onClick={handleSubmitOTP}>Xác nhận</Button>
+									<Button className="px-8 py-3" onClick={handleSubmitOTP}>
+										Xác nhận
+									</Button>
 								</div>
 							</div>
 						</div>
@@ -275,12 +277,12 @@ export default function ForgotPassword() {
 											*Sau khi đổi mật khẩu, bạn sẽ được chuyển hướng để đăng nhập lại tài khoản bằng mật khẩu mới này
 										</p>
 										<p className="mb-1 text-red-600">{newPasswordErrMessage}</p>
-										<Button onClick={gotoStep3} disabled={!reValidateNewPassword()}>
+										<Button className="px-8 py-3" onClick={gotoStep3} disabled={!reValidateNewPassword()}>
 											Xác nhận
 										</Button>
 									</div>
 
-									<Button type="secondary" onClick={gotoStep1}>
+									<Button type="secondary" className="px-8 py-3" onClick={gotoStep1}>
 										<ArrowLeftIcon /> Quay lại
 									</Button>
 								</div>
@@ -294,7 +296,7 @@ export default function ForgotPassword() {
 								relative w-10/12 mx-auto border-b-[1px] border-[--gray-light-clr] overflow-visible text-[--gray-light-clr]
 								before:absolute before:left-1/2 before:-translate-x-1/2 before:-translate-y-1/2 before:content-['Hoặc'] before:size-fit before:bg-[--background-clr] before:px-2"
 						/>
-						<Button type="secondary" to="/login">
+						<Button type="secondary" className="px-8 py-3" to="/login">
 							Đăng nhập tài khoản khác
 						</Button>
 					</div>

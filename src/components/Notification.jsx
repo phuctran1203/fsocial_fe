@@ -1,23 +1,39 @@
-import React from "react";
+import React, { useState } from "react";
 import { Link } from "react-router-dom";
-import { CloseCollapseIcon, CommentNoti, Glyph, HeartNoti } from "./Icon";
-import { dateTimeToText } from "../utils/convertDateTime";
-import { popupNotificationtStore } from "../store/popupStore";
-
-const data = [
-	{ id: 1, type: "commentPost", image: "user_2.png", name: "Phương Nam", time: "2025-02-07 16:32:19", read: false },
-	{ id: 2, type: "commentPost", image: "user_2.png", name: "Phương Nam", time: "2025-02-07 15:22:19", read: false },
-	{ id: 3, type: "likePost", image: "user_2.png", name: "Phương Nam", time: "2025-02-07 10:22:19", read: true },
-	{ id: 4, type: "likePost", image: "user_2.png", name: "Phương Nam", time: "2025-02-06 10:22:19", read: true },
-	{ id: 5, type: "likePost", image: "user_2.png", name: "Phương Nam", time: "2025-02-01 10:22:19", read: true },
-	{ id: 6, type: "commentPost", image: "user_2.png", name: "Phương Nam", time: "2025-01-07 10:22:19", read: false },
-	{ id: 7, type: "likePost", image: "user_2.png", name: "Phương Nam", time: "2024-02-07 10:22:19", read: true },
-	{ id: 8, type: "commentPost", image: "user_2.png", name: "Phương Nam", time: "2024-02-07 10:22:19", read: true },
-	{ id: 9, type: "likePost", image: "user_2.png", name: "Phương Nam", time: "2024-02-07 10:22:19", read: true },
-];
+import { Check, CloseCollapseIcon, CommentNoti, Glyph, HeartNoti, TrashCanIcon, XMarkIcon } from "./Icon";
+import { dateTimeToNotiTime } from "../utils/convertDateTime";
+import { popupNotificationtStore, popupExpandNoti3DotStore } from "../store/popupStore";
+import Button from "./Button";
 
 const Noti = (props) => {
-	const { id, type, image, name, time, read, glyphClick } = props;
+	const { id, type, image, name, read, textTime, index } = props;
+
+	const { idNotiShowing, setIdNotiShowing } = popupExpandNoti3DotStore();
+
+	const setVisible = popupNotificationtStore((state) => state.setIsVisible);
+
+	const open = () => {
+		setIdNotiShowing(index);
+	};
+
+	const close = () => {
+		setIdNotiShowing(null);
+	};
+
+	const deleteNoti = () => {
+		//call delete
+		close();
+	};
+
+	const markAsRead = () => {
+		//call mark this noti as read
+		close();
+	};
+
+	const notiClicked = () => {
+		close();
+		setVisible(false);
+	};
 
 	const notiMap = {
 		likePost: {
@@ -36,13 +52,19 @@ const Noti = (props) => {
 
 	return (
 		<div
-			key={id}
-			className="px-4 py-1 rounded-md flex justify-between items-start gap-3
-						hover:bg-[--gray-extraaa-light-clr] active:bg-[--gray-extra-light-clr] ct-transition"
+			key={index}
+			className={`
+			relative overflow-hidden ps-4 py-1 rounded-md flex justify-between
+			${
+				idNotiShowing != null && idNotiShowing === index
+					? ""
+					: "hover:bg-[--gray-extraaa-light-clr] active:bg-[--gray-extra-light-clr]"
+			} 
+			ct-transition`}
 		>
 			{/* direct đến thông báo */}
-			<Link to="" className="flex items-center gap-2">
-				<div className={`relative ${read ? "opacity-80" : ""}`}>
+			<Link to="" className="flex items-center gap-2" onClick={notiClicked}>
+				<div className={`relative ${read ? "opacity-60" : ""}`}>
 					<div className={`size-12 rounded-full overflow-hidden`}>
 						<img className="size-full object-center object-cover" src={`./temp/${image}`} alt="" />
 					</div>
@@ -50,28 +72,67 @@ const Noti = (props) => {
 				</div>
 
 				<div>
-					<p className={`fs-sm ${read ? "text-[--gray-clr]" : ""}`}>
+					<p className={`fs-sm ${read ? "text-[--gray-light-clr]" : ""}`}>
 						<span className="fs-sm font-semibold">{name} </span>
 						{notiMap[type].content}
 					</p>
 					<div className="flex items-center gap-2">
-						<span className="fs-xsm text-[--gray-clr]">{dateTimeToText(time).text}</span>
+						<span className={`fs-xsm ${read ? "text-[--gray-light-clr]" : ""} `}>{textTime}</span>
 
 						{!read && <span className="size-2 bg-[--primary-clr] rounded-full" />}
 					</div>
 				</div>
 			</Link>
-			<div onClick={() => glyphClick(id)}>
-				<Glyph />
+			<button className="px-4" onClick={open}>
+				<Glyph className="rotate-90" />
+			</button>
+			<div
+				className={`flex absolute top-0 h-full left-full ${
+					idNotiShowing != null && idNotiShowing === index ? "-translate-x-full" : ""
+				} ct-transition`}
+			>
+				<Button type="secondary" className="rounded-none px-3 border-r-[1px]" onClick={deleteNoti}>
+					<TrashCanIcon />
+				</Button>
+				<Button type="secondary" className=" rounded-none px-3 border-r-[1px]" onClick={markAsRead}>
+					<Check />
+				</Button>
+				<Button type="secondary" className=" rounded-none px-3" onClick={close}>
+					<XMarkIcon />
+				</Button>
 			</div>
 		</div>
 	);
 };
 
+const data = [
+	{ id: 1, type: "commentPost", image: "user_2.png", name: "Phương Nam", time: "2025-02-09 16:32:19", read: false },
+	{ id: 2, type: "commentPost", image: "user_2.png", name: "Phương Nam", time: "2025-02-08 16:32:19", read: false },
+	{ id: 3, type: "commentPost", image: "user_2.png", name: "Phương Nam", time: "2025-02-07 15:22:19", read: false },
+	{ id: 4, type: "likePost", image: "user_2.png", name: "Phương Nam", time: "2025-02-06 10:22:19", read: true },
+	{ id: 5, type: "likePost", image: "user_2.png", name: "Phương Nam", time: "2025-02-02 10:22:19", read: true },
+	{ id: 5, type: "likePost", image: "user_2.png", name: "Phương Nam", time: "2025-02-02 10:22:19", read: true },
+	{ id: 6, type: "commentPost", image: "user_2.png", name: "Phương Nam", time: "2025-01-10 10:22:19", read: false },
+	{ id: 7, type: "likePost", image: "user_2.png", name: "Phương Nam", time: "2024-09-07 10:22:19", read: true },
+	{ id: 8, type: "commentPost", image: "user_2.png", name: "Phương Nam", time: "2024-02-07 10:22:19", read: true },
+	{ id: 9, type: "likePost", image: "user_2.png", name: "Phương Nam", time: "2024-02-07 10:22:19", read: true },
+];
+
 export default function Notification() {
-	const today = data.filter((noti) => dateTimeToText(noti.time).labelType === 0);
-	const yesterday = data.filter((noti) => dateTimeToText(noti.time).labelType === 1);
-	const old = data.filter((noti) => dateTimeToText(noti.time).labelType === 2);
+	const processData = data.map((noti) => {
+		const { textTime, labelType } = dateTimeToNotiTime(noti.time);
+		return {
+			...noti,
+			textTime,
+			labelType,
+		};
+	});
+
+	const today = processData.filter((noti) => noti.labelType === 0);
+
+	const last7days = processData.filter((noti) => noti.labelType === 1);
+
+	const old = processData.filter((noti) => noti.labelType === 2);
 
 	const { isVisible, setIsVisible } = popupNotificationtStore();
 
@@ -81,23 +142,15 @@ export default function Notification() {
 		}
 	};
 
-	const hanldeClickGlyph = (id) => {
-		if (id === "glyph-all") {
-			console.log("filter all notification");
-		} else {
-			console.log("show modal action that noti which is clicked. id: ", id);
-		}
-	};
-
 	return (
 		<div
 			className={` 
 			close-target-zone
-			z-0 bg-black bg-opacity-25 h-screen overflow-hidden
-			lg:block lg:relative lg:left-auto lg:border-l-[1px] lg:w-fit lg:visible 
+			z-0 bg-black h-screen overflow-hidden
+			lg:block lg:relative lg:left-auto lg:min-w-fit lg:max-w-fit lg:visible 
 			md:left-[260px] md:w-[calc(100%-260px)]
-			sm:left-[210px] sm:w-[calc(100%-210px)]
-			left-0 absolute w-full
+			sm:left-[210px] sm:w-[calc(100%-210px)] sm:bg-opacity-25 sm:border-l-[1px]
+			left-0 absolute w-full bg-opacity-0
 			${isVisible ? "" : "invisible bg-opacity-0"}
 			ct-transition
 			`}
@@ -146,27 +199,24 @@ export default function Notification() {
 							</div>
 							<h5>Thông báo</h5>
 						</div>
-						<div onClick={() => hanldeClickGlyph("glyph-all")}>
-							<Glyph />
-						</div>
 					</div>
 
 					{today.length > 0 && (
 						<div className="space-y-1">
-							<h6 className="px-4">Gần đây</h6>
-							{today.map((noti) => Noti({ ...noti, glyphClick: hanldeClickGlyph }))}
+							<h6 className="px-4">Hôm nay</h6>
+							{today.map((noti, index) => Noti({ ...noti, index: index }))}
 						</div>
 					)}
-					{yesterday.length > 0 && (
+					{last7days.length > 0 && (
 						<div className="space-y-1">
-							<h6 className="px-4">Hôm qua</h6>
-							{yesterday.map((noti) => Noti({ ...noti, glyphClick: hanldeClickGlyph }))}
+							<h6 className="px-4">7 ngày trước</h6>
+							{last7days.map((noti, index) => Noti({ ...noti, index: index + today.length }))}
 						</div>
 					)}
 					{old.length > 0 && (
 						<div className="space-y-1">
 							<h6 className="px-4">Trước đó</h6>
-							{old.map((noti) => Noti({ ...noti, glyphClick: hanldeClickGlyph }))}
+							{old.map((noti, index) => Noti({ ...noti, index: index + today.length + last7days.length }))}
 						</div>
 					)}
 				</div>
