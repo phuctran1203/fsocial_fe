@@ -9,13 +9,12 @@ import Login from "./pages/Login";
 import Signup from "./pages/Signup";
 import ForgotPassword from "./pages/ForgotPassword";
 import Friends from "./pages/Friends";
-import Test from "./pages/Test";
+import Search from "./pages/Search";
 
 function App() {
 	return (
 		<BrowserRouter basename={import.meta.env.BASE_URL}>
 			<Routes>
-				<Route path="/test" element={<Test />} />
 				<Route path="/login" element={<Login />} />
 				<Route path="/signup" element={<Signup />} />
 				<Route path="/forgot-password" element={<ForgotPassword />} />
@@ -24,6 +23,7 @@ function App() {
 					<Route index element={<Home />} />
 					<Route path="/home" element={<Home />} />
 					<Route path="/friends" element={<Friends />} />
+					<Route path="/search" element={<Search />} />
 					<Route path="*" element={<NotFound />} />
 				</Route>
 				<Route pat="/admin"></Route>
