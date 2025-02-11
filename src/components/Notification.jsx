@@ -65,7 +65,7 @@ const Noti = (props) => {
 			{/* direct đến thông báo */}
 			<Link to="" className="flex items-center gap-2" onClick={notiClicked}>
 				<div className={`relative ${read ? "opacity-60" : ""}`}>
-					<div className={`size-12 rounded-full overflow-hidden`}>
+					<div className={`sm:size-12 size-11 rounded-full overflow-hidden`}>
 						<img className="size-full object-center object-cover" src={`./temp/${image}`} alt="" />
 					</div>
 					<div className="absolute size-fit -top-1 -left-0.5">{notiMap[type].icon}</div>
@@ -151,7 +151,7 @@ export default function Notification() {
 			md:left-[260px] md:w-[calc(100%-260px)]
 			sm:left-[210px] sm:w-[calc(100%-210px)] sm:bg-opacity-25 sm:border-l-[1px]
 			left-0 absolute w-full bg-opacity-0
-			${isVisible ? "" : "invisible bg-opacity-0"}
+			${isVisible ? "" : "invisible sm:bg-opacity-0"}
 			ct-transition
 			`}
 			onClick={closeNotification}

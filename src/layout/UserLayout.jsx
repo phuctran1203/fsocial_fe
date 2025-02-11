@@ -14,7 +14,7 @@ export default function UserLayout() {
 				<Nav />
 				<Outlet />
 				<Notification />
-				{/* <CreatePost /> */}
+				<CreatePost />
 			</main>
 		</>
 	);

@@ -5,6 +5,7 @@ import { popupCommentStore } from "../store/popupStore";
 import { postsApi } from "../api/postsApi";
 import { postsStore } from "../store/postsStore";
 import { ownerAccountStore } from "../store/ownerAccountStore";
+import { TextBox } from "./Field";
 
 export default function CommentModal() {
 	const user = ownerAccountStore((state) => state.user);
@@ -15,7 +16,7 @@ export default function CommentModal() {
 
 	const { posts } = postsStore();
 
-	const post = posts.find((p) => p.id == id);
+	const post = posts?.find((p) => p.id == id);
 
 	const [comments, setComments] = useState([]);
 
@@ -42,7 +43,7 @@ export default function CommentModal() {
 			<div
 				className={`
 				flex flex-col bg-[--background-clr] rounded w-[600px] overflow-y-auto h-full scrollable-div
-				${isVisible ? "translate-y-0" : "translate-y-full"}	
+				${isVisible ? "translate-y-0" : "translate-y-[100vh]"}	
 				ct-transition`}
 			>
 				<div className="bg-[--background-clr] border-b sticky top-0 py-2">
@@ -102,13 +103,9 @@ export default function CommentModal() {
 				{/* Ô nhập bình luận */}
 				<div className="sticky bottom-0 bg-[--background-clr] flex items-end gap-4 px-4 py-2 border-t">
 					<img src={`./temp/${user.avatar}`} alt="avatar" className="size-10 rounded-full" />
-					<div
-						ref={divRef}
-						className="relative flex-grow py-2 outline-none max-h-[40vh] overflow-auto
-						before:absolute empty:before:content-[attr(data-placeholder)] before:text-[--gray-clr] before:pointer-events-none"
-						contentEditable="true"
-						data-placeholder="Điền bình luận"
-					></div>
+
+					<TextBox texboxRef={divRef} className="w-full max-h-[40vh]" placeholder="Viết bình luận" />
+
 					<button className="py-2" onClick={() => {}}>
 						<SendIcon />
 					</button>

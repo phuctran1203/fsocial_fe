@@ -30,7 +30,7 @@ export default function Post({ post, className = "" }) {
 			<div className="flex items-center justify-between px-4">
 				<div className="flex space-x-2">
 					<Link to="">
-						<img src={`./temp/${post.avatar}`} alt="avatar" className="md:size-12 size-9 rounded-full" />
+						<img src={`./temp/${post.avatar}`} alt="avatar" className="md:size-11 size-9 rounded-full" />
 					</Link>
 					<div className="flex flex-col justify-center">
 						<Link to="" className="font-semibold">

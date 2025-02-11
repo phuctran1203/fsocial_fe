@@ -10,6 +10,16 @@ const API = axios.create({
 API.interceptors.request.use(
 	(config) => {
 		const token = localStorage.getItem("token");
+		const path = new URL(config.url, API.defaults.baseURL).pathname;
+		// Nếu request đến /login hoặc /register, không cần token
+		if (["/login", "/signup"].includes(path)) {
+			return config;
+		}
+		// Có token nhưng cố mở login hoặc resigter
+		if (token && ["/login", "/signup"].includes(path)) {
+			window.location.href = "/home";
+			return Promise.reject(new Error("Redirecting to home..."));
+		}
 		// if (!token) {
 		// 	window.location.href = "/login"; // Redirect về trang đăng nhập
 		// 	return Promise.reject(new Error("Redirecting to login..."));

@@ -1,8 +1,8 @@
 import React from "react";
 import { NavLink, useLocation } from "react-router-dom";
-import styles from "../scss/navbar.module.scss";
+import styles from "./Nav.module.scss";
 import { Bell, FriendsIcon, HomeIcon, LogoNoBG, SearchIcon } from "./Icon";
-import { popupNotificationtStore } from "../store/popupStore";
+import { popupCreatePostStore, popupNotificationtStore } from "../store/popupStore";
 import { ownerAccountStore } from "../store/ownerAccountStore";
 
 const navStyle = `w-full flex items-center gap-4 px-2 py-3 rounded-md 
@@ -18,11 +18,19 @@ export default function Nav() {
 
 	const { isVisible, setIsVisible } = popupNotificationtStore();
 
+	const isVisibleCreatePost = popupCreatePostStore((state) => state.isVisible);
+	const setIsVisibleCreatePost = popupCreatePostStore((state) => state.setIsVisible);
+
 	const toggleShowNotification = () => {
 		setIsVisible(!isVisible);
 	};
 
 	const closeNotification = () => setIsVisible(false);
+
+	const handlePopupCreatePost = () => {
+		isVisible ? closeNotification() : "";
+		setIsVisibleCreatePost(!isVisibleCreatePost);
+	};
 
 	return (
 		<nav
@@ -94,7 +102,7 @@ export default function Nav() {
 						<span className={`sm:inline hidden`}>Thông báo</span>
 					</button>
 
-					<button className={navStyle} onClick={closeNotification}>
+					<button className={navStyle} onClick={handlePopupCreatePost}>
 						<svg className="size-[26px]" viewBox="0 0 26 26" fill="none">
 							<path
 								className="fill-[--text-black-clr]"

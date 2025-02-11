@@ -29,7 +29,7 @@ export default function Home() {
 				<div
 					className="
 					space-y-1 w-full pb-12 mt-12 mx-auto
-					lg:max-w-[600px]
+					lg:max-w-[580px]
 					md:space-y-4 md:pb-0
 					sm:mt-0"
 				>
