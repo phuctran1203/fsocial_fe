@@ -91,7 +91,9 @@ export default function CreatePost() {
 		>
 			<div
 				className={`
-				pb-3 flex flex-col space-y-3 bg-[--background-clr] rounded overflow-hidden w-[500px] max-h-full scrollable-div
+				pb-3 flex flex-col space-y-3 bg-[--background-clr] rounded overflow-hidden w-[500px]
+				sm:h-fit sm:max-h-full
+				h-full
 				${isVisible ? "translate-y-0" : "translate-y-[100vh]"}	
 				ct-transition`}
 			>
