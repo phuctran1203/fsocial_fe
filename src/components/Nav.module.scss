@@ -1,0 +1,9 @@
+.transitionNav {
+	a,
+	svg,
+	path,
+	span,
+	button {
+		transition: var(--transition);
+	}
+}

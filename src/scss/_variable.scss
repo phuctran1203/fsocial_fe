@@ -1,4 +1,5 @@
 @use "sass:math";
+
 @import url("https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100..900;1,100..900&display=swap");
 
 @function round($number) {
@@ -53,15 +54,21 @@ $fs-5xl: clamp-font-size(6);
 	--secondary-clr: #f2f2f2;
 	--secondary-hover-clr: #e8e8e8;
 	--secondary-active-clr: #d9d9d9;
-	--lower-backround-clr: #f2f4f7;
-	--background-clr: #fcfcfc;
+	--lower-backround-clr: hsl(220, 16%, 96%);
+	--background-clr: hsl(0, 0%, 99%);
 	--gray-clr: #737373;
 	--gray-light-clr: #adadad;
-	--gray-extra-light-clr: #e6e6e6;
+	--gray-extra-light-clr: hsl(0, 0%, 90%);
+	--gray-extraaa-light-clr: hsl(0, 0%, 96%);
 	--text-black-clr: hsl(0, 0%, 25%);
 	--text-white-clr: #ffffff;
 
-	--ff: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+	--shadow-y: 0px -1px 2px 0px hsla(0, 0%, 0%, 8%), 0px 1px 2px 0px hsla(0, 0%, 0%, 8%);
+	--transition: all 0.12s ease-out;
+
+	--fs-base: $fs-base;
+
+	// --ff: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
 	--ff: "Roboto", serif;
 }
 body.dark {

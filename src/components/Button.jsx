@@ -1,7 +1,7 @@
 import { Link } from "react-router-dom";
 
 const baseStyle =
-	"block flex justify-center items-center w-full py-3 px-8 rounded outline-none hover:transition hover:duration-100 focus-visible:ring-2 focus-visible:ring-offset-2";
+	"flex justify-center items-center w-full rounded outline-none hover:transition hover:duration-100 focus-visible:ring-2 focus-visible:ring-offset-2";
 
 const primaryButton =
 	"bg-[--primary-clr] text-[--text-white-clr] hover:bg-[--primary-hover-clr] focus-visible:ring-[--primary-clr] active:bg-[--primary-active-clr]";
@@ -38,7 +38,7 @@ export default function Button({
 			transparent: transparentButton,
 			ghost: ghostButton,
 		};
-		return `${styleMap[type]} ${baseStyle} ${className} ${disabled ? disabledMask : ""}`;
+		return `${baseStyle} ${styleMap[type]} ${className} ${disabled ? disabledMask : ""}`;
 	};
 
 	if (to) {

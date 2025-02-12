@@ -3,12 +3,12 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import "./index.scss";
 
 import Home from "./pages/Home";
-import UserLayout from "./UserLayout";
+import UserLayout from "./layout/UserLayout";
 import NotFound from "./pages/NotFound";
 import Login from "./pages/Login";
 import Signup from "./pages/Signup";
 import ForgotPassword from "./pages/ForgotPassword";
-import Friends from "./pages/Friends";
+import Friends from "./pages/Follow";
 
 function App() {
 	return (
@@ -21,7 +21,7 @@ function App() {
 				<Route path="/" element={<UserLayout />}>
 					<Route index element={<Home />} />
 					<Route path="/home" element={<Home />} />
-					<Route path="/friends" element={<Friends />} />
+					<Route path="/follow" element={<Friends />} />
 					<Route path="*" element={<NotFound />} />
 				</Route>
 				<Route pat="/admin"></Route>

@@ -6,9 +6,40 @@
 
 //global style
 body {
+	font-size: $fs-base;
 	font-family: var(--ff);
 	background-color: var(--lower-backround-clr);
 	color: var(--text-black-clr);
+}
+
+/* Toàn bộ thanh scrollbar */
+
+/* Track (background của scrollbar) */
+::-webkit-scrollbar-track {
+	background: var(--backgroud-clr); /* Màu nền */
+	border-radius: 10px;
+}
+
+/* Handle (thanh kéo) */
+::-webkit-scrollbar-thumb {
+	background: var(--gray-light-clr); /* Màu thanh kéo */
+	border-radius: 10px;
+}
+
+/* Hover vào thanh kéo */
+::-webkit-scrollbar-thumb:hover {
+	background: var(--gray-clr);
+}
+
+::-webkit-scrollbar {
+	width: 0px; /* Độ rộng */
+	height: 0px; /* Dùng cho thanh cuộn ngang */
+}
+@media screen and (min-width: 1025px) {
+	::-webkit-scrollbar {
+		width: 8px; /* Độ rộng */
+		height: 8px; /* Dùng cho thanh cuộn ngang */
+	}
 }
 
 ::-ms-reveal {
@@ -51,13 +82,22 @@ span,
 a,
 button,
 input,
-select {
+select,
+textarea {
 	font-size: $fs-base;
 	font-weight: 400;
 }
 
 label {
 	font-size: $fs-sm;
+}
+
+.textarea-comment {
+	height: calc((var(--i) + 0.6) * $fs-base);
+}
+
+input[type="checkbox"] {
+	accent-color: var(--primary-clr);
 }
 
 //class custom
@@ -69,9 +109,16 @@ label {
 	font-size: $fs-sm;
 }
 
+.ct-transition {
+	transition: var(--transition);
+}
+
+.ct-shadow-y {
+	box-shadow: var(--shadow-y);
+}
+
 // class custom home
 .scrollable-div {
-	overflow-y: auto;
 	scrollbar-width: none;
 	-ms-overflow-style: none;
 }

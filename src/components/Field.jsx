@@ -105,7 +105,9 @@ export function Select({
 	const { form, updateField } = store();
 	const handleChange = (e) => {
 		const value = e.target.value;
-		updateField(id, value, true, true);
+		console.log(value);
+
+		updateField(id, { value });
 	};
 	return (
 		<div className={`relative ${className} group`}>
@@ -140,5 +142,19 @@ export function Select({
 				</svg>
 			</span>
 		</div>
+	);
+}
+
+export function TextBox({ texboxRef, placeholder, className }) {
+	return (
+		<div
+			ref={texboxRef}
+			className={`
+			relative w-full py-2 outline-none overflow-auto
+			before:absolute before:ps-0.5 empty:before:content-[attr(data-placeholder)] before:text-[--gray-clr] before:pointer-events-none 
+			${className}`}
+			contentEditable="true"
+			data-placeholder={placeholder}
+		></div>
 	);
 }

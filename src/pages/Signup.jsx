@@ -4,6 +4,8 @@ import { Field, Select } from "../components/Field";
 import { useSignupStore } from "../store/signupStore";
 import { useEffect, useRef, useState } from "react";
 import EnterOTPCode from "../components/EnterOTPCode";
+import { ArrowLeftIcon, AtIcon, EyeIcon, EyeSplashIcon, LoadingIcon, UserIcon } from "../components/Icon";
+import { signupAPI } from "../api/signupApi";
 
 export default function Signup() {
 	const navigate = useNavigate();
@@ -27,6 +29,7 @@ export default function Signup() {
 
 	useEffect(() => {
 		const parent = formContainer.current;
+
 		if (!parent) return;
 
 		const resizeObserver = new ResizeObserver(() => {
@@ -46,17 +49,16 @@ export default function Signup() {
 	}, [currentStep, form.ten.isTouched, form.ho.isTouched, stepsRef.current[currentStep]?.offsetHeight]);
 
 	// Check điều kiện vượt qua step 1 và sinh username mặc định
-	const hoten = useRef(form.ten.value + form.ho.value);
+	const hoten = useRef(form.ten.value + form.ho.value + (Math.floor(Math.random() * 9000) + 1000));
 
-	const [countStepPassed, setCountStepPassed] = useState({ s1: false, s2: false, s3: false, s4: false });
+	const [stepsPass, setStepsPass] = useState({ s1: false, s2: false });
 
 	const handleStep1 = () => {
-		if (!form.ho.isValid || !form.ten.isValid) {
-			setCountStepPassed((prev) => ({ ...prev, s1: false }));
-		} else {
-			setCountStepPassed((prev) => ({ ...prev, s1: true }));
-			hoten.current = form.ten.value + form.ho.value + (Math.floor(Math.random() * 9000) + 1000);
-		}
+		const valid = form.ho.isValid && form.ten.isValid;
+		setStepsPass((prev) => {
+			if (prev.s1 === valid) return prev;
+			return { ...prev, s1: valid };
+		});
 	};
 
 	useEffect(() => {
@@ -65,11 +67,11 @@ export default function Signup() {
 
 	// Check điều kiện vượt qua step 2
 	const handleStep2 = () => {
-		if (!form.username.isValid || !form.email.isValid || !form.password.isValid || !form.rePassword.isValid) {
-			setCountStepPassed((prev) => ({ ...prev, s2: false }));
-		} else {
-			setCountStepPassed((prev) => ({ ...prev, s2: true }));
-		}
+		const valid = form.username.isValid && form.email.isValid && form.password.isValid && form.rePassword.isValid;
+		setStepsPass((prev) => {
+			if (prev.s2 === valid) return prev;
+			return { ...prev, s2: valid };
+		});
 	};
 
 	useEffect(() => {
@@ -81,33 +83,62 @@ export default function Signup() {
 	};
 
 	const goToStep2 = () => {
+		hoten.current = form.ten.value + form.ho.value + (Math.floor(Math.random() * 9000) + 1000);
 		setCurrentStep(2);
 		autoFocusOTP.current = false;
 	};
 
-	const [errMessageEmail, setErrMessageEmail] = useState("Email không đúng định dạng");
+	const [errMessageEmail, setErrMessageEmail] = useState("Điền đúng định dạng email");
+
+	const [requestOTPClicked, setRequestOTPClicked] = useState(false);
+
 	const autoFocusOTP = useRef(false);
-	const goToStep3 = () => {
-		// call request gửi code
-		const resp = true;
-		if (resp) {
+
+	const goToStep3 = async () => {
+		// const duplicateInto = await ;
+		setRequestOTPClicked(true);
+		const result = await signupAPI.requestOTP({
+			email: form.email.value,
+			type: "REGISTER",
+		});
+		if (result.statusCode === 200) {
 			autoFocusOTP.current = true;
 			setCurrentStep(3);
 		} else {
 			updateField("email", { isValid: false });
-			setErrMessageEmail("Email đã tồn tại");
+			setErrMessageEmail(result);
 		}
+		setRequestOTPClicked(false);
 	};
 
-	const goToStep4 = () => {
-		// sending post tạo account
-		const data = getFormData();
-		console.log(data);
+	const [validOTPClicked, setValidOTPClicked] = useState(false);
+	const [OTPErr, setOTPErr] = useState("");
 
-		setCurrentStep(4);
-		setTimeout(() => {
-			navigate("/home");
-		}, 2000);
+	const goToStep4 = async () => {
+		setValidOTPClicked(true);
+		const sending = {
+			username: form.username.value,
+			password: form.password.value,
+			email: form.email.value,
+			firstName: form.ten.value,
+			lastName: form.ho.value,
+			dob: `${form.year.value}-${form.month.value.toString().padStart(2, "0")}-${form.day.value
+				.toString()
+				.padStart(2, "0")}`,
+			gender: form.gender.value,
+			otp: OTPValue.join(""),
+		};
+		console.log(sending);
+		const result = await signupAPI.validOTP(sending);
+		if (result.statusCode === 200) {
+			setCurrentStep(4);
+			setTimeout(() => {
+				navigate("/home");
+			}, 2000);
+		} else {
+			setOTPErr(result.message);
+		}
+		setValidOTPClicked(false);
 	};
 
 	// Handle ẩn hiện mật khẩu
@@ -122,6 +153,7 @@ export default function Signup() {
 			updateField(rePassword, { isValid: true });
 		}
 	};
+
 	useEffect(() => {
 		handleshowHidePassword();
 	}, [form.password.value, form.rePassword.value]);
@@ -276,19 +308,21 @@ export default function Signup() {
 									id="gender"
 									label="Giới tính"
 									store={useSignupStore}
-									options={{ 0: "nam", 1: "nữ", 2: "khác", 3: "Không muốn tiết lộ" }}
+									options={{ 0: "Nam", 1: "Nữ", 2: "Khác", 3: "Không muốn tiết lộ" }}
 									allowTab={currentStep === 1}
 								/>
 
 								<Button
-									onClick={!countStepPassed.s1 ? () => {} : goToStep2}
+									className="py-3"
+									onClick={!stepsPass.s1 ? () => {} : goToStep2}
 									allowTab={currentStep === 1}
-									disabled={!countStepPassed.s1}
+									disabled={!stepsPass.s1}
 								>
 									Tiếp theo
 								</Button>
 							</div>
 						</div>
+
 						{/* step 2 */}
 						<div ref={setStepsRef(2)} className={`md:px-8 px-4 h-fit ${currentStep === 2 ? "" : "invisible"}`}>
 							<div className="mb-4">
@@ -307,12 +341,7 @@ export default function Signup() {
 									errorMessage="Tên đăng nhập không được để trống"
 									allowTab={currentStep === 2}
 								>
-									<svg className="w-full" viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg">
-										<path
-											d="M18.625 7C18.625 5.83968 18.1641 4.72688 17.3436 3.90641C16.5231 3.08594 15.4103 2.625 14.25 2.625C13.0897 2.625 11.9769 3.08594 11.1564 3.90641C10.3359 4.72688 9.875 5.83968 9.875 7C9.875 8.16032 10.3359 9.27312 11.1564 10.0936C11.9769 10.9141 13.0897 11.375 14.25 11.375C15.4103 11.375 16.5231 10.9141 17.3436 10.0936C18.1641 9.27312 18.625 8.16032 18.625 7ZM7.25 7C7.25 5.14348 7.9875 3.36301 9.30025 2.05025C10.613 0.737498 12.3935 0 14.25 0C16.1065 0 17.887 0.737498 19.1997 2.05025C20.5125 3.36301 21.25 5.14348 21.25 7C21.25 8.85652 20.5125 10.637 19.1997 11.9497C17.887 13.2625 16.1065 14 14.25 14C12.3935 14 10.613 13.2625 9.30025 11.9497C7.9875 10.637 7.25 8.85652 7.25 7ZM4.69609 25.375H23.8094C23.3227 21.9133 20.3477 19.25 16.7547 19.25H11.7562C8.16328 19.25 5.18828 21.9133 4.70156 25.375H4.69609ZM2 26.3758C2 20.9891 6.36406 16.625 11.7508 16.625H16.7492C22.1359 16.625 26.5 20.9891 26.5 26.3758C26.5 27.2727 25.7727 28 24.8758 28H3.62422C2.72734 28 2 27.2727 2 26.3758Z"
-											fill="#2E2E2E"
-										/>
-									</svg>
+									<UserIcon />
 								</Field>
 								<Field
 									type="email"
@@ -325,12 +354,7 @@ export default function Signup() {
 									errorMessage={errMessageEmail}
 									allowTab={currentStep === 2}
 								>
-									<svg className="w-full" viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg">
-										<path
-											d="M14 27C17.4729 27 20.7372 25.648 23.1929 23.1923L21.3541 21.3541C19.3898 23.3184 16.7781 24.4 14 24.4C8.2657 24.4 3.6 19.7343 3.6 14C3.6 8.2657 8.2657 3.6 14 3.6C19.7343 3.6 24.4 8.2657 24.4 14C24.4 15.4339 23.2339 16.6 21.8 16.6C20.3661 16.6 19.2 15.4339 19.2 14V8.8H16.6V9.50135C15.8343 9.05805 14.9483 8.8 14 8.8C11.1283 8.8 8.8 11.1283 8.8 14C8.8 16.8717 11.1283 19.2 14 19.2C15.5561 19.2 16.9484 18.5129 17.9019 17.43C18.8555 18.5123 20.2471 19.2 21.8 19.2C24.6671 19.2 27 16.8671 27 14C27 6.8318 21.1682 1 14 1C6.8318 1 1 6.8318 1 14C1 21.1682 6.8318 27 14 27ZM14 16.6C12.5661 16.6 11.4 15.4339 11.4 14C11.4 12.5661 12.5661 11.4 14 11.4C15.4339 11.4 16.6 12.5661 16.6 14C16.6 15.4339 15.4339 16.6 14 16.6Z"
-											fill="#2E2E2E"
-										/>
-									</svg>
+									<AtIcon />
 								</Field>
 								<Field
 									type={isShowPassword ? "text" : "password"}
@@ -344,8 +368,8 @@ export default function Signup() {
 									allowTab={currentStep === 2}
 								>
 									<div onClick={() => setIsShowPassword(!isShowPassword)}>
-										<img src="./icon/eye.svg" className={`w-full ${isShowPassword ? "hidden" : "block"}`} />
-										<img src="./icon/eye_splash.svg" className={`w-full ${isShowPassword ? "block" : "hidden"}`} />
+										<EyeIcon className={`w-full ${isShowPassword ? "hidden" : "block"}`} />
+										<EyeSplashIcon className={`w-full ${!isShowPassword ? "hidden" : "block"}`} />
 									</div>
 								</Field>
 
@@ -361,21 +385,22 @@ export default function Signup() {
 									allowTab={currentStep === 2}
 								>
 									<div onClick={() => setIsShowRePassword(!isShowRePassword)}>
-										<img src="./icon/eye.svg" className={`w-full ${isShowRePassword ? "hidden" : "block"}`} />
-										<img src="./icon/eye_splash.svg" className={`w-full ${isShowRePassword ? "block" : "hidden"}`} />
+										<EyeIcon className={`w-full ${isShowRePassword ? "hidden" : "block"}`} />
+										<EyeSplashIcon className={`w-full ${!isShowRePassword ? "hidden" : "block"}`} />
 									</div>
 								</Field>
 								<div className="space-y-4">
 									<Button
 										type="primary"
-										onClick={!countStepPassed.s2 ? () => {} : goToStep3}
+										className="py-3"
+										onClick={!stepsPass.s2 ? () => {} : goToStep3}
 										allowTab={currentStep === 2}
-										disabled={!countStepPassed.s2}
+										disabled={!stepsPass.s2 || requestOTPClicked}
 									>
-										Tiếp theo
+										{requestOTPClicked ? <LoadingIcon /> : "Tiếp theo"}
 									</Button>
-									<Button type="secondary" className="gap-2" onClick={gotoStep1} allowTab={currentStep === 2}>
-										<img src="./icon/arrow_left.svg" alt="" /> Quay lại
+									<Button type="secondary" className="gap-2 py-3" onClick={gotoStep1} allowTab={currentStep === 2}>
+										<ArrowLeftIcon /> Quay lại
 									</Button>
 								</div>
 							</div>
@@ -401,13 +426,13 @@ export default function Signup() {
 
 							<div className="space-y-4">
 								<div>
-									<p className="hidden text-red-600">*Mã không đúng, hãy kiểm tra lại</p>
-									<Button type="primary" allowTab={currentStep === 3} onClick={goToStep4}>
-										Xác nhận
+									<p className="text-red-600">{OTPErr}</p>
+									<Button type="primary" className="py-3" allowTab={currentStep === 3} onClick={goToStep4}>
+										{validOTPClicked ? <LoadingIcon /> : "Xác nhận"}
 									</Button>
 								</div>
-								<Button type="secondary" className="gap-2" allowTab={currentStep === 3} onClick={goToStep2}>
-									<img src="./icon/arrow_left.svg" alt="" /> Quay lại
+								<Button type="secondary" className="gap-2 py-3" allowTab={currentStep === 3} onClick={goToStep2}>
+									<ArrowLeftIcon /> Quay lại
 								</Button>
 							</div>
 						</div>
@@ -420,7 +445,7 @@ export default function Signup() {
 								before:absolute before:left-1/2 before:-translate-x-1/2 before:-translate-y-1/2 before:content-['Hoặc'] before:size-fit before:bg-[--background-clr] before:px-2"
 						/>
 						<div>
-							<Button type="secondary" className="mb-5 gap-3">
+							<Button type="secondary" className="mb-5 gap-3 py-3">
 								<img className="size-6" src="./decor/google_icon.svg" alt="" />
 								Đăng ký với Google
 							</Button>

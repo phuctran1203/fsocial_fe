@@ -1,24 +1,26 @@
+import React, { useEffect } from "react";
+import Post from "../components/Post";
+import CommentModal from "../components/CommentModal";
+import { postsApi } from "../api/postsApi";
+import { postsStore } from "../store/postsStore";
+import "../index.scss";
 
-import React, { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
-import Post from '../components/Post';
-import CommentModal from '../components/CommentModal';
-import Nav from '../components/Nav';
-import '../index.scss';
-import { getPosts } from "../api/postapi";
-
-export default function Home() {
+export default function Follow() {
 	const setPosts = postsStore((state) => state.setPosts);
 	const posts = postsStore((state) => state.posts);
 
-
 	useEffect(() => {
-		const controller = new AbortController();
 		const fetchPosts = async () => {
-			setPosts(await postsApi.getPosts(), controller.signal);
+			try {
+				const resp = await postsApi.getPosts();
+				const data = await resp.data;
+				setPosts(data);
+			} catch (error) {
+				console.log(error);
+				setPosts(null);
+			}
 		};
 		fetchPosts();
-		return () => controller.abort();
 	}, []);
 
 	return (

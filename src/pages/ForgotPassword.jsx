@@ -4,6 +4,7 @@ import { useForgotPasswordStore } from "../store/forgotPwStore";
 import Button from "../components/Button";
 import EnterOTPCode from "../components/EnterOTPCode";
 import { useNavigate } from "react-router-dom";
+import { ArrowLeftIcon, EyeIcon, EyeSplashIcon } from "../components/Icon";
 
 export default function ForgotPassword() {
 	const navigate = useNavigate();
@@ -55,7 +56,7 @@ export default function ForgotPassword() {
 	]);
 
 	//handle email
-	const [errMessageEmail, setErrMessageEmail] = useState("Email không đúng định dạng");
+	const [errMessageEmail, setErrMessageEmail] = useState("Điền đúng định dạng email");
 
 	//handle button Send OTP
 	const [disableResendOTP, setDisableResendOTP] = useState(form.email.isValid);
@@ -223,7 +224,9 @@ export default function ForgotPassword() {
 								<EnterOTPCode OTPValue={OTPValue} setOTPValue={setOTPValue} allowTab={currentStep === 1} />
 								<div>
 									<p className="mb-1 text-red-600">{OTPErrMessage}</p>
-									<Button onClick={handleSubmitOTP}>Xác nhận</Button>
+									<Button className="px-8 py-3" onClick={handleSubmitOTP}>
+										Xác nhận
+									</Button>
 								</div>
 							</div>
 						</div>
@@ -246,8 +249,8 @@ export default function ForgotPassword() {
 									allowTab={currentStep === 2}
 								>
 									<div onClick={() => setIsShowPassword(!isShowPassword)}>
-										<img src="./icon/eye.svg" className={`w-full ${isShowPassword ? "hidden" : "block"}`} />
-										<img src="./icon/eye_splash.svg" className={`w-full ${isShowPassword ? "block" : "hidden"}`} />
+										<EyeIcon className={`w-full ${isShowPassword ? "hidden" : "block"}`} />
+										<EyeSplashIcon className={`w-full ${!isShowPassword ? "hidden" : "block"}`} />
 									</div>
 								</Field>
 
@@ -263,8 +266,8 @@ export default function ForgotPassword() {
 									allowTab={currentStep === 2}
 								>
 									<div onClick={() => setIsShowRePassword(!isShowRePassword)}>
-										<img src="./icon/eye.svg" className={`w-full ${isShowRePassword ? "hidden" : "block"}`} />
-										<img src="./icon/eye_splash.svg" className={`w-full ${isShowRePassword ? "block" : "hidden"}`} />
+										<EyeIcon className={`w-full ${isShowRePassword ? "hidden" : "block"}`} />
+										<EyeSplashIcon className={`w-full ${!isShowRePassword ? "hidden" : "block"}`} />
 									</div>
 								</Field>
 
@@ -274,13 +277,13 @@ export default function ForgotPassword() {
 											*Sau khi đổi mật khẩu, bạn sẽ được chuyển hướng để đăng nhập lại tài khoản bằng mật khẩu mới này
 										</p>
 										<p className="mb-1 text-red-600">{newPasswordErrMessage}</p>
-										<Button onClick={gotoStep3} disabled={!reValidateNewPassword()}>
+										<Button className="px-8 py-3" onClick={gotoStep3} disabled={!reValidateNewPassword()}>
 											Xác nhận
 										</Button>
 									</div>
 
-									<Button type="secondary" onClick={gotoStep1}>
-										<img src="./icon/arrow_left.svg" alt="" /> Quay lại
+									<Button type="secondary" className="px-8 py-3" onClick={gotoStep1}>
+										<ArrowLeftIcon /> Quay lại
 									</Button>
 								</div>
 							</div>
@@ -293,7 +296,7 @@ export default function ForgotPassword() {
 								relative w-10/12 mx-auto border-b-[1px] border-[--gray-light-clr] overflow-visible text-[--gray-light-clr]
 								before:absolute before:left-1/2 before:-translate-x-1/2 before:-translate-y-1/2 before:content-['Hoặc'] before:size-fit before:bg-[--background-clr] before:px-2"
 						/>
-						<Button type="secondary" to="/login">
+						<Button type="secondary" className="px-8 py-3" to="/login">
 							Đăng nhập tài khoản khác
 						</Button>
 					</div>
