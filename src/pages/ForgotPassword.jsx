@@ -56,7 +56,7 @@ export default function ForgotPassword() {
 	]);
 
 	//handle email
-	const [errMessageEmail, setErrMessageEmail] = useState("Email không đúng định dạng");
+	const [errMessageEmail, setErrMessageEmail] = useState("Điền đúng định dạng email");
 
 	//handle button Send OTP
 	const [disableResendOTP, setDisableResendOTP] = useState(form.email.isValid);

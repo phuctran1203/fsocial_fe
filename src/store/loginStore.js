@@ -2,7 +2,7 @@ import { create } from "zustand";
 
 export const useLoginStore = create((set) => ({
 	form: {
-		email: { value: "", isValid: false, isTouched: false },
+		loginName: { value: "", isValid: false, isTouched: false },
 		password: { value: "", isValid: false, isTouched: false },
 		// rePassword: { value: "", isValid: false, isTouched: false },
 	},

@@ -4,7 +4,8 @@ import { Field, Select } from "../components/Field";
 import { useSignupStore } from "../store/signupStore";
 import { useEffect, useRef, useState } from "react";
 import EnterOTPCode from "../components/EnterOTPCode";
-import { ArrowLeftIcon, AtIcon, EyeIcon, EyeSplashIcon, UserIcon } from "../components/Icon";
+import { ArrowLeftIcon, AtIcon, EyeIcon, EyeSplashIcon, LoadingIcon, UserIcon } from "../components/Icon";
+import { signupAPI } from "../api/signupApi";
 
 export default function Signup() {
 	const navigate = useNavigate();
@@ -87,31 +88,57 @@ export default function Signup() {
 		autoFocusOTP.current = false;
 	};
 
-	const [errMessageEmail, setErrMessageEmail] = useState("Email không đúng định dạng");
+	const [errMessageEmail, setErrMessageEmail] = useState("Điền đúng định dạng email");
+
+	const [requestOTPClicked, setRequestOTPClicked] = useState(false);
 
 	const autoFocusOTP = useRef(false);
 
-	const goToStep3 = () => {
-		// call request gửi code
-		const resp = true;
-		if (resp) {
+	const goToStep3 = async () => {
+		// const duplicateInto = await ;
+		setRequestOTPClicked(true);
+		const result = await signupAPI.requestOTP({
+			email: form.email.value,
+			type: "REGISTER",
+		});
+		if (result.statusCode === 200) {
 			autoFocusOTP.current = true;
 			setCurrentStep(3);
 		} else {
 			updateField("email", { isValid: false });
-			setErrMessageEmail("Email đã tồn tại");
+			setErrMessageEmail(result);
 		}
+		setRequestOTPClicked(false);
 	};
 
-	const goToStep4 = () => {
-		// sending post tạo account
-		const data = getFormData();
-		console.log(data);
+	const [validOTPClicked, setValidOTPClicked] = useState(false);
+	const [OTPErr, setOTPErr] = useState("");
 
-		setCurrentStep(4);
-		setTimeout(() => {
-			navigate("/home");
-		}, 2000);
+	const goToStep4 = async () => {
+		setValidOTPClicked(true);
+		const sending = {
+			username: form.username.value,
+			password: form.password.value,
+			email: form.email.value,
+			firstName: form.ten.value,
+			lastName: form.ho.value,
+			dob: `${form.year.value}-${form.month.value.toString().padStart(2, "0")}-${form.day.value
+				.toString()
+				.padStart(2, "0")}`,
+			gender: form.gender.value,
+			otp: OTPValue.join(""),
+		};
+		console.log(sending);
+		const result = await signupAPI.validOTP(sending);
+		if (result.statusCode === 200) {
+			setCurrentStep(4);
+			setTimeout(() => {
+				navigate("/home");
+			}, 2000);
+		} else {
+			setOTPErr(result.message);
+		}
+		setValidOTPClicked(false);
 	};
 
 	// Handle ẩn hiện mật khẩu
@@ -281,7 +308,7 @@ export default function Signup() {
 									id="gender"
 									label="Giới tính"
 									store={useSignupStore}
-									options={{ 0: "nam", 1: "nữ", 2: "khác", 3: "Không muốn tiết lộ" }}
+									options={{ 0: "Nam", 1: "Nữ", 2: "Khác", 3: "Không muốn tiết lộ" }}
 									allowTab={currentStep === 1}
 								/>
 
@@ -368,9 +395,9 @@ export default function Signup() {
 										className="py-3"
 										onClick={!stepsPass.s2 ? () => {} : goToStep3}
 										allowTab={currentStep === 2}
-										disabled={!stepsPass.s2}
+										disabled={!stepsPass.s2 || requestOTPClicked}
 									>
-										Tiếp theo
+										{requestOTPClicked ? <LoadingIcon /> : "Tiếp theo"}
 									</Button>
 									<Button type="secondary" className="gap-2 py-3" onClick={gotoStep1} allowTab={currentStep === 2}>
 										<ArrowLeftIcon /> Quay lại
@@ -399,9 +426,9 @@ export default function Signup() {
 
 							<div className="space-y-4">
 								<div>
-									<p className="hidden text-red-600">*Mã không đúng, hãy kiểm tra lại</p>
+									<p className="text-red-600">{OTPErr}</p>
 									<Button type="primary" className="py-3" allowTab={currentStep === 3} onClick={goToStep4}>
-										Xác nhận
+										{validOTPClicked ? <LoadingIcon /> : "Xác nhận"}
 									</Button>
 								</div>
 								<Button type="secondary" className="gap-2 py-3" allowTab={currentStep === 3} onClick={goToStep2}>

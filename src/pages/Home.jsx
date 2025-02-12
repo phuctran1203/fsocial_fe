@@ -10,17 +10,12 @@ export default function Home() {
 	const posts = postsStore((state) => state.posts);
 
 	useEffect(() => {
+		const controller = new AbortController();
 		const fetchPosts = async () => {
-			try {
-				const resp = await postsApi.getPosts();
-				const data = await resp.data;
-				setPosts(data);
-			} catch (error) {
-				console.log(error);
-				setPosts(null);
-			}
+			setPosts(await postsApi.getPosts(), controller.signal);
 		};
 		fetchPosts();
+		return () => controller.abort();
 	}, []);
 
 	return (
