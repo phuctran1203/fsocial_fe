@@ -23,10 +23,11 @@ export default function Home() {
 			<div className="overflow-y-auto scrollable-div w-full">
 				<div
 					className="
-					space-y-1 w-full pb-12 mt-12 mx-auto
+					w-full mx-auto
 					lg:max-w-[580px]
 					md:space-y-4 md:pb-0
-					sm:mt-0"
+					sm:mt-0
+					mt-12 space-y-1 pb-12"
 				>
 					{posts === null ? (
 						<h1>Lỗi lấy posts</h1>

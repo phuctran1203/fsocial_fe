@@ -8,7 +8,8 @@ import NotFound from "./pages/NotFound";
 import Login from "./pages/Login";
 import Signup from "./pages/Signup";
 import ForgotPassword from "./pages/ForgotPassword";
-import Friends from "./pages/Follow";
+import Search from "./pages/Search";
+import Follow from "./pages/Follow";
 
 function App() {
 	return (
@@ -21,7 +22,8 @@ function App() {
 				<Route path="/" element={<UserLayout />}>
 					<Route index element={<Home />} />
 					<Route path="/home" element={<Home />} />
-					<Route path="/follow" element={<Friends />} />
+					<Route path="/follow" element={<Follow />} />
+					<Route path="/search" element={<Search />} />
 					<Route path="*" element={<NotFound />} />
 				</Route>
 				<Route pat="/admin"></Route>
