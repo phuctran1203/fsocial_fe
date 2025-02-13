@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import Post from "../components/Post";
 import Button from "../components/Button";
+import { SearchIcon } from "../components/Icon";
 
 export default function Search() {
 	const [query, setQuery] = useState("");
@@ -101,15 +102,16 @@ export default function Search() {
           flex-grow bg-[--background-clr] h-screen overflow-auto scrollable-div
           lg:border-none
           sm:border-s sm:pt-5 
-          pt-14
+          pt-16
     "
 		>
-			<div className="space-y-5 lg:max-w-[600px] mx-auto">
-				<div className="mx-3">
+			<div className="md:space-y-5 space-y-4 lg:max-w-[600px] mx-auto">
+				<div className="flex gap-2 mx-3 py-2 px-3 border rounded border-[--gray-light-clr] hover:border-[--gray-clr]">
+					<SearchIcon color="stroke-[--gray-clr]" />
 					<input
 						type="text"
 						placeholder="Tìm kiếm..."
-						className="w-full py-2 px-3 border rounded"
+						className="w-full outline-none"
 						value={query}
 						onChange={(e) => setQuery(e.target.value)}
 					/>
@@ -157,10 +159,10 @@ export default function Search() {
 					</div>
 				) : null}
 				{tab === "all" || tab === "posts" ? (
-					<div className="space-y-3">
+					<div className="space-y-3 sm:px-3">
 						<h5 className="font-semibold px-3">Bài viết</h5>
 						{filteredPosts.map((post) => (
-							<Post key={post.id} post={post} className="rounded ct-shadow-y" />
+							<Post key={post.id} post={post} className="sm:rounded ct-shadow-y" />
 						))}
 					</div>
 				) : null}

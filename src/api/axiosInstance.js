@@ -1,8 +1,11 @@
 import axios from "axios";
 
+const originalDomain = "http://localhost:8081";
+// const originalDomain = "http://localhost:8888/api/v1";
+
 // Tạo instance Axios
 const API = axios.create({
-	baseURL: "http://localhost:8888/api/v1",
+	baseURL: originalDomain,
 	headers: { "Content-Type": "application/json" },
 	withCredentials: true,
 });

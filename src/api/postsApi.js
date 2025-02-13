@@ -6,7 +6,7 @@ export const postsApi = {
 			.then((resp) => resp.data)
 			.catch((error) => {
 				console.error("Error at getPosts:", error);
-				return error.response.data;
+				return error.response?.data || null;
 			}),
 	getComments: (id, signal) =>
 		API.get("/comments", { signal })

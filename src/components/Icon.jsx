@@ -76,14 +76,11 @@ export const FriendsIcon = ({ compareVar }) => (
 	</svg>
 );
 
-export const SearchIcon = ({ compareVar }) => (
+export const SearchIcon = ({ color = "stroke-[--text-black-clr]", compareVar }) => (
 	<svg className="h-[26px]" viewBox="0 0 26 26" fill="none">
+		<path className={`${color} ${compareVar ? "stroke-[2.3]" : "stroke-[1.6]"}`} d="M20.9868 20.9863L24.0005 24" />
 		<path
-			className={`stroke-[--text-black-clr] ${compareVar ? "stroke-[2.3]" : "stroke-[1.6]"}`}
-			d="M20.9868 20.9863L24.0005 24"
-		/>
-		<path
-			className={` stroke-[--text-black-clr] ${compareVar ? "stroke-[2.3]" : "stroke-[1.6]"}`}
+			className={`${color} ${compareVar ? "stroke-[2.3]" : "stroke-[1.6]"}`}
 			d="M11.4286 20.8572C16.6358 20.8572 20.8572 16.6358 20.8572 11.4286C20.8572 6.22132 16.6358 2 11.4286 2C6.22132 2 2 6.22132 2 11.4286C2 16.6358 6.22132 20.8572 11.4286 20.8572Z"
 		/>
 	</svg>
