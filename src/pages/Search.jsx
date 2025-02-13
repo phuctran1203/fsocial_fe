@@ -96,28 +96,49 @@ export default function Search() {
 	}, []);
 
 	return (
-		<div className="pt-5 flex-grow bg-[--background-clr] h-screen overflow-auto scrollable-div">
+		<div
+			className="
+          flex-grow bg-[--background-clr] h-screen overflow-auto scrollable-div
+          lg:border-none
+          sm:border-s sm:pt-5 
+          pt-14
+    "
+		>
 			<div className="space-y-5 lg:max-w-[600px] mx-auto">
-				<input
-					type="text"
-					placeholder="Tìm kiếm..."
-					className="w-full p-2 border rounded"
-					value={query}
-					onChange={(e) => setQuery(e.target.value)}
-				/>
-				<div className="flex">
-					<Button type="secondary" className="py-2 rounded-r-none" onClick={() => setTab("all")}>
+				<div className="mx-3">
+					<input
+						type="text"
+						placeholder="Tìm kiếm..."
+						className="w-full py-2 px-3 border rounded"
+						value={query}
+						onChange={(e) => setQuery(e.target.value)}
+					/>
+				</div>
+				<div className="flex px-3">
+					<Button
+						type="secondary"
+						className={`py-2.5 rounded-r-none ${tab === "all" ? "bg-[--secondary-hover-clr]" : ""}`}
+						onClick={() => setTab("all")}
+					>
 						Tất cả
 					</Button>
-					<Button type="secondary" className="py-2 rounded-none" onClick={() => setTab("users")}>
+					<Button
+						type="secondary"
+						className={`py-2.5 rounded-none ${tab === "users" ? "bg-[--secondary-hover-clr]" : ""}`}
+						onClick={() => setTab("users")}
+					>
 						Mọi người
 					</Button>
-					<Button type="secondary" className="py-2 rounded-l-none" onClick={() => setTab("posts")}>
+					<Button
+						type="secondary"
+						className={`py-2.5 rounded-l-none ${tab === "posts" ? "bg-[--secondary-hover-clr]" : ""}`}
+						onClick={() => setTab("posts")}
+					>
 						Bài viết
 					</Button>
 				</div>
 				{tab === "all" || tab === "users" ? (
-					<div className="">
+					<div className="px-3">
 						<h5 className="font-semibold">Người dùng</h5>
 						{filteredUsers.map((user) => (
 							<div key={user.id} className="flex items-center justify-between border-b py-3">
@@ -137,7 +158,7 @@ export default function Search() {
 				) : null}
 				{tab === "all" || tab === "posts" ? (
 					<div className="space-y-3">
-						<h5 className="font-semibold">Bài viết</h5>
+						<h5 className="font-semibold px-3">Bài viết</h5>
 						{filteredPosts.map((post) => (
 							<Post key={post.id} post={post} className="rounded ct-shadow-y" />
 						))}
