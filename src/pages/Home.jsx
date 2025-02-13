@@ -1,11 +1,12 @@
 
-import React, { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
-import Post from '../components/Post';
+import React, { useEffect } from "react";
+import { postsApi } from "../api/postsApi";
 import CommentModal from '../components/CommentModal';
-import Nav from '../components/Nav';
+import Post from '../components/Post';
 import '../index.scss';
-import { getPosts } from "../api/postapi";
+import { postsStore } from "../store/postsStore";
+import axios from "axios";
+import API from "../api/axiosInstance";
 
 export default function Home() {
 	const setPosts = postsStore((state) => state.setPosts);
@@ -13,12 +14,22 @@ export default function Home() {
 
 
 	useEffect(() => {
-		const controller = new AbortController();
-		const fetchPosts = async () => {
-			setPosts(await postsApi.getPosts(), controller.signal);
-		};
-		fetchPosts();
-		return () => controller.abort();
+
+		const result = async ()=> { 	
+				console.log("call");
+				
+			return await API.get("/timeline")
+			
+		 }
+
+		 result()
+
+		// const controller = new AbortController();
+		// const fetchPosts = async () => {
+		// 	setPosts(await postsApi.getPosts(), controller.signal);
+		// };
+		// fetchPosts();
+		// return () => controller.abort();
 	}, []);
 
 	return (

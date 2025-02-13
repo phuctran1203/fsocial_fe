@@ -38,9 +38,9 @@ export default function Login() {
 		};
 
 		const result = await loginAPI.login(data);
-
 		if (result.statusCode === 200) {
-			navigate("/home");
+			console.log("đăng nhập thành công, ", result);
+			
 		} else {
 			setLoginErr(result.message);
 		}
