@@ -2,17 +2,17 @@ import API from "./axiosInstance";
 
 export const postsApi = {
 	getPosts: (signal) =>
-		API.get("/posts", { signal })
+		API.get("/timeline", { signal })
 			.then((resp) => resp.data)
 			.catch((error) => {
-				console.error("Lỗi lấy post:", error);
-				return null;
+				console.error("Error at getPosts:", error);
+				return error.response.data;
 			}),
 	getComments: (id, signal) =>
 		API.get("/comments", { signal })
 			.then((resp) => resp.data.filter((comment) => comment.postID == id))
 			.catch((error) => {
-				console.log(`Lỗi lấy comment cho bài ${id}: `, error);
-				return null;
+				console.log(`Error at getComments for id ${id}: `, error);
+				return error.response.data;
 			}),
 };
