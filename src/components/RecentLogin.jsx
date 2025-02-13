@@ -14,15 +14,18 @@ export default function RecentLogin() {
 	return (
 		<div className="grid gap-4 md:grid-cols-3 grid-cols-2">
 			{list.map((user, index) => (
-				<div key={index} className="max-w-52 border border-[--gray-light-clr] rounded cursor-pointer">
-					<div className="aspect-square overflow-hidden">
+				<div
+					key={index}
+					className="max-w-52 border border-[--gray-extra-light-clr] rounded cursor-pointer overflow-hidden"
+				>
+					<div className="aspect-square">
 						<img src={user.avatar} alt={user.name} className="size-full object-cover" />
 					</div>
 					<p className="text-center py-2.5 font-semibold">{user.name}</p>
 				</div>
 			))}
 
-			<div className="max-w-52 border border-[--gray-light-clr] rounded cursor-pointer">
+			<div className="max-w-52 border border-[--gray-extra-light-clr] rounded cursor-pointer">
 				<div className=" aspect-square grid place-content-center border-b-2">
 					<div className="bg-[--primary-clr] sm:size-15 size-14 rounded-full">
 						<svg fill="none" viewBox="0 0 24 24">

@@ -6,7 +6,7 @@ export const signupAPI = {
 			.then((resp) => resp.data)
 			.catch((error) => {
 				console.log("Error at checkDuplicate: ", error);
-				return error.response.data;
+				return error.response?.data || {};
 			}),
 
 	requestOTP: (data) =>
@@ -14,14 +14,22 @@ export const signupAPI = {
 			.then((resp) => resp.data)
 			.catch((error) => {
 				console.log("Error at requestOTP: ", error);
-				return error.response.data;
+				return error.response?.data || {};
 			}),
 
 	validOTP: (data) =>
+		API.post("/account/verify-otp", data)
+			.then((resp) => resp.data)
+			.catch((error) => {
+				console.log("Error at validOTP: ", error);
+				return error.response?.data || {};
+			}),
+
+	sendingCreateAccount: (data) =>
 		API.post("/account/register", data)
 			.then((resp) => resp.data)
 			.catch((error) => {
 				console.log("Error at validOTP: ", error);
-				return error.response.data;
+				return error.response?.data || {};
 			}),
 };

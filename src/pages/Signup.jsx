@@ -88,6 +88,7 @@ export default function Signup() {
 		autoFocusOTP.current = false;
 	};
 
+	const [errMessageUsername, setErrMessageUsernname] = useState("Tên đăng nhập không được để trống");
 	const [errMessageEmail, setErrMessageEmail] = useState("Điền đúng định dạng email");
 
 	const [requestOTPClicked, setRequestOTPClicked] = useState(false);
@@ -95,18 +96,39 @@ export default function Signup() {
 	const autoFocusOTP = useRef(false);
 
 	const goToStep3 = async () => {
-		// const duplicateInto = await ;
 		setRequestOTPClicked(true);
+		const dataCheck = {
+			username: form.username.value,
+			email: form.email.value,
+		};
+		const resultDuplicateInto = await signupAPI.checkDuplicate(dataCheck);
+		console.log("After checking: ", await resultDuplicateInto);
+
+		console.log(resultDuplicateInto);
+		const resultUsernameErr = resultDuplicateInto.data.username;
+		const resultEmailErr = resultDuplicateInto.data.email;
+		if (resultUsernameErr != "OK" || resultEmailErr != "OK") {
+			updateField("username", { isValid: false });
+			updateField("email", { isValid: false });
+			setErrMessageUsernname(resultUsernameErr);
+			setErrMessageEmail(resultEmailErr);
+			setRequestOTPClicked(false);
+			return;
+		}
+
 		const result = await signupAPI.requestOTP({
 			email: form.email.value,
 			type: "REGISTER",
 		});
+
 		if (result.statusCode === 200) {
 			autoFocusOTP.current = true;
 			setCurrentStep(3);
 		} else {
+			updateField("username", { isValid: false });
 			updateField("email", { isValid: false });
-			setErrMessageEmail(result);
+			setErrMessageUsernname(result.username || "Error when check duplicate");
+			setErrMessageEmail(result.email || "Error when check duplidate");
 		}
 		setRequestOTPClicked(false);
 	};
@@ -126,7 +148,6 @@ export default function Signup() {
 				.toString()
 				.padStart(2, "0")}`,
 			gender: form.gender.value,
-			otp: OTPValue.join(""),
 		};
 		console.log(sending);
 		const result = await signupAPI.validOTP(sending);
@@ -338,7 +359,7 @@ export default function Signup() {
 									initValue={hoten.current}
 									store={useSignupStore}
 									required={true}
-									errorMessage="Tên đăng nhập không được để trống"
+									errorMessage={errMessageUsername}
 									allowTab={currentStep === 2}
 								>
 									<UserIcon />

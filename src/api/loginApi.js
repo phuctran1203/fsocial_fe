@@ -8,6 +8,6 @@ export const loginAPI = {
 			})
 			.catch((error) => {
 				console.log("Error at login: ", error);
-				return error.response.data;
+				return error.response?.data || {};
 			}),
 };

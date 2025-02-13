@@ -51,11 +51,12 @@ export default function Login() {
 	return (
 		<div
 			className="
-			flex items-center justify-center max-w-[1440px] min-h-screen md:px-6
+			flex items-center justify-center max-w-[1440px] mx-auto min-h-screen md:px-6
 			md:gap-20 md:flex-nowrap
-			gap-10 flex-wrap"
+			sm:bg-transparent
+			bg-[--background-clr] gap-4 flex-wrap"
 		>
-			<div className="h-fit w-[440px] rounded-lg bg-[--background-clr] shadow-md px-8 py-10">
+			<div className="h-fit w-[440px] rounded-lg bg-[--background-clr] sm:shadow-md sm:px-8 sm:py-10 px-3 py-6">
 				<div className="mb-4">
 					<h2>
 						Chào mừng đến với <span className="font-semibold text-2xl text-[--primary-clr]">FSocial</span> 👋
@@ -138,9 +139,9 @@ export default function Login() {
 			</div>
 
 			<div className="md:w-[550px] px-3 mb-28">
-				<h1 className="mb-2 md:text-5xl text-4xl text-[--primary-clr]">FSocial</h1>
+				<h1 className="mb-2 md:text-5xl text-4xl text-[--primary-clr] hidden sm:block">FSocial</h1>
 				<div className="mb-3">
-					<p className="font-medium text-2xl">Đăng nhập gần đây</p>
+					<h1>Đăng nhập gần đây</h1>
 					<p className="text-[var(--gray-clr)]">Chọn ảnh tài khoản hoặc ấn dấu “+” để thêm tài khoản mới</p>
 				</div>
 

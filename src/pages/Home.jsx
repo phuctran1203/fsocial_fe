@@ -10,12 +10,17 @@ export default function Home() {
 	const posts = postsStore((state) => state.posts);
 
 	useEffect(() => {
-		const controller = new AbortController();
 		const fetchPosts = async () => {
-			setPosts(await postsApi.getPosts(), controller.signal);
+			try {
+				const resp = await postsApi.getPosts();
+				const data = await resp.data;
+				setPosts(data);
+			} catch (error) {
+				console.log(error);
+				setPosts(null);
+			}
 		};
 		fetchPosts();
-		return () => controller.abort();
 	}, []);
 
 	return (
@@ -23,11 +28,10 @@ export default function Home() {
 			<div className="overflow-y-auto scrollable-div w-full">
 				<div
 					className="
-					w-full mx-auto
+					space-y-1 w-full pb-12 mt-12 mx-auto
 					lg:max-w-[580px]
 					md:space-y-4 md:pb-0
-					sm:mt-0
-					mt-12 space-y-1 pb-12"
+					sm:mt-0"
 				>
 					{posts === null ? (
 						<h1>Lỗi lấy posts</h1>
