@@ -193,7 +193,7 @@ export default function CreatePost() {
 							Thêm ảnh/video
 						</Button>
 					)}
-					<Button className=" py-2 w-auto rounded-md" onClick={handleSubmitPost} disabled={submitClicked}>
+					<Button className="py-2 w-auto rounded-[4px]" onClick={handleSubmitPost} disabled={submitClicked}>
 						{submitClicked ? <LoadingIcon /> : "Đăng bài"}
 					</Button>
 				</div>
