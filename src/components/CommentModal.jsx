@@ -63,14 +63,16 @@ export default function CommentModal() {
 		<div
 			className={`z-20 fixed inset-0 sm:py-2 bg-black flex items-center justify-center ${
 				isVisible ? "bg-opacity-30 visible" : "bg-opacity-0 invisible"
-			} 
+			}
 			ct-transition`}
+			onClick={() => setIsVisible(false)}
 		>
 			<div
 				className={`
 				flex flex-col bg-[--background-clr] rounded w-[600px] overflow-y-auto h-full scrollable-div
 				${isVisible ? "translate-y-0" : "translate-y-[100vh]"}	
 				ct-transition`}
+				onClick={(e) => e.stopPropagation()}
 			>
 				<div className="bg-[--background-clr] border-b sticky top-0 py-2">
 					<h4 className="text-center">Bài viết của {post?.displayName}</h4>
@@ -131,7 +133,12 @@ export default function CommentModal() {
 				<div className="sticky bottom-0 bg-[--background-clr] flex items-end gap-4 px-4 py-2 border-t">
 					<img src={user.avatar} alt="avatar" className="size-10 rounded-full" />
 					<input id="test-media" type="file" />
-					<TextBox texboxRef={textbox} className="w-full max-h-[40vh]" placeholder="Viết bình luận" />
+					<TextBox
+						texboxRef={textbox}
+						className="w-full max-h-[40vh]"
+						placeholder="Viết bình luận"
+						contentEditable={!submitCmtClicked}
+					/>
 
 					<button className="py-2" onClick={handleSendComment} disabled={submitCmtClicked}>
 						{submitCmtClicked ? <LoadingIcon color="stroke-[--gray-light-clr]" /> : <SendIcon />}

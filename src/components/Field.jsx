@@ -145,7 +145,7 @@ export function Select({
 	);
 }
 
-export function TextBox({ texboxRef, placeholder, className }) {
+export function TextBox({ texboxRef, placeholder, contentEditable = true, className }) {
 	return (
 		<div
 			ref={texboxRef}
@@ -153,7 +153,7 @@ export function TextBox({ texboxRef, placeholder, className }) {
 			relative w-full py-2 outline-none overflow-auto
 			before:absolute before:ps-0.5 empty:before:content-[attr(data-placeholder)] before:text-[--gray-clr] before:pointer-events-none 
 			${className}`}
-			contentEditable="true"
+			contentEditable={contentEditable}
 			data-placeholder={placeholder}
 		></div>
 	);
