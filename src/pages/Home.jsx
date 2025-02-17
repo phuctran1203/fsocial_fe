@@ -12,8 +12,11 @@ export default function Home() {
 	useEffect(() => {
 		const fetchPosts = async () => {
 			try {
-				const resp = await postsApi.getPosts();
-				const data = await resp.data;
+				// const resp = await postsApi.getPosts();
+				// const data = await resp.data;
+				const resp = await fetch("http://localhost:8000/posts");
+				const data = await resp.json();
+				console.log(data);
 				setPosts(data);
 			} catch (error) {
 				console.log(error);
