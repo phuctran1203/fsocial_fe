@@ -1,10 +1,10 @@
 import React, { useEffect, useRef, useState } from "react";
-import { UploadDecorIcon, XMarkIcon } from "./Icon";
+import { LoadingIcon, UploadDecorIcon, XMarkIcon } from "./Icon";
 import Button from "./Button";
 import { popupCreatePostStore } from "../store/popupStore";
 import { TextBox } from "./Field";
 import { ownerAccountStore } from "../store/ownerAccountStore";
-import styles from "./CreatePost.module.scss";
+import { postsApi } from "../api/postsApi";
 
 export default function CreatePost() {
 	const { isVisible, setIsVisible } = popupCreatePostStore();
@@ -71,8 +71,26 @@ export default function CreatePost() {
 		});
 	};
 
-	const handleSubmitPost = () => {
-		console.log(textbox.current.innerHTML);
+	const [submitClicked, setSubmitClicked] = useState(false);
+
+	const handleSubmitPost = async () => {
+		setSubmitClicked(true);
+
+		const formData = new FormData();
+
+		formData.append("userId", user.userId);
+		formData.append("text", textbox.current.innerText);
+		formData.append("HTMLText", textbox.current.innerHTML);
+		fileUploads.forEach((file) => {
+			formData.append("media", file);
+		});
+
+		const respCreatePost = await postsApi.createPost(formData);
+
+		if (respCreatePost.statusCode === 100) {
+			closePopup();
+		}
+		setSubmitClicked(false);
 	};
 
 	useEffect(() => {
@@ -87,7 +105,7 @@ export default function CreatePost() {
 			className={`z-20 fixed inset-0 sm:py-2 bg-black flex items-center justify-center ${
 				isVisible ? "bg-opacity-25 visible" : "bg-opacity-0 invisible"
 			} 
-		ct-transition`}
+			ct-transition`}
 		>
 			<div
 				className={`
@@ -106,7 +124,7 @@ export default function CreatePost() {
 
 				<div className="px-3 overflow-y-auto flex-grow scrollable-div">
 					<div className=" flex space-x-2">
-						<img src={`./temp/${user.avatar}`} alt="avatar" className="md:size-11 size-9 rounded-full" />
+						<img src={`${user.avatar}`} alt="avatar" className="md:size-11 size-9 rounded-full" />
 						<div className="flex flex-col justify-center">
 							<span className="font-semibold">{user.displayName}</span>
 						</div>
@@ -175,8 +193,8 @@ export default function CreatePost() {
 							Thêm ảnh/video
 						</Button>
 					)}
-					<Button className=" py-2 w-auto rounded-sm" onClick={handleSubmitPost}>
-						Đăng bài
+					<Button className=" py-2 w-auto rounded-md" onClick={handleSubmitPost} disabled={submitClicked}>
+						{submitClicked ? <LoadingIcon /> : "Đăng bài"}
 					</Button>
 				</div>
 			</div>
