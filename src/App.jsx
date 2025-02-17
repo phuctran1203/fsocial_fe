@@ -10,6 +10,7 @@ import Signup from "./pages/Signup";
 import ForgotPassword from "./pages/ForgotPassword";
 import Search from "./pages/Search";
 import Follow from "./pages/Follow";
+import Message from "./pages/Message";
 
 function App() {
 	return (
@@ -24,6 +25,7 @@ function App() {
 					<Route path="/home" element={<Home />} />
 					<Route path="/follow" element={<Follow />} />
 					<Route path="/search" element={<Search />} />
+					<Route path="/message" element={<Message />} />
 					<Route path="*" element={<NotFound />} />
 				</Route>
 				<Route pat="/admin"></Route>
