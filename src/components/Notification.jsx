@@ -149,9 +149,9 @@ export default function Notification() {
 			z-0 bg-black h-screen overflow-hidden
 			lg:block lg:relative lg:left-auto lg:min-w-fit lg:max-w-fit lg:visible 
 			md:left-[260px] md:w-[calc(100%-260px)]
-			sm:left-[210px] sm:w-[calc(100%-210px)] sm:bg-opacity-25 sm:border-l-[1px]
+			sm:left-[210px] sm:w-[calc(100%-210px)] sm:border-l-[1px]
 			left-0 absolute w-full bg-opacity-0
-			${isVisible ? "" : "invisible sm:bg-opacity-0"}
+			${isVisible ? "sm:bg-opacity-25" : "invisible sm:bg-opacity-0"}
 			ct-transition
 			`}
 			onClick={closeNotification}
