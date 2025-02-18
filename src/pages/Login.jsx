@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import RecentLogin from "../components/recentLogin";
+import RecentLogin from "../components/RecentLogin";
 import { Field } from "../components/Field";
 import { useLoginStore } from "../store/loginStore";
 import { AtIcon, EyeIcon, EyeSplashIcon, LoadingIcon, UserIcon } from "../components/Icon";

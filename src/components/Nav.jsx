@@ -116,11 +116,7 @@ export default function Nav() {
 						{({ isActive }) => (
 							<>
 								<div className="size-6 rounded-full overflow-hidden">
-									<img
-										className="size-full object-cover object-center"
-										src={`./temp/${user.avatar}`}
-										alt="navbar avatar account"
-									/>
+									<img className="size-full object-cover object-center" src={user.avatar} alt="navbar avatar account" />
 								</div>
 								<span className={`sm:inline hidden ${isActive ? "font-semibold" : ""}`}>Hồ sơ</span>
 							</>

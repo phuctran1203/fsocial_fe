@@ -97,13 +97,34 @@ export default function Signup() {
 	const goToStep3 = async () => {
 		// const duplicateInto = await ;
 		setRequestOTPClicked(true);
+		// check đã tồn tại username và email
+		const dataCheck = {
+			username: form.username.value,
+			email: form.email.value,
+		};
+
+		const respCheckDuplicateInto = await signupAPI.checkDuplicate(dataCheck);
+
+		console.log(respCheckDuplicateInto);
+
+		if (respCheckDuplicateInto.message != "Thông tin hợp lệ.") {
+			updateField("username", { isValid: false });
+			updateField("email", { isValid: false });
+			setErrMessageUsernname(respCheckDuplicateInto.data.username);
+			setErrMessageEmail(respCheckDuplicateInto.data.email);
+			setRequestOTPClicked(false);
+			return;
+		}
 		const result = await signupAPI.requestOTP({
 			email: form.email.value,
 			type: "REGISTER",
 		});
+
+		setCurrentStep(3);
 		if (result.statusCode === 200) {
 			autoFocusOTP.current = true;
-			setCurrentStep(3);
+			updateField("username", { isValid: true });
+			updateField("email", { isValid: true });
 		} else {
 			updateField("email", { isValid: false });
 			setErrMessageEmail(result);
@@ -111,11 +132,14 @@ export default function Signup() {
 		setRequestOTPClicked(false);
 	};
 
+	// xác thực OTP đã gửi về email client
 	const [validOTPClicked, setValidOTPClicked] = useState(false);
+
 	const [OTPErr, setOTPErr] = useState("");
 
 	const goToStep4 = async () => {
 		setValidOTPClicked(true);
+
 		const sending = {
 			username: form.username.value,
 			password: form.password.value,
@@ -128,17 +152,29 @@ export default function Signup() {
 			gender: form.gender.value,
 			otp: OTPValue.join(""),
 		};
-		console.log(sending);
-		const result = await signupAPI.validOTP(sending);
-		if (result.statusCode === 200) {
-			setCurrentStep(4);
-			setTimeout(() => {
-				navigate("/home");
-			}, 2000);
-		} else {
-			setOTPErr(result.message);
+
+		const sendingOTP = {
+			email: form.email.value,
+			otp: OTPValue.join(""),
+			type: "REGISTER",
+		};
+
+		const respValidOTP = await signupAPI.validOTP(sendingOTP);
+
+		if (respValidOTP.statusCode != 200) {
+			setOTPErr(respValidOTP.message);
+			setValidOTPClicked(false);
+			return;
 		}
-		setValidOTPClicked(false);
+
+		setCurrentStep(4);
+		const responseCreateAccount = await signupAPI.sendingCreateAccount(sending);
+		console.log(responseCreateAccount);
+		if (responseCreateAccount.statusCode === 200) {
+			setTimeout(() => {
+				navigate("/login");
+			}, 2500);
+		}
 	};
 
 	// Handle ẩn hiện mật khẩu

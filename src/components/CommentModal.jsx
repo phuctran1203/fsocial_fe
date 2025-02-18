@@ -1,8 +1,8 @@
 import React, { useEffect, useRef, useState } from "react";
-import { SendIcon, XMarkIcon } from "./Icon";
+import { LoadingIcon, SendIcon, XMarkIcon } from "./Icon";
 import Post from "./Post";
 import { popupCommentStore } from "../store/popupStore";
-import { postsApi } from "../api/postsApi";
+import { commentsApi } from "../api/commentsApi";
 import { postsStore } from "../store/postsStore";
 import { ownerAccountStore } from "../store/ownerAccountStore";
 import { TextBox } from "./Field";
@@ -12,24 +12,50 @@ export default function CommentModal() {
 
 	const { isVisible, setIsVisible, id } = popupCommentStore();
 
-	const divRef = useRef(null);
+	const textbox = useRef(null);
 
-	const { posts } = postsStore();
+	const { posts, updatePost } = postsStore();
 
 	const post = posts?.find((p) => p.id == id);
 
 	const [comments, setComments] = useState(null);
 
+	const [submitCmtClicked, setSubmitCmtClicked] = useState(false);
+
+	const handleSendComment = async () => {
+		setSubmitCmtClicked(true);
+		const formData = new FormData();
+
+		formData.append("postId", id);
+		formData.append("userId", user.userId);
+		formData.append("text", textbox.current.innerText);
+		formData.append("HTMLText", textbox.current.innerHTML);
+		const file = document.querySelector("#test-media");
+		formData.append("media", file.files[0]);
+
+		const respSendCmt = await commentsApi.sendComment(formData);
+
+		if (respSendCmt.statusCode === 205) {
+			updatePost(id, { countComments: post.countComments + 1 });
+			setComments((prev) => [respSendCmt.data, ...prev]);
+			textbox.current.innerHTML = "";
+		}
+		setSubmitCmtClicked(false);
+	};
+
 	useEffect(() => {
 		const getComment = async () => {
-			setComments(await postsApi.getComments(post.id));
+			const respGetComment = await commentsApi.getComments(post.id);
+			setComments(respGetComment.data);
 		};
 
 		if (isVisible) {
 			setTimeout(() => {
-				divRef.current.focus();
+				textbox.current.focus();
 			}, 100);
 			getComment();
+		} else {
+			textbox.current.innerHTML = "";
 		}
 	}, [isVisible]);
 
@@ -37,14 +63,16 @@ export default function CommentModal() {
 		<div
 			className={`z-20 fixed inset-0 sm:py-2 bg-black flex items-center justify-center ${
 				isVisible ? "bg-opacity-30 visible" : "bg-opacity-0 invisible"
-			} 
+			}
 			ct-transition`}
+			onClick={() => setIsVisible(false)}
 		>
 			<div
 				className={`
 				flex flex-col bg-[--background-clr] rounded w-[600px] overflow-y-auto h-full scrollable-div
 				${isVisible ? "translate-y-0" : "translate-y-[100vh]"}	
 				ct-transition`}
+				onClick={(e) => e.stopPropagation()}
 			>
 				<div className="bg-[--background-clr] border-b sticky top-0 py-2">
 					<h4 className="text-center">Bài viết của {post?.displayName}</h4>
@@ -63,8 +91,8 @@ export default function CommentModal() {
 									<img src={comment.avatar} alt="avatar" className="size-9 rounded-full" />
 									<div className="space-y-1">
 										<div>
-											<p className="font-semibold">{comment.user}</p>
-											<div>{comment.content}</div>
+											<p className="font-semibold">{comment.userName}</p>
+											<div dangerouslySetInnerHTML={{ __html: comment.content.htmltext }}></div>
 										</div>
 										<div className="flex items-center gap-2 text-[--gray-clr]">
 											<span className="text-[--gray-clr] fs-sm">{comment.time}</span>
@@ -86,13 +114,13 @@ export default function CommentModal() {
 														strokeWidth={1}
 													/>
 												</svg>
-												<span className="fs-sm">{comment.likes}</span>
+												<span className="fs-sm">{comment.countLikes}</span>
 											</div>
 											<button className="fs-sm" onClick={() => {}}>
 												Phản hồi
 											</button>
 										</div>
-										{comment.replies && (
+										{comment.reply && (
 											<button className="fs-xsm ps-2 font-semibold text-[--gray-clr]">12 phản hồi</button>
 										)}
 									</div>
@@ -103,12 +131,17 @@ export default function CommentModal() {
 
 				{/* Ô nhập bình luận */}
 				<div className="sticky bottom-0 bg-[--background-clr] flex items-end gap-4 px-4 py-2 border-t">
-					<img src={`./temp/${user.avatar}`} alt="avatar" className="size-10 rounded-full" />
+					<img src={user.avatar} alt="avatar" className="size-10 rounded-full" />
+					<input id="test-media" type="file" />
+					<TextBox
+						texboxRef={textbox}
+						className="w-full max-h-[40vh]"
+						placeholder="Viết bình luận"
+						contentEditable={!submitCmtClicked}
+					/>
 
-					<TextBox texboxRef={divRef} className="w-full max-h-[40vh]" placeholder="Viết bình luận" />
-
-					<button className="py-2" onClick={() => {}}>
-						<SendIcon />
+					<button className="py-2" onClick={handleSendComment} disabled={submitCmtClicked}>
+						{submitCmtClicked ? <LoadingIcon color="stroke-[--gray-light-clr]" /> : <SendIcon />}
 					</button>
 				</div>
 			</div>
