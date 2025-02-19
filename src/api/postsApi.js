@@ -2,7 +2,7 @@ import API from "./axiosInstance";
 
 export const postsApi = {
 	getPosts: (signal) =>
-		API.get("/timeline", { signal })
+		API.get("/timeline/post", { signal })
 			.then((resp) => resp.data)
 			.catch((error) => {
 				console.error("Error at getPosts:", error);

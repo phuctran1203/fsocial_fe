@@ -3,6 +3,7 @@ import Post from "../components/Post";
 import CommentModal from "../components/CommentModal";
 import { postsApi } from "../api/postsApi";
 import { postsStore } from "../store/postsStore";
+import datajson from '../data/db.json'
 import "../index.scss";
 
 export default function Home() {
