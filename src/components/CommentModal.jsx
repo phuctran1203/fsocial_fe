@@ -6,6 +6,7 @@ import { commentsApi } from "../api/commentsApi";
 import { postsStore } from "../store/postsStore";
 import { ownerAccountStore } from "../store/ownerAccountStore";
 import { TextBox } from "./Field";
+import { dateTimeToNotiTime } from "../utils/convertDateTime";
 
 export default function CommentModal() {
 	const user = ownerAccountStore((state) => state.user);
@@ -22,25 +23,53 @@ export default function CommentModal() {
 
 	const [submitCmtClicked, setSubmitCmtClicked] = useState(false);
 
+	const [selectReply, setSelectReply] = useState({});
+
+	const selectCommentToReply = (props) => {
+		const { id, userId, displayName } = props;
+		setSelectReply(props);
+		console.log(userId, displayName);
+		textbox.current.innerHTML = `<span class="text-[--primary-clr] font-semibold">${displayName}</span>&nbsp`;
+		textbox.current.focus();
+		// Di chuyển con trỏ đến cuối nội dung trong div
+		const range = document.createRange();
+		const selection = window.getSelection();
+
+		if (textbox.current.lastChild) {
+			range.setStartAfter(textbox.current.lastChild); // Đặt con trỏ sau thẻ <a>
+			range.collapse(true); // true => con trỏ sẽ đặt sau phần tử cuối
+			selection.removeAllRanges();
+			selection.addRange(range);
+		}
+	};
+
+	const handleStopReply = () => setSelectReply(null);
+
 	const handleSendComment = async () => {
 		setSubmitCmtClicked(true);
 		const formData = new FormData();
+		if (selectReply.id) {
+			// formData.append("postId", id);
+		}
 
 		formData.append("postId", id);
 		formData.append("userId", user.userId);
 		formData.append("text", textbox.current.innerText);
 		formData.append("HTMLText", textbox.current.innerHTML);
-		const file = document.querySelector("#test-media");
-		formData.append("media", file.files[0]);
-
+		// const file = document.querySelector("#test-media");
+		// formData.append("media", file.files[0]);
 		const respSendCmt = await commentsApi.sendComment(formData);
 
-		if (respSendCmt.statusCode === 205) {
+		if (respSendCmt.statusCode === 0) {
 			updatePost(id, { countComments: post.countComments + 1 });
 			setComments((prev) => [respSendCmt.data, ...prev]);
 			textbox.current.innerHTML = "";
 		}
 		setSubmitCmtClicked(false);
+	};
+
+	const textBoxOnChange = () => {
+		if (textbox.current.innerHTML == "<br>") textbox.current.innerHTML = "";
 	};
 
 	useEffect(() => {
@@ -69,7 +98,7 @@ export default function CommentModal() {
 		>
 			<div
 				className={`
-				flex flex-col bg-[--background-clr] rounded w-[600px] overflow-y-auto h-full scrollable-div
+				flex flex-col bg-[--background-clr] rounded-lg w-[600px] overflow-y-auto h-full scrollable-div
 				${isVisible ? "translate-y-0" : "translate-y-[100vh]"}	
 				ct-transition`}
 				onClick={(e) => e.stopPropagation()}
@@ -95,7 +124,7 @@ export default function CommentModal() {
 											<div dangerouslySetInnerHTML={{ __html: comment.content.htmltext }}></div>
 										</div>
 										<div className="flex items-center gap-2 text-[--gray-clr]">
-											<span className="text-[--gray-clr] fs-sm">{comment.time}</span>
+											<span className="text-[--gray-clr] fs-sm">{dateTimeToNotiTime(comment.createdAt).textTime}</span>
 											<div className="flex items-center">
 												<svg className="sm:h-[15px] h-[13px]" width="25" height="22" viewBox="0 0 25 22" fill="none">
 													<path
@@ -116,7 +145,16 @@ export default function CommentModal() {
 												</svg>
 												<span className="fs-sm">{comment.countLikes}</span>
 											</div>
-											<button className="fs-sm" onClick={() => {}}>
+											<button
+												className="fs-sm"
+												onClick={() => {
+													selectCommentToReply({
+														id: comment.id,
+														userId: comment.userId,
+														displayName: comment.userName,
+													});
+												}}
+											>
 												Phản hồi
 											</button>
 										</div>
@@ -130,19 +168,33 @@ export default function CommentModal() {
 				</div>
 
 				{/* Ô nhập bình luận */}
-				<div className="sticky bottom-0 bg-[--background-clr] flex items-end gap-4 px-4 py-2 border-t">
-					<img src={user.avatar} alt="avatar" className="size-10 rounded-full" />
-					<input id="test-media" type="file" />
-					<TextBox
-						texboxRef={textbox}
-						className="w-full max-h-[40vh]"
-						placeholder="Viết bình luận"
-						contentEditable={!submitCmtClicked}
-					/>
+				<div className="sticky bottom-0">
+					<div
+						className={`absolute w-full -z-10 bg-[--background-clr] top-0 border-t py-2 px-4 flex items-center justify-between
+						${selectReply?.id ? "-translate-y-full" : "translate-y-0"}
+						transition`}
+					>
+						<p>
+							Đang phản hồi <span className="font-semibold">{selectReply?.displayName}</span>
+						</p>
+						<div onClick={handleStopReply} className="cursor-pointer">
+							<XMarkIcon />
+						</div>
+					</div>
+					<div className="bg-[--background-clr] flex items-end gap-4 px-4 py-2 border-t">
+						<img src={user.avatar} alt="avatar" className="size-10 rounded-full" />
+						<TextBox
+							texboxRef={textbox}
+							className="py-2 w-full max-h-[40vh]"
+							placeholder="Viết bình luận"
+							contentEditable={!submitCmtClicked}
+							onInput={textBoxOnChange}
+						/>
 
-					<button className="py-2" onClick={handleSendComment} disabled={submitCmtClicked}>
-						{submitCmtClicked ? <LoadingIcon color="stroke-[--gray-light-clr]" /> : <SendIcon />}
-					</button>
+						<button className="py-2" onClick={handleSendComment} disabled={submitCmtClicked}>
+							{submitCmtClicked ? <LoadingIcon color="stroke-[--gray-light-clr]" /> : <SendIcon />}
+						</button>
+					</div>
 				</div>
 			</div>
 		</div>

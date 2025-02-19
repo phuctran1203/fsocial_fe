@@ -14,6 +14,8 @@ export default function Nav() {
 
 	const location = useLocation();
 
+	const isInMessage = location.pathname === "/message";
+
 	const isInHome = ["/", "/home"].includes(location.pathname);
 
 	const { isVisible, setIsVisible } = popupNotificationtStore();
@@ -36,9 +38,13 @@ export default function Nav() {
 		<nav
 			className={`
 			z-10 bg-[--background-clr] border-[--gray-extra-light-clr]
-			lg:border-r-[1px]
-			md:min-w-[260px] md:max-w-[260px] 
-			sm:min-w-[210px] sm:max-w-[210px] sm:static sm:flex sm:flex-col sm:justify-between sm:h-screen sm:py-6 
+			sm:border-r border-0
+			${
+				!isInMessage
+					? "md:min-w-[260px] md:max-w-[260px] sm:min-w-[210px] sm:max-w-[210px]"
+					: "lg:min-w-[260px] lg:max-w-[260px] sm:w-fit"
+			} 
+			sm:static sm:flex sm:flex-col sm:justify-between sm:h-screen sm:py-6
 			absolute bottom-0 w-full border-t-[1px]
 			ct-transition
 			${styles.transitionNav}`}
@@ -46,20 +52,26 @@ export default function Nav() {
 			<div className="sm:space-y-8 sm:block w-full">
 				{/* logo */}
 				<NavLink to="/" className="sm:block hidden">
-					<LogoNoBG className="ms-6" />
+					<LogoNoBG className={!isInMessage ? "ms-6" : "lg:ms-6 ms-2"} />
 				</NavLink>
 
 				<div className="sm:space-y-3 sm:mx-4 sm:block flex justify-evenly">
 					<NavLink to="/home" className={navStyle} onClick={closeNotification}>
 						<HomeIcon compareVar={isInHome} />
-						<span className={`sm:inline hidden ${isInHome ? "font-semibold" : ""}`}> Trang chủ </span>
+						<span className={`${!isInMessage ? "sm:inline" : "lg:inline"} hidden ${isInHome && "font-semibold"}`}>
+							{" "}
+							Trang chủ{" "}
+						</span>
 					</NavLink>
 
 					<NavLink to="/follow" className={navStyle} onClick={closeNotification}>
 						{({ isActive }) => (
 							<>
 								<FriendsIcon compareVar={isActive} />
-								<span className={`sm:inline hidden ${isActive ? "font-semibold" : ""}`}> Theo dõi </span>
+								<span className={`${!isInMessage ? "sm:inline" : "lg:inline"} hidden ${isActive && "font-semibold"}`}>
+									{" "}
+									Theo dõi{" "}
+								</span>
 							</>
 						)}
 					</NavLink>
@@ -68,7 +80,9 @@ export default function Nav() {
 						{({ isActive }) => (
 							<>
 								<SearchIcon compareVar={isActive} />
-								<span className={`sm:inline hidden ${isActive ? "font-semibold" : ""}`}> Tìm kiếm </span>
+								<span className={`${!isInMessage ? "sm:inline" : "lg:inline"} hidden ${isActive && "font-semibold"}`}>
+									Tìm kiếm
+								</span>
 							</>
 						)}
 					</NavLink>
@@ -89,17 +103,24 @@ export default function Nav() {
 									/>
 								</svg>
 
-								<span className={`sm:inline hidden ${isActive ? "font-semibold" : ""}`}>Tin nhắn</span>
+								<span className={`${!isInMessage ? "sm:inline" : "lg:inline"} hidden ${isActive && "font-semibold"}`}>
+									Tin nhắn
+								</span>
 							</>
 						)}
 					</NavLink>
 
-					<button className={`${navStyle} lg:hidden sm:flex hidden`} onClick={toggleShowNotification}>
+					<button
+						className={`${navStyle} ${
+							location.pathname === "/message" ? "sm:flex hidden" : "lg:hidden sm:flex hidden"
+						}`}
+						onClick={toggleShowNotification}
+					>
 						<div className="relative">
 							<Bell />
 							<div className="absolute size-2.5 -top-[1px] right-[1px]  bg-[--primary-clr] rounded-full " />
 						</div>
-						<span className={`sm:inline hidden`}>Thông báo</span>
+						<span className={`${!isInMessage ? "sm:inline" : "lg:inline"} hidden`}>Thông báo</span>
 					</button>
 
 					<button className={navStyle} onClick={handlePopupCreatePost}>
@@ -109,7 +130,7 @@ export default function Nav() {
 								d="M12.9359 1H14.6744C15.1368 1 15.5116 1.37484 15.5116 1.83721C15.5116 2.29958 15.1368 2.67442 14.6744 2.67442H13C10.3452 2.67442 8.43838 2.67619 6.98725 2.87129C5.56018 3.06316 4.69985 3.42806 4.06396 4.06396C3.42806 4.69985 3.06316 5.56019 2.87129 6.98725C2.67619 8.43839 2.67442 10.3452 2.67442 13C2.67442 15.6547 2.67619 17.5615 2.87129 19.0127C3.06316 20.4398 3.42806 21.3001 4.06396 21.936C4.69985 22.572 5.56018 22.9369 6.98725 23.1286C8.43838 23.3238 10.3452 23.3256 13 23.3256C15.6547 23.3256 17.5615 23.3238 19.0127 23.1286C20.4398 22.9369 21.3001 22.572 21.936 21.936C22.572 21.3001 22.9369 20.4398 23.1286 19.0127C23.3238 17.5615 23.3256 15.6547 23.3256 13V11.3256C23.3256 10.8632 23.7004 10.4884 24.1628 10.4884C24.6251 10.4884 25 10.8632 25 11.3256V13.0641C25 15.6409 25 17.6602 24.7882 19.2359C24.5713 20.8485 24.1189 22.1212 23.1201 23.1201C22.1212 24.1189 20.8485 24.5713 19.2358 24.7882C17.6602 25 15.6409 25 13.0641 25H12.9359C10.3591 25 8.33974 25 6.76413 24.7882C5.1514 24.5713 3.87882 24.1189 2.87997 23.1201C1.88111 22.1212 1.42864 20.8485 1.21181 19.2359C0.999978 17.6602 0.999989 15.6409 1 13.0641V12.9359C0.999989 10.3591 0.999978 8.33974 1.21181 6.76414C1.42864 5.1514 1.88111 3.87883 2.87997 2.87997C3.87882 1.88111 5.1514 1.42864 6.76413 1.21181C8.33974 0.999978 10.3591 0.999989 12.9359 1ZM18.3252 2.14521C19.8521 0.618265 22.3278 0.618265 23.8548 2.14521C25.3817 3.67215 25.3817 6.1478 23.8548 7.67475L16.4337 15.0959C16.0192 15.5104 15.7595 15.77 15.4699 15.9961C15.1286 16.2622 14.7594 16.4904 14.3687 16.6766C14.037 16.8346 13.6886 16.9507 13.1326 17.136L9.89033 18.2168C9.29172 18.4163 8.63177 18.2606 8.1856 17.8144C7.73944 17.3682 7.58364 16.7083 7.78317 16.1096L8.86392 12.8674C9.04924 12.3114 9.16534 11.963 9.32341 11.6313C9.5096 11.2406 9.73779 10.8714 10.004 10.5301C10.2299 10.2404 10.4896 9.98078 10.9041 9.56632L18.3252 2.14521ZM22.6707 3.3292C21.7977 2.45616 20.3823 2.45616 19.5092 3.3292L19.0888 3.74962C19.1142 3.85662 19.1496 3.98411 19.1989 4.12632C19.3589 4.58741 19.6616 5.19465 20.2335 5.7665C20.8053 6.33834 21.4126 6.64107 21.8736 6.80104C22.0158 6.85038 22.1433 6.88583 22.2504 6.91117L22.6707 6.49076C23.5438 5.61772 23.5438 4.20223 22.6707 3.3292ZM20.9313 8.23023C20.3554 7.98253 19.6845 7.58544 19.0494 6.95049C18.4145 6.31555 18.0174 5.64463 17.7697 5.06868L12.1265 10.7119C11.6616 11.1769 11.4792 11.3613 11.3242 11.5599C11.1329 11.8052 10.9688 12.0708 10.835 12.3517C10.7265 12.5792 10.6432 12.8246 10.4352 13.4484L9.95312 14.8948L11.1052 16.0469L12.5516 15.5647C13.1754 15.3568 13.4208 15.2734 13.6483 15.165C13.9292 15.0312 14.1947 14.8671 14.4401 14.6757C14.6387 14.5208 14.8231 14.3384 15.288 13.8735L20.9313 8.23023Z"
 							/>
 						</svg>
-						<span className={`sm:inline hidden`}>Tạo bài viết</span>
+						<span className={`${!isInMessage ? "sm:inline" : "lg:inline"} hidden`}>Tạo bài viết</span>
 					</button>
 
 					<NavLink to={`/profile?id=${user.id}`} className={navStyle} onClick={closeNotification}>
@@ -118,7 +139,9 @@ export default function Nav() {
 								<div className="size-6 rounded-full overflow-hidden">
 									<img className="size-full object-cover object-center" src={user.avatar} alt="navbar avatar account" />
 								</div>
-								<span className={`sm:inline hidden ${isActive ? "font-semibold" : ""}`}>Hồ sơ</span>
+								<span className={`${!isInMessage ? "sm:inline" : "lg:inline"} hidden ${isActive && "font-semibold"}`}>
+									Hồ sơ
+								</span>
 							</>
 						)}
 					</NavLink>
@@ -154,7 +177,7 @@ export default function Nav() {
 									d="M15.0707 1C15.2521 1.00001 15.4289 1.05761 15.5756 1.16451C15.7222 1.27141 15.8311 1.42209 15.8867 1.59486L16.8295 4.52457C17.2255 4.71829 17.6044 4.936 17.9661 5.18114L20.9764 4.53314C21.1539 4.49525 21.3388 4.51467 21.5045 4.58861C21.6703 4.66255 21.8083 4.78718 21.8987 4.94457L24.2747 9.05714C24.3654 9.21444 24.4038 9.39649 24.3844 9.57703C24.365 9.75758 24.2888 9.9273 24.1667 10.0617L22.1009 12.3417C22.131 12.7789 22.131 13.2177 22.1009 13.6549L24.1667 15.9383C24.2888 16.0727 24.365 16.2424 24.3844 16.423C24.4038 16.6035 24.3654 16.7856 24.2747 16.9429L21.8987 21.0571C21.808 21.2142 21.6699 21.3385 21.5042 21.4121C21.3385 21.4857 21.1537 21.5049 20.9764 21.4669L17.9661 20.8189C17.6061 21.0623 17.2255 21.2817 16.8312 21.4754L15.8867 24.4051C15.8311 24.5779 15.7222 24.7286 15.5756 24.8355C15.4289 24.9424 15.2521 25 15.0707 25H10.3187C10.1372 25 9.9604 24.9424 9.81376 24.8355C9.66712 24.7286 9.55819 24.5779 9.50266 24.4051L8.56152 21.4771C8.16658 21.284 7.78565 21.0635 7.42152 20.8171L4.41295 21.4669C4.23546 21.5048 4.05052 21.4853 3.88478 21.4114C3.71903 21.3375 3.58103 21.2128 3.49066 21.0554L1.11466 16.9429C1.02393 16.7856 0.985502 16.6035 1.00491 16.423C1.02432 16.2424 1.10057 16.0727 1.22266 15.9383L3.28838 13.6549C3.25845 13.2188 3.25845 12.7812 3.28838 12.3451L1.22266 10.0617C1.10057 9.9273 1.02432 9.75758 1.00491 9.57703C0.985502 9.39649 1.02393 9.21444 1.11466 9.05714L3.49066 4.94286C3.58128 4.78578 3.71939 4.6615 3.88511 4.58788C4.05084 4.51426 4.23564 4.49509 4.41295 4.53314L7.42152 5.18286C7.78495 4.93771 8.16552 4.71657 8.56152 4.52286L9.50437 1.59486C9.55972 1.42265 9.66813 1.27236 9.81409 1.16551C9.96004 1.05867 10.1361 1.00073 10.3169 1H15.0689H15.0707ZM10.9461 2.71429H14.4432H14.4449L15.4238 5.74514L16.0787 6.064C16.4011 6.22153 16.7121 6.4014 17.0095 6.60229L17.6147 7.01029L20.7295 6.34171L22.4798 9.37257L20.3421 11.7331L20.3935 12.46C20.4182 12.819 20.4182 13.1793 20.3935 13.5383L20.3421 14.2651L22.4781 16.6274L20.7295 19.6583L17.6147 18.988L17.0095 19.3977C16.7121 19.5986 16.4011 19.7784 16.0787 19.936L15.4238 20.2549L14.4467 23.2857H10.9461L9.97066 20.2566L9.31409 19.936C8.99132 19.7781 8.67974 19.5982 8.38152 19.3977L7.77466 18.988L4.66152 19.6583L2.91123 16.6274L5.04895 14.2651L4.99752 13.5383C4.97289 13.1799 4.97289 12.8201 4.99752 12.4617L5.04895 11.7349L2.91466 9.37257L4.66323 6.34171L7.77638 7.01371L8.38323 6.60229C8.68145 6.4018 8.99303 6.22195 9.3158 6.064L9.97237 5.74343L10.9461 2.71429Z"
 								/>
 							</svg>
-							<span>Cài đặt</span>
+							<span className={`lg:inline hidden`}>Cài đặt</span>
 						</>
 					)}
 				</NavLink>
@@ -171,7 +194,7 @@ export default function Nav() {
 							strokeWidth="1.8"
 						/>
 					</svg>
-					<span>Đăng xuất</span>
+					<span className={`lg:inline hidden`}>Đăng xuất</span>
 				</button>
 			</div>
 		</nav>
