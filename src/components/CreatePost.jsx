@@ -5,9 +5,12 @@ import { popupCreatePostStore } from "../store/popupStore";
 import { TextBox } from "./Field";
 import { ownerAccountStore } from "../store/ownerAccountStore";
 import { postsApi } from "../api/postsApi";
+import { postsStore } from "../store/postsStore";
 
 export default function CreatePost() {
 	const { isVisible, setIsVisible } = popupCreatePostStore();
+
+	const insertPost = postsStore((state) => state.insertPost);
 
 	const user = ownerAccountStore((state) => state.user);
 
@@ -88,6 +91,12 @@ export default function CreatePost() {
 		const respCreatePost = await postsApi.createPost(formData);
 
 		if (respCreatePost.statusCode === 100) {
+			const postCreated = {
+				...respCreatePost.data,
+				displayName: user.displayName,
+				avatar: user.avatar,
+			};
+			insertPost(postCreated);
 			closePopup();
 		}
 		setSubmitClicked(false);
@@ -109,7 +118,7 @@ export default function CreatePost() {
 		>
 			<div
 				className={`
-				pb-3 flex flex-col space-y-3 bg-[--background-clr] rounded overflow-hidden w-[500px]
+				pb-3 flex flex-col space-y-3 bg-[--background-clr] rounded-lg overflow-hidden w-[500px]
 				sm:h-fit sm:max-h-full
 				h-full
 				${isVisible ? "translate-y-0" : "translate-y-[100vh]"}	

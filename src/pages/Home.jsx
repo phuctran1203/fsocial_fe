@@ -12,13 +12,13 @@ export default function Home() {
 	useEffect(() => {
 		const fetchPosts = async () => {
 			const resp = await postsApi.getPosts();
-			setPosts(resp.statusCode === 200 ? resp.data : null);
+			setPosts(resp?.statusCode === 200 ? resp.data : null);
 		};
 		fetchPosts();
 	}, []);
 
 	return (
-		<div className=" bg-[--background-clr] flex flex-grow h-screen">
+		<div className="bg-[--background-clr] flex flex-grow h-screen">
 			<div className="overflow-y-auto scrollable-div w-full">
 				<div
 					className="

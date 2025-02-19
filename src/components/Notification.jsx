@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import { Check, CloseCollapseIcon, CommentNoti, Glyph, HeartNoti, TrashCanIcon, XMarkIcon } from "./Icon";
 import { dateTimeToNotiTime } from "../utils/convertDateTime";
 import { popupNotificationtStore, popupExpandNoti3DotStore } from "../store/popupStore";
@@ -119,6 +119,9 @@ const data = [
 ];
 
 export default function Notification() {
+	const location = useLocation();
+	const isInMessage = location.pathname === "/message";
+
 	const processData = data.map((noti) => {
 		const { textTime, labelType } = dateTimeToNotiTime(noti.time);
 		return {
@@ -140,7 +143,8 @@ export default function Notification() {
 		<div
 			className={` 
 			z-0 bg-black h-screen overflow-hidden
-			lg:block lg:relative lg:left-auto lg:min-w-fit lg:max-w-fit lg:visible 
+			${!isInMessage ? "lg:relative lg:left-auto lg:min-w-fit lg:max-w-fit lg:visible" : ""}
+			lg:block 
 			md:left-[260px] md:w-[calc(100%-260px)]
 			sm:left-[210px] sm:w-[calc(100%-210px)] sm:border-l-[1px]
 			left-0 absolute w-full bg-opacity-0
@@ -152,7 +156,8 @@ export default function Notification() {
 			<div
 				className={`
 				h-full relative bg-[--background-clr] border-[--gray-extra-light-clr] lg:drop-shadow-none
-				lg:translate-x-0 lg:translate-y-0
+				${!isInMessage ? "lg:translate-x-0" : ""}
+				lg:translate-y-0
 				md:min-w-[340px] md:max-w-[340px]
 				sm:min-w-[310px] sm:max-w-[310px]
 				w-full
@@ -160,12 +165,15 @@ export default function Notification() {
 				ct-transition`}
 			>
 				<CloseCollapseIcon
-					className={` absolute left-full top-1/2 -translate-x-[1px] -translate-y-1/2 cursor-pointer lg:hidden sm:block hidden
+					className={`absolute left-full top-1/2 -translate-x-[1px] -translate-y-1/2 cursor-pointer  ${
+						!isInMessage ? "lg:hidden" : ""
+					} sm:block hidden
 						${isVisible ? "" : "-translate-x-full"}`}
 				/>
 				<div
 					className={`
 					h-full overflow-y-auto
+					${!isInMessage ? "" : "scrollable-div"}
 					md:space-y-4  
 					sm:pt-6 sm:pb-2 sm:ps-4 sm:pe-5
 					py-14 space-y-2`}
@@ -181,7 +189,7 @@ export default function Notification() {
 										strokeWidth="1.6"
 									/>
 									<path
-										className={` stroke-[--text-black-clr]`}
+										className={`stroke-[--text-black-clr]`}
 										d="M10.8335 22.75C11.3628 23.4143 12.1373 23.8333 13.0002 23.8333C13.863 23.8333 14.6375 23.4143 15.1668 22.75"
 										strokeWidth="1.6"
 									/>

@@ -98,12 +98,8 @@ export default function Search() {
 
 	return (
 		<div
-			className="
-          flex-grow bg-[--background-clr] h-screen overflow-auto scrollable-div
-          lg:border-none
-          sm:border-s sm:pt-5 
-          pt-16
-    "
+			className="flex-grow bg-[--background-clr] h-screen overflow-auto scrollable-div
+          lg:border-none sm:pt-5 pt-16"
 		>
 			<div className="md:space-y-5 space-y-4 lg:max-w-[600px] mx-auto">
 				<div className="flex gap-2 mx-3 py-2 px-3 border rounded border-[--gray-light-clr] hover:border-[--gray-clr]">
@@ -161,9 +157,9 @@ export default function Search() {
 				{tab === "all" || tab === "posts" ? (
 					<div className="space-y-3 sm:px-3">
 						<h5 className="font-semibold px-3">Bài viết</h5>
-						{filteredPosts.map((post) => (
+						{/* {filteredPosts.map((post) => (
 							<Post key={post.id} post={post} className="sm:rounded ct-shadow-y" />
-						))}
+						))} */}
 					</div>
 				) : null}
 			</div>
