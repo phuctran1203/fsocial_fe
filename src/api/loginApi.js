@@ -4,7 +4,9 @@ export const loginAPI = {
 	login: (data) =>
 		API.post("/account/login", data)
 			.then((resp) => {
-				return resp.data;
+				const data = resp.data;
+				console.log("Resp login: ", data);
+				return data;
 			})
 			.catch((error) => {
 				console.log("Error at login: ", error);

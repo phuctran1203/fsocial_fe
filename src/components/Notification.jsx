@@ -136,25 +136,18 @@ export default function Notification() {
 
 	const { isVisible, setIsVisible } = popupNotificationtStore();
 
-	const closeNotification = (e) => {
-		if (e.target.classList.contains("close-target-zone")) {
-			setIsVisible(false);
-		}
-	};
-
 	return (
 		<div
 			className={` 
-			close-target-zone
 			z-0 bg-black h-screen overflow-hidden
 			lg:block lg:relative lg:left-auto lg:min-w-fit lg:max-w-fit lg:visible 
 			md:left-[260px] md:w-[calc(100%-260px)]
-			sm:left-[210px] sm:w-[calc(100%-210px)] sm:bg-opacity-25 sm:border-l-[1px]
+			sm:left-[210px] sm:w-[calc(100%-210px)] sm:border-l-[1px]
 			left-0 absolute w-full bg-opacity-0
-			${isVisible ? "" : "invisible sm:bg-opacity-0"}
+			${isVisible ? "sm:bg-opacity-25" : "invisible sm:bg-opacity-0"}
 			ct-transition
 			`}
-			onClick={closeNotification}
+			onClick={() => setIsVisible(false)}
 		>
 			<div
 				className={`
@@ -164,11 +157,10 @@ export default function Notification() {
 				sm:min-w-[310px] sm:max-w-[310px]
 				w-full
 				${isVisible ? "drop-shadow-[1px_0px_4px_hsla(0,0%,0%,0.15)]" : "sm:-translate-x-full sm:translate-y-0 translate-y-full"}
-				ct-transition
-			`}
+				ct-transition`}
 			>
 				<CloseCollapseIcon
-					className={`close-target-zone absolute left-full top-1/2 -translate-x-[1px] -translate-y-1/2 cursor-pointer lg:hidden sm:block hidden
+					className={` absolute left-full top-1/2 -translate-x-[1px] -translate-y-1/2 cursor-pointer lg:hidden sm:block hidden
 						${isVisible ? "" : "-translate-x-full"}`}
 				/>
 				<div
@@ -177,6 +169,7 @@ export default function Notification() {
 					md:space-y-4  
 					sm:pt-6 sm:pb-2 sm:ps-4 sm:pe-5
 					py-14 space-y-2`}
+					onClick={(e) => e.stopPropagation()}
 				>
 					<div className="flex justify-between px-4">
 						<div className="flex items-center gap-5">

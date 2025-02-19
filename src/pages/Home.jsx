@@ -12,14 +12,8 @@ export default function Home() {
 
 	useEffect(() => {
 		const fetchPosts = async () => {
-			try {
-				const resp = await postsApi.getPosts();
-				const data = await resp.data;
-				setPosts(data);
-			} catch (error) {
-				console.log(error);
-				setPosts(null);
-			}
+			const resp = await postsApi.getPosts();
+			setPosts(resp.statusCode === 200 ? resp.data : null);
 		};
 		fetchPosts();
 	}, []);

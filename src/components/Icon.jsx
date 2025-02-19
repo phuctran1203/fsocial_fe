@@ -269,7 +269,7 @@ export const UploadDecorIcon = ({ className }) => (
 	</svg>
 );
 
-export const LoadingIcon = () => (
+export const LoadingIcon = ({ color = "stroke-[--text-white-clr]" }) => (
 	<svg
 		className="size-6"
 		preserveAspectRatio="xMidYMid"
@@ -279,7 +279,7 @@ export const LoadingIcon = () => (
 		viewBox="0 0 100 100"
 	>
 		<circle
-			className="stroke-[--text-white-clr]"
+			className={color}
 			cx={50}
 			cy={50}
 			r={32}

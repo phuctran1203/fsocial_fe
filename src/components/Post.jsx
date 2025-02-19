@@ -8,7 +8,7 @@ import { dateTimeToNotiTime } from "../utils/convertDateTime";
 export default function Post({ post, className = "" }) {
 	const { isVisible, setIsVisible, setId } = popupCommentStore();
 
-	const likes = post.likes;
+	const likes = post.countLikes;
 
 	const liked = post.liked;
 
@@ -22,7 +22,7 @@ export default function Post({ post, className = "" }) {
 
 	const handleLike = () => {
 		//call API
-		updatePost(post.id, { liked: !liked, likes: liked ? likes - 1 : likes + 1 });
+		updatePost(post.id, { liked: !liked, countLikes: liked ? likes - 1 : likes + 1 });
 	};
 
 	return (
@@ -34,7 +34,7 @@ export default function Post({ post, className = "" }) {
 					</Link>
 					<div className="flex flex-col justify-center">
 						<Link to="" className="font-semibold">
-							{post.displayName}
+							{post.userName}
 						</Link>
 						<span className="text-[--gray-clr] fs-xsm">{dateTimeToNotiTime(post.time).textTime}</span>
 					</div>
@@ -43,11 +43,11 @@ export default function Post({ post, className = "" }) {
 			</div>
 
 			<div className="space-y-2">
-				<div className="px-4" dangerouslySetInnerHTML={{ __html: post.content }}></div>
+				<div className="px-4" dangerouslySetInnerHTML={{ __html: post.content.htmltext }}></div>
 
 				{/* assets post */}
 				<div className="max-h-[200vh] overflow-hidden">
-					{post.image && <img src={`./temp/${post.image}`} alt="Bài đăng" className="w-full" />}
+					<img src={`${post.content.media[0]}`} alt="Bài đăng" className="w-full" />
 				</div>
 			</div>
 
@@ -84,7 +84,7 @@ export default function Post({ post, className = "" }) {
 							strokeWidth="0.6"
 						/>
 					</svg>
-					<span>{post.comments > 0 ? post.comments : "Bình luận"}</span>
+					<span>{post.countComments > 0 ? post.countComments : "Bình luận"}</span>
 				</div>
 
 				{/* re post button */}
