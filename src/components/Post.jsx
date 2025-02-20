@@ -50,9 +50,11 @@ export default function Post({ post, className = "" }) {
 				<div className="px-4" dangerouslySetInnerHTML={{ __html: post.content.htmltext }}></div>
 
 				{/* assets post */}
-				<div className="max-h-[200vh] overflow-hidden">
-					<img src={`${post.content.media[0]}`} alt="Bài đăng" className="w-full" />
-				</div>
+				{post.content.media.length > 0 && (
+					<div className="max-h-[200vh] overflow-hidden">
+						<img src={`${post.content.media[0]}`} alt="Bài đăng" className="w-full" />
+					</div>
+				)}
 			</div>
 
 			<div className="flex justify-between px-4">

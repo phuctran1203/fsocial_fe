@@ -143,10 +143,19 @@ export default function Notification() {
 		<div
 			className={` 
 			z-0 bg-black h-screen overflow-hidden
-			${!isInMessage ? "lg:relative lg:left-auto lg:min-w-fit lg:max-w-fit lg:visible" : ""}
-			lg:block 
-			md:left-[260px] md:w-[calc(100%-260px)]
-			sm:left-[210px] sm:w-[calc(100%-210px)] sm:border-l-[1px]
+			lg:block ${
+				!isInMessage
+					? `
+				lg:relative lg:left-auto lg:min-w-fit lg:max-w-fit lg:visible
+				md:left-[260px] md:w-[calc(100%-260px)]
+				sm:left-[210px] sm:w-[calc(100%-210px)]`
+					: `
+				lg:left-[260px] lg:w-[calc(100%-260px)] 
+				sm:left-[76px] sm:w-[calc(100%-76px)]
+				`
+			}
+			
+			sm:border-l-[1px]
 			left-0 absolute w-full bg-opacity-0
 			${isVisible ? "sm:bg-opacity-25" : "invisible sm:bg-opacity-0"}
 			ct-transition

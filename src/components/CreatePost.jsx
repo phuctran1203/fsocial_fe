@@ -90,7 +90,7 @@ export default function CreatePost() {
 
 		const respCreatePost = await postsApi.createPost(formData);
 
-		if (respCreatePost.statusCode === 100) {
+		if (respCreatePost.statusCode === 200) {
 			const postCreated = {
 				...respCreatePost.data,
 				displayName: user.displayName,
@@ -118,7 +118,7 @@ export default function CreatePost() {
 		>
 			<div
 				className={`
-				pb-3 flex flex-col space-y-3 bg-[--background-clr] rounded-lg overflow-hidden w-[500px]
+				pb-3 flex flex-col space-y-3 bg-[--background-clr] rounded-lg overflow-hidden w-[550px]
 				sm:h-fit sm:max-h-full
 				h-full
 				${isVisible ? "translate-y-0" : "translate-y-[100vh]"}	
@@ -131,8 +131,8 @@ export default function CreatePost() {
 					</button>
 				</div>
 
-				<div className="px-3 overflow-y-auto flex-grow scrollable-div">
-					<div className=" flex space-x-2">
+				<div className="px-3 overflow-y-auto flex-grow scrollable-div space-y-2">
+					<div className="flex space-x-2">
 						<img src={`${user.avatar}`} alt="avatar" className="md:size-11 size-9 rounded-full" />
 						<div className="flex flex-col justify-center">
 							<span className="font-semibold">{user.displayName}</span>
