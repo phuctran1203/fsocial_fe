@@ -3,75 +3,81 @@ import Post from "../components/Post";
 import Button from "../components/Button";
 import { SearchIcon } from "../components/Icon";
 import { searchAPI } from "../api/searchApi";
+import CommentModal from "../components/CommentModal";
+import { postsStore } from "../store/postsStore";
 
 export default function Search() {
 	const [query, setQuery] = useState("");
+
 	const [tab, setTab] = useState("all");
+
 	const [users, setUsers] = useState([]);
-	const [posts, setPosts] = useState([]);
-	// const filteredUsers = users.filter((user) => user.name.toLowerCase().includes(query.toLowerCase()));
-	// const filteredPosts = posts.filter((post) => post.content.toLowerCase().includes(query.toLowerCase()));
+
+	const setPosts = postsStore((state) => state.setPosts);
+
+	const posts = postsStore((state) => state.posts);
 
 	const handleSendKeyword = async () => {
-		console.log("send keyword");
-
-		const [respUsers, respPosts] = await Promise.all([searchAPI.searchUsers(query), searchAPI.searchPosts(query)]);
-
+		const [respUsers, respPosts] = await Promise.all([
+			searchAPI.searchUsers(query.toLowerCase()),
+			searchAPI.searchPosts(query.toLowerCase()),
+		]);
 		const dataUsers = respUsers.data;
 		const dataPosts = respPosts.data;
 		setUsers(dataUsers);
 		setPosts(dataPosts);
 	};
-	// const firstRender = useRef(true);
-	let timeout = null;
+
+	const timeout = useRef(null);
+
 	useEffect(() => {
-		// if (firstRender.current) {
-		// 	firstRender.current = false;
-		// 	return;
-		// }
-		timeout = setTimeout(() => {
+		timeout.current = setTimeout(() => {
 			handleSendKeyword();
-		}, 1000);
-		return () => clearTimeout(timeout);
+		}, 500);
+		return () => clearTimeout(timeout.current);
 	}, [query]);
 
 	return (
 		<div
 			className="flex-grow bg-[--background-clr] h-screen overflow-auto scrollable-div
-          lg:border-none sm:pt-5 pt-16"
+           sm:pt-5 pt-16"
 		>
 			<div className="md:space-y-5 space-y-4 lg:max-w-[600px] mx-auto">
-				<div className="flex gap-2 mx-3 py-2 px-3 border rounded border-[--gray-light-clr] hover:border-[--gray-clr]">
-					<SearchIcon color="stroke-[--gray-clr]" />
+				<label
+					htmlFor="search"
+					className="flex gap-2 mx-3 py-2 px-3 border rounded-full border-[--gray-extra-light-clr] hover:border-[--gray-light-clr]"
+				>
+					<SearchIcon color="stroke-[--gray-clr]" className="size-6" />
 					<input
+						id="search"
 						type="text"
 						placeholder="Tìm kiếm..."
 						className="w-full outline-none"
 						value={query}
 						onChange={(e) => setQuery(e.target.value)}
 					/>
-				</div>
+				</label>
 				<div className="flex px-3">
 					<Button
-						type="secondary"
-						className={`py-2.5 rounded-r-none ${tab === "all" ? "bg-[--secondary-hover-clr]" : ""}`}
+						type="transparent"
+						className={`py-2.5 rounded-r-none ${tab === "all" && "bg-[--secondary-clr]"}`}
 						onClick={() => setTab("all")}
 					>
-						Tất cả
+						<p className={tab !== "all" && "text-[--gray-clr]"}> Tất cả</p>
 					</Button>
 					<Button
-						type="secondary"
-						className={`py-2.5 rounded-none ${tab === "users" ? "bg-[--secondary-hover-clr]" : ""}`}
+						type="transparent"
+						className={`py-2.5 rounded-none ${tab === "users" && "bg-[--secondary-clr]"}`}
 						onClick={() => setTab("users")}
 					>
-						Mọi người
+						<p className={tab !== "users" && "text-[--gray-clr]"}>Mọi người</p>
 					</Button>
 					<Button
-						type="secondary"
-						className={`py-2.5 rounded-l-none ${tab === "posts" ? "bg-[--secondary-hover-clr]" : ""}`}
+						type="transparent"
+						className={`py-2.5 rounded-l-none ${tab === "posts" && "bg-[--secondary-clr]"}`}
 						onClick={() => setTab("posts")}
 					>
-						Bài viết
+						<p className={tab !== "posts" && "text-[--gray-clr]"}>Bài viết</p>
 					</Button>
 				</div>
 				{tab === "all" || tab === "users" ? (
@@ -94,14 +100,15 @@ export default function Search() {
 					</div>
 				) : null}
 				{tab === "all" || tab === "posts" ? (
-					<div className="space-y-3 sm:px-3">
-						<h5 className="font-semibold px-3">Bài viết</h5>
+					<div className="sm:space-y-3 space-y-2 lg:px-3">
+						<h5 className="font-semibold lg:px-0 px-3">Bài viết</h5>
 						{posts.map((post) => (
 							<Post key={post.id} post={post} className="sm:rounded ct-shadow-y" />
 						))}
 					</div>
 				) : null}
 			</div>
+			<CommentModal />
 		</div>
 	);
 }
