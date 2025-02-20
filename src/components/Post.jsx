@@ -1,11 +1,14 @@
 import React, { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import { Glyph } from "./Icon";
 import { popupCommentStore } from "../store/popupStore";
 import { postsStore } from "../store/postsStore";
 import { dateTimeToNotiTime } from "../utils/convertDateTime";
+import Button from "./Button";
 
 export default function Post({ post, className = "" }) {
+	const location = useLocation();
+
 	const { isVisible, setIsVisible, setId } = popupCommentStore();
 
 	const likes = post.countLikes;
@@ -43,16 +46,31 @@ export default function Post({ post, className = "" }) {
 						<span className="text-[--gray-clr] fs-xsm">{dateTimeToNotiTime(post.createdAt).textTime}</span>
 					</div>
 				</div>
-				<Glyph />
+				<button className="relative">
+					<Glyph />
+					{/* <div className="absolute right-full bg-[--background-clr] w-40 shadow-2xl p-2 rounded-md">
+						<Button type="transparent" className="!justify-start py-2 ps-3 text-nowrap">
+							Báo cáo
+						</Button>
+						<Button type="transparent" className="!justify-start text-nowrap py-2 ps-3">
+							Chỉnh sửa
+						</Button>
+						<Button type="transparent" className="!justify-start py-2 ps-3 text-nowrap">
+							Xóa bài
+						</Button>
+					</div> */}
+				</button>
 			</div>
 
 			<div className="space-y-2">
 				<div className="px-4" dangerouslySetInnerHTML={{ __html: post.content.htmltext }}></div>
 
 				{/* assets post */}
-				<div className="max-h-[200vh] overflow-hidden">
-					<img src={`${post.content.media[0]}`} alt="Bài đăng" className="w-full" />
-				</div>
+				{post.content.media.length > 0 && (
+					<div className="max-h-[200vh] border-y border-[--gray-extraaa-light-clr] overflow-hidden">
+						<img src={`${post.content.media[0]}`} alt="Bài đăng" className="w-full" />
+					</div>
+				)}
 			</div>
 
 			<div className="flex justify-between px-4">

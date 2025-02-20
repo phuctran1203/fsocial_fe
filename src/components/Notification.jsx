@@ -143,10 +143,19 @@ export default function Notification() {
 		<div
 			className={` 
 			z-0 bg-black h-screen overflow-hidden
-			${!isInMessage ? "lg:relative lg:left-auto lg:min-w-fit lg:max-w-fit lg:visible" : ""}
-			lg:block 
-			md:left-[260px] md:w-[calc(100%-260px)]
-			sm:left-[210px] sm:w-[calc(100%-210px)] sm:border-l-[1px]
+			lg:block ${
+				!isInMessage
+					? `
+				lg:relative lg:left-auto lg:min-w-fit lg:max-w-fit lg:visible
+				md:left-[260px] md:w-[calc(100%-260px)]
+				sm:left-[210px] sm:w-[calc(100%-210px)]`
+					: `
+				lg:left-[260px] lg:w-[calc(100%-260px)] 
+				sm:left-[76px] sm:w-[calc(100%-76px)]
+				`
+			}
+
+			lg:border-l-[1px]
 			left-0 absolute w-full bg-opacity-0
 			${isVisible ? "sm:bg-opacity-25" : "invisible sm:bg-opacity-0"}
 			ct-transition
@@ -155,7 +164,7 @@ export default function Notification() {
 		>
 			<div
 				className={`
-				h-full relative bg-[--background-clr] border-[--gray-extra-light-clr] lg:drop-shadow-none
+				h-full relative bg-[--background-clr] lg:drop-shadow-none
 				${!isInMessage ? "lg:translate-x-0" : ""}
 				lg:translate-y-0
 				md:min-w-[340px] md:max-w-[340px]
@@ -203,19 +212,19 @@ export default function Notification() {
 					</div>
 
 					{today.length > 0 && (
-						<div className="space-y-1">
+						<div className="md:space-y-1 space-y-2">
 							<h6 className="px-4">Hôm nay</h6>
 							{today.map((noti, index) => Noti({ ...noti, index: index }))}
 						</div>
 					)}
 					{last7days.length > 0 && (
-						<div className="space-y-1">
+						<div className="md:space-y-1 space-y-2">
 							<h6 className="px-4">7 ngày trước</h6>
 							{last7days.map((noti, index) => Noti({ ...noti, index: index + today.length }))}
 						</div>
 					)}
 					{old.length > 0 && (
-						<div className="space-y-1">
+						<div className="md:space-y-1 space-y-2">
 							<h6 className="px-4">Trước đó</h6>
 							{old.map((noti, index) => Noti({ ...noti, index: index + today.length + last7days.length }))}
 						</div>

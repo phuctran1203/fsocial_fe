@@ -10,7 +10,7 @@ const secondaryButton =
 	"bg-[--secondary-clr] text-[--text-black-clr] hover:bg-[--secondary-hover-clr] focus-visible:ring-[--gray-light-clr] active:bg-[--secondary-active-clr]";
 
 const transparentButton =
-	"bg-transparent text-[--text-black-clr] hover:bg-[--secondary-hover-clr] focus-visible:ring-[--secondary-clr] active:bg-[--secondary-active-clr]";
+	"text-[--text-black-clr] hover:bg-[--secondary-hover-clr] focus-visible:ring-[--secondary-clr] active:bg-[--secondary-active-clr]";
 
 const ghostButton = "bg-[--primary-ghost-clr] text-[--primary-clr]";
 

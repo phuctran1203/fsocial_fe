@@ -4,7 +4,8 @@ import { useForgotPasswordStore } from "../store/forgotPwStore";
 import Button from "../components/Button";
 import EnterOTPCode from "../components/EnterOTPCode";
 import { useNavigate } from "react-router-dom";
-import { ArrowLeftIcon, EyeIcon, EyeSplashIcon } from "../components/Icon";
+import { ArrowLeftIcon, EyeIcon, EyeSplashIcon, LoadingIcon } from "../components/Icon";
+import { forgotPasswordApi } from "../api/forgotPasswordApi";
 
 export default function ForgotPassword() {
 	const navigate = useNavigate();
@@ -66,8 +67,8 @@ export default function ForgotPassword() {
 	const handleRequireOTP = (e) => {
 		if (!form.email.isValid || (form.email.isValid && interResend.current != null)) return;
 		const btn = e.target;
-		btn.innerText = `Gửi lại (20)`;
-		let time = 19;
+		btn.innerText = `Gửi lại (30)`;
+		let time = 29;
 		interResend.current = setInterval(() => {
 			btn.innerText = `Gửi lại (${time})`;
 			if (time <= 0) {
@@ -79,6 +80,13 @@ export default function ForgotPassword() {
 			time -= 1;
 		}, 900);
 		setDisableResendOTP(true);
+
+		//call api request OTP
+		const dataSending = {
+			email: form.email.value,
+			type: "RESET",
+		};
+		forgotPasswordApi.requestOTP(dataSending);
 	};
 
 	useEffect(() => {
@@ -86,19 +94,32 @@ export default function ForgotPassword() {
 	}, [form.email.isValid]);
 
 	//handle submit OTP
+	const [validOTPClicked, setValidOTPClicked] = useState(false);
+
 	const [OTPValue, setOTPValue] = useState(["", "", "", ""]);
 
-	const handleSubmitOTP = () => {
-		let OTP = OTPValue.reduce((total, value) => total + value, "");
+	const handleSubmitOTP = async () => {
+		setValidOTPClicked(true);
+		const OTP = OTPValue.join("");
 		let isAnyEmpty = OTPValue.find((otp) => otp === "");
 
 		if (OTP === "" || isAnyEmpty !== undefined) {
 			setOTPErrMessage("*Mã không đúng, hãy kiểm tra lại");
 			return;
 		}
-		setOTPErrMessage("");
-		console.log(OTP);
-		gotoStep2();
+
+		const sendingOTP = {
+			email: form.email.value,
+			otp: OTP,
+			type: "RESET",
+		};
+		const resp = await forgotPasswordApi.validOTP(sendingOTP);
+		if (resp.statusCode === 200) {
+			gotoStep2();
+		} else {
+			setOTPErrMessage(resp.message);
+		}
+		setValidOTPClicked(false);
 	};
 
 	//handle show & hide password
@@ -119,14 +140,23 @@ export default function ForgotPassword() {
 	const reValidateNewPassword = () =>
 		form.password.isValid && form.rePassword.isValid && form.password.value === form.rePassword.value; //ảo vãi lìn
 
-	const gotoStep3 = () => {
+	const gotoStep3 = async () => {
 		if (!reValidateNewPassword()) {
-			setNewPasswordErrMessage("Mật khẩu bla bla có vấn đề");
-		} else {
+			setNewPasswordErrMessage("Mật khẩu mới và mật khẩu nhập lại không thỏa mãn");
+			return;
+		}
+		const dataSending = {
+			email: form.email.value,
+			newPassword: form.password.value,
+		};
+		const respChangePw = await forgotPasswordApi.changePassword(dataSending);
+		if (respChangePw.statusCode === 200) {
 			setCurrentStep(3);
 			setTimeout(() => {
-				navigate("/home");
+				navigate("/login");
 			}, 2000);
+		} else {
+			console.log("Lỗi đổi mật khẩu");
 		}
 	};
 
@@ -224,8 +254,8 @@ export default function ForgotPassword() {
 								<EnterOTPCode OTPValue={OTPValue} setOTPValue={setOTPValue} allowTab={currentStep === 1} />
 								<div>
 									<p className="mb-1 text-red-600">{OTPErrMessage}</p>
-									<Button className="px-8 py-3" onClick={handleSubmitOTP}>
-										Xác nhận
+									<Button className="px-8 py-3" onClick={handleSubmitOTP} disabled={validOTPClicked}>
+										{validOTPClicked ? <LoadingIcon /> : "Xác nhận"}
 									</Button>
 								</div>
 							</div>
@@ -315,7 +345,7 @@ export default function ForgotPassword() {
 							Đã đổi mật khẩu thành công
 							<br /> 🎉🎉🎉
 						</h1>
-						<h3 className="text-[--primary-clr]">Đang chuyển hướng về trang chủ...</h3>
+						<h3 className="text-[--primary-clr]">Đang chuyển hướng về trang đăng nhập...</h3>
 						<img src="./decor/signup_step_4_decor.svg" alt="" />
 					</div>
 				</div>

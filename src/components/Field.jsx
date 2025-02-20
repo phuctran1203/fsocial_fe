@@ -145,7 +145,10 @@ export function Select({
 	);
 }
 
-export function TextBox({ texboxRef, placeholder, contentEditable = true, onInput = () => {}, className }) {
+export function TextBox({ texboxRef, placeholder, contentEditable = true, onKeyDown = () => {}, className }) {
+	const onInput = (e) => {
+		if (e.target.innerHTML == "<br>") e.target.innerHTML = "";
+	};
 	return (
 		<div
 			ref={texboxRef}
@@ -155,6 +158,7 @@ export function TextBox({ texboxRef, placeholder, contentEditable = true, onInpu
 			${className}`}
 			contentEditable={contentEditable}
 			data-placeholder={placeholder}
+			onKeyDown={onKeyDown}
 			onInput={onInput}
 		></div>
 	);
