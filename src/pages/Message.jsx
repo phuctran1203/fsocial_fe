@@ -84,7 +84,7 @@ export default function Message() {
 	};
 
 	return (
-		<div className={`${selectedUser && "z-10"} flex-grow sm:flex h-screen bg-[--background-clr] overflow-hidden`}>
+		<div className={`${selectedUser && "z-10"} flex-grow sm:flex h-screen bg-background overflow-hidden`}>
 			{/* Danh sách hội thoại */}
 			<div
 				className="
@@ -106,7 +106,7 @@ export default function Message() {
 					{listUsers.map((user) => (
 						<div
 							key={user.userId}
-							className="px-3 py-2.5 rounded-md flex items-center gap-3 hover:bg-[--gray-extraaa-light-clr] ct-transition cursor-pointer"
+							className="px-3 py-2.5 rounded-md flex items-center gap-3 hover:bg-gray-3light ct-transition cursor-pointer"
 							onClick={() => handleUserClick(user.userId)}
 						>
 							<div className="max-w-12 aspect-square rounded-full overflow-hidden">
@@ -115,9 +115,7 @@ export default function Message() {
 							<div>
 								<div className="flex items-center gap-3">
 									<span className="font-semibold">{user.displayName}</span>
-									{user.latestMessage !== "" && !user.read && (
-										<span className="size-2 bg-[--primary-clr] rounded-full" />
-									)}
+									{user.latestMessage !== "" && !user.read && <span className="size-2 bg-primary rounded-full" />}
 								</div>
 								{user.latestMessage !== "" && (
 									<div className="flex gap-1">
@@ -133,7 +131,7 @@ export default function Message() {
 
 			{/* Cửa sổ tin nhắn */}
 			<div
-				className={`w-screen flex flex-col bg-[--background-clr] bg-opacity-50 h-screen ${
+				className={`w-screen flex flex-col bg-background h-screen ${
 					selectedUser && "sm:translate-y-0 -translate-y-full"
 				} transition duration-100`}
 			>
@@ -163,10 +161,10 @@ export default function Message() {
 						<TextBox
 							texboxRef={textbox}
 							placeholder="Soạn tin nhắn"
-							className="sm:py-2 py-1.5 max-h-[120px] bg-[--gray-extraaa-light-clr] border rounded-3xl px-5 flex-grow scrollable-div"
+							className="sm:py-2 py-1.5 max-h-[120px] bg-gray-3light border rounded-3xl px-5 flex-grow scrollable-div"
 						/>
-						<button onClick={sendMessage} className="bg-[--primary-clr] sm:py-2 py-1.5 px-5 rounded-full">
-							<SendIcon color="stroke-[--text-white-clr]" />
+						<button onClick={sendMessage} className="bg-primary sm:py-2 py-1.5 px-5 rounded-full">
+							<SendIcon color="stroke-secondary-text" />
 						</button>
 					</div>
 				)}

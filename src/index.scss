@@ -1,116 +1,106 @@
 @use "./scss/_variable.scss" as *;
+@use "./scss/_tailwind-components.scss" as *;
 
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
-//global style
-body {
-	font-size: $fs-base;
-	font-family: var(--ff);
-	background-color: var(--lower-backround-clr);
-	color: var(--text-black-clr);
-}
-
-/* Toàn bộ thanh scrollbar */
-
-/* Track (background của scrollbar) */
-::-webkit-scrollbar-track {
-	background: var(--backgroud-clr); /* Màu nền */
-	border-radius: 10px;
-}
-
-/* Handle (thanh kéo) */
-::-webkit-scrollbar-thumb {
-	background: var(--gray-light-clr); /* Màu thanh kéo */
-	border-radius: 10px;
-}
-
-/* Hover vào thanh kéo */
-::-webkit-scrollbar-thumb:hover {
-	background: var(--gray-clr);
-}
-
-::-webkit-scrollbar {
-	width: 0px; /* Độ rộng */
-	height: 0px; /* Dùng cho thanh cuộn ngang */
-}
-@media screen and (min-width: 1025px) {
-	::-webkit-scrollbar {
-		width: 8px; /* Độ rộng */
-		height: 8px; /* Dùng cho thanh cuộn ngang */
+@layer base {
+	//global style
+	body {
+		font-size: $fs-base;
+		font-family: var(--ff);
+		background-color: var(--lower-backround-clr);
+		color: var(--text-black-clr);
 	}
-}
 
-::-ms-reveal {
-	/* ẩn icon show password của MS Edge */
-	display: none;
-}
+	/* Toàn bộ thanh scrollbar */
+	/* Track (background của scrollbar) */
+	::-webkit-scrollbar-track {
+		background: var(--backgroud-clr); /* Màu nền */
+		border-radius: 10px;
+	}
 
-h1 {
-	font-size: $fs-5xl;
-	font-weight: 600;
-}
+	/* Handle (thanh kéo) */
+	::-webkit-scrollbar-thumb {
+		background: var(--gray-light-clr); /* Màu thanh kéo */
+		border-radius: 10px;
+	}
 
-h2 {
-	font-size: $fs-4xl;
-	font-weight: 600;
-}
+	/* Hover vào thanh kéo */
+	::-webkit-scrollbar-thumb:hover {
+		background: var(--gray-clr);
+	}
 
-h3 {
-	font-size: $fs-3xl;
-	font-weight: 600;
-}
+	::-webkit-scrollbar {
+		width: 0px; /* Độ rộng */
+		height: 0px; /* Dùng cho thanh cuộn ngang */
+	}
+	@media screen and (min-width: 1025px) {
+		::-webkit-scrollbar {
+			width: 8px; /* Độ rộng */
+			height: 8px; /* Dùng cho thanh cuộn ngang */
+		}
+	}
 
-h4 {
-	font-size: $fs-2xl;
-	font-weight: 600;
-}
+	::-ms-reveal {
+		/* ẩn icon show password của MS Edge */
+		display: none;
+	}
 
-h5 {
-	font-size: $fs-xl;
-	font-weight: 500;
-}
+	h1 {
+		font-size: $fs-5xl;
+		font-weight: 600;
+	}
 
-h6 {
-	font-size: $fs-lg;
-	font-weight: 500;
-}
+	h2 {
+		font-size: $fs-4xl;
+		font-weight: 600;
+	}
 
-p,
-span,
-a,
-button,
-input,
-select,
-textarea {
-	font-size: $fs-base;
-	font-weight: 400;
-}
+	h3 {
+		font-size: $fs-3xl;
+		font-weight: 600;
+	}
 
-label {
-	font-size: $fs-sm;
-}
+	h4 {
+		font-size: $fs-2xl;
+		font-weight: 600;
+	}
 
-.textarea-comment {
-	height: calc((var(--i) + 0.6) * $fs-base);
-}
+	h5 {
+		font-size: $fs-xl;
+		font-weight: 500;
+	}
 
-input[type="checkbox"] {
-	accent-color: var(--primary-clr);
+	h6 {
+		font-size: $fs-lg;
+		font-weight: 500;
+	}
+
+	p,
+	span,
+	a,
+	button,
+	input,
+	select,
+	textarea {
+		font-size: $fs-base;
+		font-weight: 400;
+	}
+
+	label {
+		font-size: $fs-sm;
+	}
 }
 
 //class custom
 .fs-xsm {
-	font-size: $fs-xsm;
+	font-size: $fs-xs;
 }
 
 .fs-sm {
 	font-size: $fs-sm;
-}
-
-.ct-transition {
-	transition: var(--transition);
 }
 
 .ct-shadow-y {
@@ -125,4 +115,15 @@ input[type="checkbox"] {
 
 .scrollable-div::-webkit-scrollbar {
 	display: none;
+}
+
+@layer base {
+	:root {
+		--chart-1: 12 76% 61%;
+		--chart-2: 173 58% 39%;
+		--chart-3: 197 37% 24%;
+		--chart-4: 43 74% 66%;
+		--chart-5: 27 87% 67%;
+		--radius: 0.5rem;
+	}
 }

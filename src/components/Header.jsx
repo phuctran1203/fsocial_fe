@@ -2,6 +2,7 @@ import React from "react";
 import { Bell, LogoNoBG } from "../components/Icon";
 import { popupNotificationtStore } from "../store/popupStore";
 import { NavLink, useLocation } from "react-router-dom";
+import { toast } from "sonner";
 export default function Header() {
 	const isInMessage = useLocation().pathname === "/message";
 
@@ -12,9 +13,9 @@ export default function Header() {
 	};
 	return (
 		<header
-			className={`z-10 px-3 py-1 bg-[--background-clr] ${
+			className={`z-10 px-3 py-1 bg-background ${
 				!isInMessage ? "sm:hidden" : "hidden"
-			} w-full absolute top-0 flex justify-between items-center border-[--gray-extra-light-clr] border-b-[1px]`}
+			} w-full absolute top-0 flex justify-between items-center border-gray-3light border-b`}
 		>
 			<NavLink to="/">
 				<LogoNoBG className="size-9" />
@@ -23,7 +24,7 @@ export default function Header() {
 				<div className="cursor-pointer" onClick={toggleShowNoti}>
 					<Bell />
 				</div>
-				<div className="absolute size-2.5 -top-[1px] right-[1px]  bg-[--primary-clr] rounded-full " />
+				<div className="absolute size-2.5 -top-[1px] right-[1px] bg-primary rounded-full " />
 			</div>
 		</header>
 	);

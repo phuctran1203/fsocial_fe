@@ -101,7 +101,7 @@ export default function CommentModal() {
 		const { id, userId, displayName } = props;
 		setSelectReply(props);
 		console.log(id, userId, displayName);
-		textbox.current.innerHTML = `<span class="text-[--primary-clr] font-semibold">${displayName}</span>&nbsp`;
+		textbox.current.innerHTML = `<span class="text-primary font-semibold">${displayName}</span>&nbsp`;
 		textbox.current.focus();
 		// Di chuyển con trỏ đến cuối nội dung trong div
 		const range = document.createRange();
@@ -196,17 +196,17 @@ export default function CommentModal() {
 			className={`z-20 fixed inset-0 sm:py-2 bg-black flex items-center justify-center ${
 				isVisible ? "bg-opacity-30 visible" : "bg-opacity-0 invisible"
 			}
-			ct-transition`}
+			transition-[--transition]`}
 			onClick={() => setIsVisible(false)}
 		>
 			<div
 				className={`
-				flex flex-col bg-[--background-clr] rounded-lg w-[600px] overflow-y-auto h-full scrollable-div
+				flex flex-col bg-background rounded-lg w-[600px] overflow-y-auto h-full scrollable-div
 				${isVisible ? "translate-y-0" : "translate-y-[100vh]"}	
-				ct-transition`}
+				transition-[--transition]`}
 				onClick={(e) => e.stopPropagation()}
 			>
-				<div className="bg-[--background-clr] border-b sticky top-0 py-2">
+				<div className="bg-background border-b sticky top-0 py-2">
 					<h4 className="text-center">Bài viết của {post?.displayName}</h4>
 					<button className="absolute right-0 top-0 h-full px-4" onClick={() => setIsVisible(false)}>
 						<XMarkIcon />
@@ -235,7 +235,7 @@ export default function CommentModal() {
 				{/* Ô nhập bình luận */}
 				<div className="sticky bottom-0">
 					<div
-						className={`absolute w-full -z-10 bg-[--background-clr] top-0 border-t py-2 px-4 flex items-center justify-between
+						className={`absolute w-full -z-10 bg-background top-0 border-t py-2 px-4 flex items-center justify-between
 						${selectReply?.id ? "-translate-y-full" : "translate-y-0"}
 						transition`}
 					>
@@ -246,7 +246,7 @@ export default function CommentModal() {
 							<XMarkIcon />
 						</div>
 					</div>
-					<div className="bg-[--background-clr] flex items-end gap-4 px-4 py-2 border-t">
+					<div className="bg-background flex items-end gap-4 px-4 py-2 border-t">
 						<img src={user.avatar} alt="avatar" className="size-10 rounded-full" />
 						<TextBox
 							texboxRef={textbox}
@@ -261,7 +261,7 @@ export default function CommentModal() {
 							onClick={handleSendComment}
 							disabled={textbox.current?.innerText == "" || submitCmtClicked}
 						>
-							{submitCmtClicked ? <LoadingIcon color="stroke-[--gray-light-clr]" /> : <SendIcon />}
+							{submitCmtClicked ? <LoadingIcon color="stroke-gray-light" /> : <SendIcon />}
 						</button>
 					</div>
 				</div>

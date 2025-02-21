@@ -18,7 +18,7 @@ export default function Home() {
 	}, []);
 
 	return (
-		<div className="bg-[--background-clr] flex flex-grow h-screen">
+		<div className="bg-background flex flex-grow h-screen">
 			<div className="overflow-y-auto scrollable-div w-full">
 				<div
 					className="
