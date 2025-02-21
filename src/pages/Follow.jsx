@@ -28,7 +28,9 @@ export default function Follow() {
 						sm:mt-0"
 				>
 					{posts === null ? (
-						<h1>Lỗi lấy posts</h1>
+						<div className="grid h-screen place-content-center">
+							<h1>Lỗi lấy posts</h1>
+						</div>
 					) : (
 						posts.map((post) => <Post key={post.id} post={post} className="rounded ct-shadow-y" />)
 					)}

@@ -1,4 +1,6 @@
 import React from "react";
+import { XMarkIcon } from "./Icon";
+import Button from "./Button";
 
 export default function RecentLogin() {
 	const list = [
@@ -11,14 +13,25 @@ export default function RecentLogin() {
 			name: "Ngô Tấn Cang",
 		},
 	];
+
+	const handleRemoveSavedAccount = () => {};
 	return (
 		<div className="grid gap-4 md:grid-cols-3 grid-cols-2">
 			{list.map((user, index) => (
-				<div key={index} className="max-w-52 border border-gray-2light rounded cursor-pointer overflow-hidden">
+				<div
+					key={index}
+					className="group relative max-w-52 border border-gray-2light rounded cursor-pointer overflow-hidden"
+				>
 					<div className="aspect-square">
 						<img src={user.avatar} alt={user.name} className="size-full object-cover" />
 					</div>
 					<p className="bg-gray-3light text-center py-2.5 font-semibold">{user.name}</p>
+					<Button
+						className="absolute right-1 top-1 btn-secondary border !size-7 opacity-0 group-hover:opacity-100 !rounded-full transition-[--transition]"
+						onClick={handleRemoveSavedAccount}
+					>
+						<XMarkIcon />
+					</Button>
 				</div>
 			))}
 

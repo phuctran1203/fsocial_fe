@@ -1,5 +1,4 @@
 @use "./scss/_variable.scss" as *;
-@use "./scss/_tailwind-components.scss" as *;
 
 @tailwind base;
 @tailwind components;
@@ -10,7 +9,7 @@
 	body {
 		font-size: $fs-base;
 		font-family: var(--ff);
-		background-color: var(--lower-backround-clr);
+		background-color: var(--lower-background-clr);
 		color: var(--text-black-clr);
 	}
 
