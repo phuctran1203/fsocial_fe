@@ -114,17 +114,17 @@ export default function CreatePost() {
 			className={`z-20 fixed inset-0 sm:py-2 bg-black flex items-center justify-center ${
 				isVisible ? "bg-opacity-25 visible" : "bg-opacity-0 invisible"
 			} 
-			ct-transition`}
+			transition-[--transition]`}
 		>
 			<div
 				className={`
-				pb-3 flex flex-col space-y-3 bg-[--background-clr] rounded-lg overflow-hidden w-[550px]
+				pb-3 flex flex-col space-y-3 bg-background rounded-lg overflow-hidden w-[550px]
 				sm:h-fit sm:max-h-full
 				h-full
 				${isVisible ? "translate-y-0" : "translate-y-[100vh]"}	
-				ct-transition`}
+				transition-[--transition]`}
 			>
-				<div className="bg-[--background-clr] border-b sticky top-0 py-2">
+				<div className="bg-background border-b sticky top-0 py-2">
 					<h4 className="text-center">Tạo bài viết</h4>
 					<button className="absolute right-0 top-0 h-full px-4" onClick={closePopup}>
 						<XMarkIcon />
@@ -143,7 +143,7 @@ export default function CreatePost() {
 
 					<label
 						htmlFor="file-upload"
-						className={`rounded-md aspect-video cursor-pointer flex items-center justify-center border-[2px] border-[--gray-extra-light-clr] ${
+						className={`rounded-md aspect-video cursor-pointer flex items-center justify-center border-[2px] border-gray-2light ${
 							fileUploads.length > 0 ? "hidden" : ""
 						}`}
 						onDragOver={(e) => {
@@ -173,8 +173,7 @@ export default function CreatePost() {
 					{filePreviews.map((preview, index) => (
 						<div key={index} className="relative">
 							<Button
-								type="secondary"
-								className="z-10 absolute m-2 max-w-7 h-7 right-0 rounded-full"
+								className="btn-secondary z-10 absolute m-2 max-w-7 h-7 right-0 rounded-full"
 								onClick={() => deleteFile(index)}
 							>
 								<XMarkIcon className="size-[15px] pointer-events-none" />
@@ -196,13 +195,15 @@ export default function CreatePost() {
 							onClick={() => {
 								document.querySelector("#file-upload").click();
 							}}
-							type="secondary"
-							className="py-1"
+							className="btn-secondary py-2"
 						>
 							Thêm ảnh/video
 						</Button>
 					)}
-					<Button className="py-2 w-auto rounded-[4px]" onClick={handleSubmitPost} disabled={submitClicked}>
+					<Button
+						className={`btn-primary py-2 w-full rounded-[4px] ${submitClicked && "disable-btn"}`}
+						onClick={handleSubmitPost}
+					>
 						{submitClicked ? <LoadingIcon /> : "Đăng bài"}
 					</Button>
 				</div>

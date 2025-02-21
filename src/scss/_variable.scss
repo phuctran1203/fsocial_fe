@@ -26,7 +26,6 @@
 	$min: cal-font-size($base-min-size, $step);
 	$max: cal-font-size($base-max-size, $step);
 	$scaling: scaling-factor($min, $max, $step);
-	//responsive font size
 	@return clamp(font-to-rem($min), scaling-factor($min, $max, $step), font-to-rem($max));
 }
 
@@ -36,7 +35,7 @@ $scale-ratio: 1.067; //ti le font scale
 $min-width: 320;
 $max-width: 1440;
 
-$fs-xsm: clamp-font-size(-2);
+$fs-xs: clamp-font-size(-2);
 $fs-sm: clamp-font-size(-1);
 $fs-base: clamp-font-size(0);
 $fs-lg: clamp-font-size(1);
@@ -54,8 +53,8 @@ $fs-5xl: clamp-font-size(6);
 	--secondary-clr: #f2f2f2;
 	--secondary-hover-clr: #e8e8e8;
 	--secondary-active-clr: #d9d9d9;
-	--lower-backround-clr: hsl(220, 16%, 96%);
-	--background-clr: hsl(0, 0%, 100%);
+	--lower-background-clr: hsl(220, 16%, 96%);
+	--background-clr: #ffffff;
 	--gray-clr: #737373;
 	--gray-light-clr: #adadad;
 	--gray-extra-light-clr: hsl(0, 0%, 90%);
@@ -63,15 +62,25 @@ $fs-5xl: clamp-font-size(6);
 	--text-black-clr: hsl(0, 0%, 25%);
 	--text-white-clr: #ffffff;
 
+	--text-primary-clr: #404040;
+	--text-secondary-clr: #ffffff;
+
 	--shadow-y: 0px -1px 2px 0px hsla(0, 0%, 0%, 8%), 0px 1px 2px 0px hsla(0, 0%, 0%, 8%);
 	--transition: all 0.12s ease-out;
 
+	--fs-xs: $fs-xs;
+	--fs-sm: $fs-sm;
 	--fs-base: $fs-base;
+	--fs-lg: $fs-lg;
+	--fs-xl: $fs-xl;
+	--fs-2xl: $fs-2xl;
+	--fs-3xl: $fs-3xl;
+	--fs-4xl: $fs-4xl;
+	--fs-5xl: $fs-5xl;
 
-	// --ff: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
 	--ff: "Roboto", serif;
 }
-body.dark {
+.dark {
 	//ghi de dark mode o day
 	--background-clr: #000;
 }

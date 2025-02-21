@@ -18,7 +18,7 @@ export default function Follow() {
 	}, []);
 
 	return (
-		<div className="bg-[--background-clr] flex flex-grow h-screen">
+		<div className="bg-background flex flex-grow h-screen">
 			<div className="overflow-y-auto scrollable-div w-full">
 				<div
 					className="
@@ -28,7 +28,9 @@ export default function Follow() {
 						sm:mt-0"
 				>
 					{posts === null ? (
-						<h1>Lỗi lấy posts</h1>
+						<div className="grid h-screen place-content-center">
+							<h1>Lỗi lấy posts</h1>
+						</div>
 					) : (
 						posts.map((post) => <Post key={post.id} post={post} className="rounded ct-shadow-y" />)
 					)}
