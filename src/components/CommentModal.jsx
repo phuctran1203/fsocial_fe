@@ -7,18 +7,25 @@ import { postsStore } from "../store/postsStore";
 import { ownerAccountStore } from "../store/ownerAccountStore";
 import { TextBox } from "./Field";
 import { dateTimeToNotiTime } from "../utils/convertDateTime";
+import { Link } from "react-router-dom";
 
 function CommentReuse(props) {
 	const { comment, selectCommentToReply, handleShowReplyComment, replies, isReply } = props;
 	return (
 		<div className={`${isReply && "ps-6"} flex flex-col space-y-2`}>
 			<div className="flex gap-3">
-				<img src={comment.avatar || "./temp/default_avatar.svg"} alt="avatar" className="size-9 rounded-full" />
+				<Link to="">
+					<img src={comment.avatar || "./temp/default_avatar.svg"} alt="avatar" className="size-9 rounded-full" />
+				</Link>
+
 				<div className="space-y-1">
 					<div>
-						<p className="font-semibold">{comment.displayName}</p>
+						<Link to="" className="font-semibold text-gray fs-xs hover:underline hover:text-primary-text">
+							{comment.displayName}
+						</Link>
 						<div dangerouslySetInnerHTML={{ __html: comment.content.htmltext }}></div>
 					</div>
+
 					<div className="flex items-center gap-2 text-[--gray-clr]">
 						<span className="text-[--gray-clr] fs-sm">{dateTimeToNotiTime(comment.createdAt).textTime}</span>
 						<div className="flex items-center">
@@ -39,8 +46,9 @@ function CommentReuse(props) {
 							</svg>
 							<span className="fs-sm">{comment.countLikes}</span>
 						</div>
+
 						<button
-							className="fs-sm"
+							className="fs-sm hover:text-primary-text"
 							onClick={() => {
 								selectCommentToReply({
 									id: comment.id,
@@ -52,9 +60,10 @@ function CommentReuse(props) {
 							Phản hồi
 						</button>
 					</div>
+
 					{comment.reply && !isReply && (
 						<button
-							className="fs-xsm ps-2 font-semibold text-[--gray-clr] hover:underline"
+							className="fs-xs ps-2 font-semibold text-[--gray-clr] hover:underline"
 							onClick={handleShowReplyComment}
 						>
 							{replies?.reply.length} phản hồi
@@ -196,14 +205,14 @@ export default function CommentModal() {
 			className={`z-20 fixed inset-0 sm:py-2 bg-black flex items-center justify-center ${
 				isVisible ? "bg-opacity-30 visible" : "bg-opacity-0 invisible"
 			}
-			transition-[--transition]`}
+			transition`}
 			onClick={() => setIsVisible(false)}
 		>
 			<div
 				className={`
-				flex flex-col bg-background rounded-lg w-[600px] overflow-y-auto h-full scrollable-div
+				flex flex-col bg-background rounded-lg w-[600px] overflow-y-auto h-full scrollable-div border
 				${isVisible ? "translate-y-0" : "translate-y-[100vh]"}	
-				transition-[--transition]`}
+				transition-all`}
 				onClick={(e) => e.stopPropagation()}
 			>
 				<div className="bg-background border-b sticky top-0 py-2">
@@ -246,8 +255,9 @@ export default function CommentModal() {
 							<XMarkIcon />
 						</div>
 					</div>
-					<div className="bg-background flex items-end gap-4 px-4 py-2 border-t">
-						<img src={user.avatar} alt="avatar" className="size-10 rounded-full" />
+
+					<div className="bg-background flex items-end gap-4 px-4 pt-2 pb-3 border-t">
+						<img src={user.avatar} alt="avatar" className="size-9 rounded-full" />
 						<TextBox
 							texboxRef={textbox}
 							className="py-2 w-full max-h-[40vh]"

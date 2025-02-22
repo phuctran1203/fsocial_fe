@@ -1,15 +1,13 @@
-import React from "react";
+import React, { useState } from "react";
 import { NavLink, useLocation } from "react-router-dom";
 import styles from "./Nav.module.scss";
-import { Bell, FriendsIcon, HamburgerIcon, HomeIcon, LogoNoBG, LogoutIcon, SearchIcon } from "./Icon";
+// import "./Nav.scss";
+import { Bell, FriendsIcon, HamburgerIcon, HomeIcon, LogoNoBG, SearchIcon } from "./Icon";
 import { popupCreatePostStore, popupNotificationtStore } from "../store/popupStore";
 import { ownerAccountStore } from "../store/ownerAccountStore";
 import { toast } from "sonner";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-
-const navStyle = `w-full flex items-center gap-4 px-2 py-3 rounded-md 
-				  hover:bg-gray-3light active:bg-gray-2light
-				  sm:justify-start justify-center transition-[--transition]`;
+import NavMorePopup from "./NavMorePopup";
 
 export default function Nav() {
 	const user = ownerAccountStore((state) => state.user);
@@ -39,7 +37,7 @@ export default function Nav() {
 	return (
 		<nav
 			className={`
-			z-10 bg-background border-gray-2light
+			z-10 bg-background
 			sm:border-r border-0
 			${
 				!isInMessage
@@ -47,25 +45,25 @@ export default function Nav() {
 					: "lg:min-w-[260px] lg:max-w-[260px] sm:w-[76px]"
 			} 
 			sm:static sm:flex sm:flex-col sm:justify-between sm:h-screen sm:py-6
-			absolute bottom-0 w-full border-t-[1px]
-			transition-[--transition]
+			absolute bottom-0 w-full border-t
+			transition
 			${styles.transitionNav}`}
 		>
 			<div className="sm:space-y-8 sm:block w-full">
 				{/* logo */}
 				<NavLink to="/" className="sm:block hidden" onClick={() => toast.message("Clicked logo")}>
-					<LogoNoBG className={!isInMessage ? "ms-6" : "lg:ms-6 ms-2"} />
+					<LogoNoBG className={!isInMessage ? "ms-6" : "lg:ms-6 mx-auto"} />
 				</NavLink>
 
 				<div className="sm:space-y-3 sm:mx-4 sm:block flex justify-evenly">
-					<NavLink to="/home" className={navStyle} onClick={closeNotification}>
+					<NavLink to="/home" className={styles.navBaseStyle} onClick={closeNotification}>
 						<HomeIcon compareVar={isInHome} />
 						<span className={`${!isInMessage ? "sm:inline" : "lg:inline"} hidden ${isInHome && "font-semibold"}`}>
 							Trang chủ
 						</span>
 					</NavLink>
 
-					<NavLink to="/follow" className={navStyle} onClick={closeNotification}>
+					<NavLink to="/follow" className={styles.navBaseStyle} onClick={closeNotification}>
 						{({ isActive }) => (
 							<>
 								<FriendsIcon compareVar={isActive} />
@@ -76,7 +74,7 @@ export default function Nav() {
 						)}
 					</NavLink>
 
-					<NavLink to="/search" className={navStyle} onClick={closeNotification}>
+					<NavLink to="/search" className={styles.navBaseStyle} onClick={closeNotification}>
 						{({ isActive }) => (
 							<>
 								<SearchIcon compareVar={isActive} />
@@ -87,7 +85,7 @@ export default function Nav() {
 						)}
 					</NavLink>
 
-					<NavLink to="/message" className={navStyle} onClick={closeNotification}>
+					<NavLink to="/message" className={styles.navBaseStyle} onClick={closeNotification}>
 						{({ isActive }) => (
 							<>
 								<svg className="size-[26px]" viewBox="0 0 26 26" fill="none">
@@ -111,19 +109,17 @@ export default function Nav() {
 					</NavLink>
 
 					<button
-						className={`${navStyle} ${
-							location.pathname === "/message" ? "sm:flex hidden" : "lg:hidden sm:flex hidden"
-						}`}
+						className={`${styles.navBaseStyle} ${!isInMessage ? "lg:!hidden sm:!flex !hidden" : "sm:!flex !hidden"}`}
 						onClick={toggleShowNotification}
 					>
 						<div className="relative">
-							<Bell />
+							<Bell active={isVisible} />
 							<div className="absolute size-2.5 -top-[1px] right-[1px]  bg-primary rounded-full " />
 						</div>
 						<span className={`${!isInMessage ? "sm:inline" : "lg:inline"} hidden`}>Thông báo</span>
 					</button>
 
-					<button className={navStyle} onClick={handlePopupCreatePost}>
+					<button className={styles.navBaseStyle} onClick={handlePopupCreatePost}>
 						<svg className="size-[26px]" viewBox="0 0 26 26" fill="none">
 							<path
 								className="fill-primary-text"
@@ -133,7 +129,7 @@ export default function Nav() {
 						<span className={`${!isInMessage ? "sm:inline" : "lg:inline"} hidden`}>Tạo bài viết</span>
 					</button>
 
-					<NavLink to={`/profile?id=${user.id}`} className={navStyle} onClick={closeNotification}>
+					<NavLink to={`/profile?id=${user.id}`} className={styles.navBaseStyle} onClick={closeNotification}>
 						{({ isActive }) => (
 							<>
 								<div className="size-[26px] rounded-full overflow-hidden">
@@ -150,15 +146,12 @@ export default function Nav() {
 
 			<div className="sm:flex hidden mx-4">
 				<Popover>
-					<PopoverTrigger className={`${navStyle} `} onClick={closeNotification}>
+					<PopoverTrigger className={`${styles.navBaseStyle}`} onClick={closeNotification}>
 						<HamburgerIcon />
 						<span className={!isInMessage ? "" : "lg:inline hidden"}>Thêm</span>
 					</PopoverTrigger>
-					<PopoverContent className="ms-4 mb-4 bg-background w-72 border rounded-lg shadow-xl p-2">
-						<button className={navStyle}>
-							<LogoutIcon />
-							<span>Đăng xuất</span>
-						</button>
+					<PopoverContent sideOffset={10} className="ms-4 bg-background w-72 border shadow-xl p-2">
+						<NavMorePopup />
 					</PopoverContent>
 				</Popover>
 			</div>
