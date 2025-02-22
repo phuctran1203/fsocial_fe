@@ -25,6 +25,7 @@ API.interceptors.request.use(
 		// 	return Promise.reject(new Error("Redirecting to login..."));
 		// }
 		if (token) config.headers.Authorization = `Bearer ${token}`;
+		// config.headers["User-Agent"] = navigator.userAgent;
 		return config;
 	},
 	(error) => Promise.reject(error)

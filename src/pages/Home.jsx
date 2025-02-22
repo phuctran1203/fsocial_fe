@@ -15,23 +15,26 @@ export default function Home() {
 
 		const fetchPosts = async () => {
 			const resp = await postsApi.getPosts();
-			setPosts(resp.statusCode === 200 ? resp.data : null);
+			setPosts(resp?.statusCode === 200 ? resp.data : null);
 		};
 		fetchPosts();
 	}, []);
 
 	return (
-		<div className=" bg-[--background-clr] flex flex-grow h-screen">
+		<div className="bg-background flex flex-grow h-screen">
 			<div className="overflow-y-auto scrollable-div w-full">
 				<div
 					className="
-					space-y-1 w-full pb-12 mt-12 mx-auto
+					w-full mx-auto
 					lg:max-w-[580px]
 					md:space-y-4 md:pb-0
-					sm:mt-0"
+					sm:mt-0
+					mt-12 space-y-1.5 pb-12"
 				>
 					{posts === null ? (
-						<h1>Lỗi lấy posts</h1>
+						<div className="grid h-screen place-content-center">
+							<h1>Lỗi lấy posts</h1>
+						</div>
 					) : (
 						posts.map((post) => <Post key={post.id} post={post} className="rounded ct-shadow-y" />)
 					)}

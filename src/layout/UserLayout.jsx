@@ -4,6 +4,7 @@ import Nav from "../components/Nav";
 import Notification from "../components/Notification";
 import Header from "../components/Header";
 import CreatePost from "../components/CreatePost";
+import { Toaster } from "sonner";
 
 export default function UserLayout() {
 	return (
@@ -16,6 +17,7 @@ export default function UserLayout() {
 				<Notification />
 				<CreatePost />
 			</main>
+			<Toaster richColors position="top-right" />
 		</>
 	);
 }

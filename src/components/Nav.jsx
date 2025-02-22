@@ -1,18 +1,22 @@
 import React from "react";
 import { NavLink, useLocation } from "react-router-dom";
 import styles from "./Nav.module.scss";
-import { Bell, FriendsIcon, HomeIcon, LogoNoBG, SearchIcon } from "./Icon";
+import { Bell, FriendsIcon, HamburgerIcon, HomeIcon, LogoNoBG, LogoutIcon, SearchIcon } from "./Icon";
 import { popupCreatePostStore, popupNotificationtStore } from "../store/popupStore";
 import { ownerAccountStore } from "../store/ownerAccountStore";
+import { toast } from "sonner";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 
 const navStyle = `w-full flex items-center gap-4 px-2 py-3 rounded-md 
-				  hover:bg-[--gray-extraaa-light-clr] active:bg-[--gray-extra-light-clr]
-				  sm:justify-start justify-center`;
+				  hover:bg-gray-3light active:bg-gray-2light
+				  sm:justify-start justify-center transition-[--transition]`;
 
 export default function Nav() {
 	const user = ownerAccountStore((state) => state.user);
 
 	const location = useLocation();
+
+	const isInMessage = location.pathname === "/message";
 
 	const isInHome = ["/", "/home"].includes(location.pathname);
 
@@ -35,31 +39,39 @@ export default function Nav() {
 	return (
 		<nav
 			className={`
-			z-10 bg-[--background-clr] border-[--gray-extra-light-clr]
-			lg:border-r-[1px]
-			md:min-w-[260px] md:max-w-[260px] 
-			sm:min-w-[210px] sm:max-w-[210px] sm:static sm:flex sm:flex-col sm:justify-between sm:h-screen sm:py-6 
+			z-10 bg-background border-gray-2light
+			sm:border-r border-0
+			${
+				!isInMessage
+					? "md:min-w-[260px] md:max-w-[260px] sm:min-w-[210px] sm:max-w-[210px]"
+					: "lg:min-w-[260px] lg:max-w-[260px] sm:w-[76px]"
+			} 
+			sm:static sm:flex sm:flex-col sm:justify-between sm:h-screen sm:py-6
 			absolute bottom-0 w-full border-t-[1px]
-			ct-transition
+			transition-[--transition]
 			${styles.transitionNav}`}
 		>
 			<div className="sm:space-y-8 sm:block w-full">
 				{/* logo */}
-				<NavLink to="/" className="sm:block hidden">
-					<LogoNoBG className="ms-6" />
+				<NavLink to="/" className="sm:block hidden" onClick={() => toast.message("Clicked logo")}>
+					<LogoNoBG className={!isInMessage ? "ms-6" : "lg:ms-6 ms-2"} />
 				</NavLink>
 
 				<div className="sm:space-y-3 sm:mx-4 sm:block flex justify-evenly">
 					<NavLink to="/home" className={navStyle} onClick={closeNotification}>
 						<HomeIcon compareVar={isInHome} />
-						<span className={`sm:inline hidden ${isInHome ? "font-semibold" : ""}`}> Trang chủ </span>
+						<span className={`${!isInMessage ? "sm:inline" : "lg:inline"} hidden ${isInHome && "font-semibold"}`}>
+							Trang chủ
+						</span>
 					</NavLink>
 
 					<NavLink to="/follow" className={navStyle} onClick={closeNotification}>
 						{({ isActive }) => (
 							<>
 								<FriendsIcon compareVar={isActive} />
-								<span className={`sm:inline hidden ${isActive ? "font-semibold" : ""}`}> Theo dõi </span>
+								<span className={`${!isInMessage ? "sm:inline" : "lg:inline"} hidden ${isActive && "font-semibold"}`}>
+									Theo dõi
+								</span>
 							</>
 						)}
 					</NavLink>
@@ -68,7 +80,9 @@ export default function Nav() {
 						{({ isActive }) => (
 							<>
 								<SearchIcon compareVar={isActive} />
-								<span className={`sm:inline hidden ${isActive ? "font-semibold" : ""}`}> Tìm kiếm </span>
+								<span className={`${!isInMessage ? "sm:inline" : "lg:inline"} hidden ${isActive && "font-semibold"}`}>
+									Tìm kiếm
+								</span>
 							</>
 						)}
 					</NavLink>
@@ -78,101 +92,75 @@ export default function Nav() {
 							<>
 								<svg className="size-[26px]" viewBox="0 0 26 26" fill="none">
 									<path
-										className={`stroke-[--text-black-clr] ${isActive ? "fill-[--text-black-clr]" : ""} `}
+										className={`stroke-primary-text ${isActive ? "fill-primary-text" : ""} `}
 										d="M2 8.72057C2 6.71818 2 5.71698 2.4074 4.95218C2.76577 4.27943 3.33759 3.73247 4.04092 3.38969C4.84048 3 5.88719 3 7.9806 3H18.4466C20.5401 3 21.5867 3 22.3864 3.38969C23.0897 3.73247 23.6615 4.27943 24.0198 4.95218C24.4272 5.71698 24.4272 6.71818 24.4272 8.72057V15.1562C24.4272 17.1586 24.4272 18.1597 24.0198 18.9246C23.6615 19.5974 23.0897 20.1443 22.3864 20.4871C21.5867 20.8768 20.5401 20.8768 18.4466 20.8768H15.3114C14.534 20.8768 14.1452 20.8768 13.7733 20.9498C13.4434 21.0146 13.1242 21.1217 12.8243 21.2683C12.4862 21.4335 12.1826 21.6657 11.5754 22.1303L8.60328 24.4047C8.08485 24.8014 7.82564 24.9998 7.60748 25C7.41776 25.0002 7.23828 24.9176 7.11993 24.7758C6.98383 24.6128 6.98383 24.2953 6.98383 23.6602V20.8768C5.82513 20.8768 5.24577 20.8768 4.77044 20.755C3.48053 20.4244 2.47299 19.4606 2.12736 18.2268C2 17.7722 2 17.218 2 16.1096V8.72057Z"
 										strokeWidth="1.5"
 									/>
 									<path
-										className={`stroke-[--text-black-clr] ${isActive ? "fill-[--background-clr]" : ""}`}
+										className={`stroke-primary-text ${isActive ? "fill-background" : ""}`}
 										d="M12.9966 8.84795C11.9969 7.68205 10.3299 7.36843 9.07734 8.43604C7.82482 9.50365 7.64849 11.2886 8.6321 12.5513C9.24148 13.3336 10.771 14.7623 11.8467 15.7363C12.2418 16.094 12.4392 16.2729 12.6763 16.3449C12.8798 16.4068 13.1134 16.4068 13.3168 16.3449C13.5539 16.2729 13.7514 16.094 14.1466 15.7363C15.2221 14.7623 16.7517 13.3336 17.361 12.5513C18.3447 11.2886 18.1899 9.49242 16.9158 8.43604C15.6418 7.37966 13.9962 7.68205 12.9966 8.84795Z"
 										strokeWidth="1.4"
 									/>
 								</svg>
 
-								<span className={`sm:inline hidden ${isActive ? "font-semibold" : ""}`}>Tin nhắn</span>
+								<span className={`${!isInMessage ? "sm:inline" : "lg:inline"} hidden ${isActive && "font-semibold"}`}>
+									Tin nhắn
+								</span>
 							</>
 						)}
 					</NavLink>
 
-					<button className={`${navStyle} lg:hidden sm:flex hidden`} onClick={toggleShowNotification}>
+					<button
+						className={`${navStyle} ${
+							location.pathname === "/message" ? "sm:flex hidden" : "lg:hidden sm:flex hidden"
+						}`}
+						onClick={toggleShowNotification}
+					>
 						<div className="relative">
 							<Bell />
-							<div className="absolute size-2.5 -top-[1px] right-[1px]  bg-[--primary-clr] rounded-full " />
+							<div className="absolute size-2.5 -top-[1px] right-[1px]  bg-primary rounded-full " />
 						</div>
-						<span className={`sm:inline hidden`}>Thông báo</span>
+						<span className={`${!isInMessage ? "sm:inline" : "lg:inline"} hidden`}>Thông báo</span>
 					</button>
 
 					<button className={navStyle} onClick={handlePopupCreatePost}>
 						<svg className="size-[26px]" viewBox="0 0 26 26" fill="none">
 							<path
-								className="fill-[--text-black-clr]"
+								className="fill-primary-text"
 								d="M12.9359 1H14.6744C15.1368 1 15.5116 1.37484 15.5116 1.83721C15.5116 2.29958 15.1368 2.67442 14.6744 2.67442H13C10.3452 2.67442 8.43838 2.67619 6.98725 2.87129C5.56018 3.06316 4.69985 3.42806 4.06396 4.06396C3.42806 4.69985 3.06316 5.56019 2.87129 6.98725C2.67619 8.43839 2.67442 10.3452 2.67442 13C2.67442 15.6547 2.67619 17.5615 2.87129 19.0127C3.06316 20.4398 3.42806 21.3001 4.06396 21.936C4.69985 22.572 5.56018 22.9369 6.98725 23.1286C8.43838 23.3238 10.3452 23.3256 13 23.3256C15.6547 23.3256 17.5615 23.3238 19.0127 23.1286C20.4398 22.9369 21.3001 22.572 21.936 21.936C22.572 21.3001 22.9369 20.4398 23.1286 19.0127C23.3238 17.5615 23.3256 15.6547 23.3256 13V11.3256C23.3256 10.8632 23.7004 10.4884 24.1628 10.4884C24.6251 10.4884 25 10.8632 25 11.3256V13.0641C25 15.6409 25 17.6602 24.7882 19.2359C24.5713 20.8485 24.1189 22.1212 23.1201 23.1201C22.1212 24.1189 20.8485 24.5713 19.2358 24.7882C17.6602 25 15.6409 25 13.0641 25H12.9359C10.3591 25 8.33974 25 6.76413 24.7882C5.1514 24.5713 3.87882 24.1189 2.87997 23.1201C1.88111 22.1212 1.42864 20.8485 1.21181 19.2359C0.999978 17.6602 0.999989 15.6409 1 13.0641V12.9359C0.999989 10.3591 0.999978 8.33974 1.21181 6.76414C1.42864 5.1514 1.88111 3.87883 2.87997 2.87997C3.87882 1.88111 5.1514 1.42864 6.76413 1.21181C8.33974 0.999978 10.3591 0.999989 12.9359 1ZM18.3252 2.14521C19.8521 0.618265 22.3278 0.618265 23.8548 2.14521C25.3817 3.67215 25.3817 6.1478 23.8548 7.67475L16.4337 15.0959C16.0192 15.5104 15.7595 15.77 15.4699 15.9961C15.1286 16.2622 14.7594 16.4904 14.3687 16.6766C14.037 16.8346 13.6886 16.9507 13.1326 17.136L9.89033 18.2168C9.29172 18.4163 8.63177 18.2606 8.1856 17.8144C7.73944 17.3682 7.58364 16.7083 7.78317 16.1096L8.86392 12.8674C9.04924 12.3114 9.16534 11.963 9.32341 11.6313C9.5096 11.2406 9.73779 10.8714 10.004 10.5301C10.2299 10.2404 10.4896 9.98078 10.9041 9.56632L18.3252 2.14521ZM22.6707 3.3292C21.7977 2.45616 20.3823 2.45616 19.5092 3.3292L19.0888 3.74962C19.1142 3.85662 19.1496 3.98411 19.1989 4.12632C19.3589 4.58741 19.6616 5.19465 20.2335 5.7665C20.8053 6.33834 21.4126 6.64107 21.8736 6.80104C22.0158 6.85038 22.1433 6.88583 22.2504 6.91117L22.6707 6.49076C23.5438 5.61772 23.5438 4.20223 22.6707 3.3292ZM20.9313 8.23023C20.3554 7.98253 19.6845 7.58544 19.0494 6.95049C18.4145 6.31555 18.0174 5.64463 17.7697 5.06868L12.1265 10.7119C11.6616 11.1769 11.4792 11.3613 11.3242 11.5599C11.1329 11.8052 10.9688 12.0708 10.835 12.3517C10.7265 12.5792 10.6432 12.8246 10.4352 13.4484L9.95312 14.8948L11.1052 16.0469L12.5516 15.5647C13.1754 15.3568 13.4208 15.2734 13.6483 15.165C13.9292 15.0312 14.1947 14.8671 14.4401 14.6757C14.6387 14.5208 14.8231 14.3384 15.288 13.8735L20.9313 8.23023Z"
 							/>
 						</svg>
-						<span className={`sm:inline hidden`}>Tạo bài viết</span>
+						<span className={`${!isInMessage ? "sm:inline" : "lg:inline"} hidden`}>Tạo bài viết</span>
 					</button>
 
 					<NavLink to={`/profile?id=${user.id}`} className={navStyle} onClick={closeNotification}>
 						{({ isActive }) => (
 							<>
-								<div className="size-6 rounded-full overflow-hidden">
+								<div className="size-[26px] rounded-full overflow-hidden">
 									<img className="size-full object-cover object-center" src={user.avatar} alt="navbar avatar account" />
 								</div>
-								<span className={`sm:inline hidden ${isActive ? "font-semibold" : ""}`}>Hồ sơ</span>
+								<span className={`${!isInMessage ? "sm:inline" : "lg:inline"} hidden ${isActive && "font-semibold"}`}>
+									Hồ sơ
+								</span>
 							</>
 						)}
 					</NavLink>
 				</div>
 			</div>
 
-			<div className="space-y-3 mx-4 sm:block hidden">
-				<NavLink to="/setting" className={navStyle} onClick={closeNotification}>
-					{({ isActive }) => (
-						<>
-							<svg className="size-[26px]" viewBox="0 0 26 26" fill="none">
-								<path
-									className={!isActive ? "fill-[--text-black-clr]" : "fill-[--background-clr]"}
-									fillRule="evenodd"
-									clipRule="evenodd"
-									d="M12.6947 7.85714C14.0586 7.85714 15.3667 8.39898 16.3312 9.36345C17.2957 10.3279 17.8375 11.636 17.8375 13C17.8375 14.364 17.2957 15.6721 16.3312 16.6365C15.3667 17.601 14.0586 18.1429 12.6947 18.1429C11.3307 18.1429 10.0226 17.601 9.05811 16.6365C8.09364 15.6721 7.5518 14.364 7.5518 13C7.5518 11.636 8.09364 10.3279 9.05811 9.36345C10.0226 8.39898 11.3307 7.85714 12.6947 7.85714ZM10.2703 10.5756C10.9133 9.93265 11.7853 9.57143 12.6947 9.57143C13.604 9.57143 14.476 9.93265 15.119 10.5756C15.762 11.2186 16.1232 12.0907 16.1232 13C16.1232 13.9093 15.762 14.7814 15.119 15.4244C14.476 16.0673 13.604 16.4286 12.6947 16.4286C11.7853 16.4286 10.9133 16.0673 10.2703 15.4244C9.62731 14.7814 9.26609 13.9093 9.26609 13C9.26609 12.0907 9.62731 11.2186 10.2703 10.5756Z"
-								/>
-								<path
-									className={
-										isActive
-											? "fill-[--text-black-clr] stroke-[--text-black-clr]"
-											: "fill-[--background-clr] stroke-[--background-clr]"
-									}
-									fillRule="evenodd"
-									clipRule="evenodd"
-									strokeWidth={isActive ? 2 : 0}
-									d="M14.4432 2.71429H10.9461L9.97237 5.74343L9.3158 6.064C8.99303 6.22195 8.68145 6.4018 8.38323 6.60229L7.77638 7.01371L4.66323 6.34171L2.91466 9.37257L5.04895 11.7349L4.99752 12.4617C4.97289 12.8201 4.97289 13.1799 4.99752 13.5383L5.04895 14.2651L2.91123 16.6274L4.66152 19.6583L7.77466 18.988L8.38152 19.3977C8.67974 19.5982 8.99132 19.7781 9.31409 19.936L9.97066 20.2566L10.9461 23.2857H14.4467L15.4238 20.2549L16.0787 19.936C16.4011 19.7784 16.7121 19.5986 17.0095 19.3977L17.6147 18.988L20.7295 19.6583L22.4781 16.6274L20.3421 14.2651L20.3935 13.5383C20.4182 13.1793 20.4182 12.819 20.3935 12.46L20.3421 11.7331L22.4798 9.37257L20.7295 6.34171L17.6147 7.01029L17.0095 6.60229C16.7121 6.4014 16.4011 6.22153 16.0787 6.064L15.4238 5.74514L14.4449 2.71429H14.4432ZM16.3312 9.36345C15.3667 8.39898 14.0586 7.85714 12.6947 7.85714C11.3307 7.85714 10.0226 8.39898 9.05811 9.36345C8.09364 10.3279 7.5518 11.636 7.5518 13C7.5518 14.364 8.09364 15.6721 9.05811 16.6365C10.0226 17.601 11.3307 18.1429 12.6947 18.1429C14.0586 18.1429 15.3667 17.601 16.3312 16.6365C17.2957 15.6721 17.8375 14.364 17.8375 13C17.8375 11.636 17.2957 10.3279 16.3312 9.36345Z"
-								/>
-								<path
-									className="fill-[--text-black-clr]"
-									fillRule="evenodd"
-									clipRule="evenodd"
-									d="M15.0707 1C15.2521 1.00001 15.4289 1.05761 15.5756 1.16451C15.7222 1.27141 15.8311 1.42209 15.8867 1.59486L16.8295 4.52457C17.2255 4.71829 17.6044 4.936 17.9661 5.18114L20.9764 4.53314C21.1539 4.49525 21.3388 4.51467 21.5045 4.58861C21.6703 4.66255 21.8083 4.78718 21.8987 4.94457L24.2747 9.05714C24.3654 9.21444 24.4038 9.39649 24.3844 9.57703C24.365 9.75758 24.2888 9.9273 24.1667 10.0617L22.1009 12.3417C22.131 12.7789 22.131 13.2177 22.1009 13.6549L24.1667 15.9383C24.2888 16.0727 24.365 16.2424 24.3844 16.423C24.4038 16.6035 24.3654 16.7856 24.2747 16.9429L21.8987 21.0571C21.808 21.2142 21.6699 21.3385 21.5042 21.4121C21.3385 21.4857 21.1537 21.5049 20.9764 21.4669L17.9661 20.8189C17.6061 21.0623 17.2255 21.2817 16.8312 21.4754L15.8867 24.4051C15.8311 24.5779 15.7222 24.7286 15.5756 24.8355C15.4289 24.9424 15.2521 25 15.0707 25H10.3187C10.1372 25 9.9604 24.9424 9.81376 24.8355C9.66712 24.7286 9.55819 24.5779 9.50266 24.4051L8.56152 21.4771C8.16658 21.284 7.78565 21.0635 7.42152 20.8171L4.41295 21.4669C4.23546 21.5048 4.05052 21.4853 3.88478 21.4114C3.71903 21.3375 3.58103 21.2128 3.49066 21.0554L1.11466 16.9429C1.02393 16.7856 0.985502 16.6035 1.00491 16.423C1.02432 16.2424 1.10057 16.0727 1.22266 15.9383L3.28838 13.6549C3.25845 13.2188 3.25845 12.7812 3.28838 12.3451L1.22266 10.0617C1.10057 9.9273 1.02432 9.75758 1.00491 9.57703C0.985502 9.39649 1.02393 9.21444 1.11466 9.05714L3.49066 4.94286C3.58128 4.78578 3.71939 4.6615 3.88511 4.58788C4.05084 4.51426 4.23564 4.49509 4.41295 4.53314L7.42152 5.18286C7.78495 4.93771 8.16552 4.71657 8.56152 4.52286L9.50437 1.59486C9.55972 1.42265 9.66813 1.27236 9.81409 1.16551C9.96004 1.05867 10.1361 1.00073 10.3169 1H15.0689H15.0707ZM10.9461 2.71429H14.4432H14.4449L15.4238 5.74514L16.0787 6.064C16.4011 6.22153 16.7121 6.4014 17.0095 6.60229L17.6147 7.01029L20.7295 6.34171L22.4798 9.37257L20.3421 11.7331L20.3935 12.46C20.4182 12.819 20.4182 13.1793 20.3935 13.5383L20.3421 14.2651L22.4781 16.6274L20.7295 19.6583L17.6147 18.988L17.0095 19.3977C16.7121 19.5986 16.4011 19.7784 16.0787 19.936L15.4238 20.2549L14.4467 23.2857H10.9461L9.97066 20.2566L9.31409 19.936C8.99132 19.7781 8.67974 19.5982 8.38152 19.3977L7.77466 18.988L4.66152 19.6583L2.91123 16.6274L5.04895 14.2651L4.99752 13.5383C4.97289 13.1799 4.97289 12.8201 4.99752 12.4617L5.04895 11.7349L2.91466 9.37257L4.66323 6.34171L7.77638 7.01371L8.38323 6.60229C8.68145 6.4018 8.99303 6.22195 9.3158 6.064L9.97237 5.74343L10.9461 2.71429Z"
-								/>
-							</svg>
-							<span>Cài đặt</span>
-						</>
-					)}
-				</NavLink>
-
-				<button className={navStyle} onClick={closeNotification}>
-					<svg className="size-[26px]" viewBox="0 0 26 26" fill="none">
-						<path
-							className="fill-[--text-black-clr]"
-							d="M6.49617 9.80028C6.87199 9.42633 6.8735 8.81851 6.49954 8.44268C6.12559 8.06686 5.51778 8.06535 5.14194 8.4393L6.49617 9.80028ZM1.28286 12.2791C0.907036 12.6531 0.905526 13.261 1.27948 13.6368C1.65343 14.0126 2.26125 14.0141 2.63708 13.6402L1.28286 12.2791ZM2.63708 12.2791C2.26125 11.9052 1.65343 11.9068 1.27948 12.2826C0.905526 12.6584 0.907036 13.2662 1.28286 13.6402L2.63708 12.2791ZM5.14194 17.4801C5.51778 17.854 6.12559 17.8525 6.49954 17.4767C6.8735 17.1009 6.87199 16.493 6.49617 16.119L5.14194 17.4801ZM1.95997 11.9997C1.4298 11.9997 1 12.4295 1 12.9597C1 13.4898 1.4298 13.9196 1.95997 13.9196V11.9997ZM19.8794 13.9196C20.4096 13.9196 20.8394 13.4898 20.8394 12.9597C20.8394 12.4295 20.4096 11.9997 19.8794 11.9997V13.9196ZM5.14194 8.4393L1.28286 12.2791L2.63708 13.6402L6.49617 9.80028L5.14194 8.4393ZM1.28286 13.6402L5.14194 17.4801L6.49617 16.119L2.63708 12.2791L1.28286 13.6402ZM1.95997 13.9196H19.8794V11.9997H1.95997V13.9196Z"
-						/>
-						<path
-							className="stroke-[--text-black-clr]"
-							d="M9.64014 16.7996C9.64014 19.6272 11.9324 21.9195 14.76 21.9195H19.8798C22.7074 21.9195 24.9997 19.6272 24.9997 16.7996V9.11984C24.9997 6.29223 22.7074 4 19.8798 4H14.76C11.9324 4 9.64014 6.29223 9.64014 9.11984"
-							strokeWidth="1.8"
-						/>
-					</svg>
-					<span>Đăng xuất</span>
-				</button>
+			<div className="sm:flex hidden mx-4">
+				<Popover>
+					<PopoverTrigger className={`${navStyle} `} onClick={closeNotification}>
+						<HamburgerIcon />
+						<span className={!isInMessage ? "" : "lg:inline hidden"}>Thêm</span>
+					</PopoverTrigger>
+					<PopoverContent className="ms-4 mb-4 bg-background w-72 border rounded-lg shadow-xl p-2">
+						<button className={navStyle}>
+							<LogoutIcon />
+							<span>Đăng xuất</span>
+						</button>
+					</PopoverContent>
+				</Popover>
 			</div>
 		</nav>
 	);

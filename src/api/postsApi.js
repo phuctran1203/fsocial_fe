@@ -1,8 +1,8 @@
 import API from "./axiosInstance";
 
 export const postsApi = {
-	getPosts: (signal) =>
-		API.get("/timeline/post", { signal })
+	getPosts: () =>
+		API.get("/timeline/post")
 			.then((resp) => {
 				const data = resp.data;
 				console.log("Resp getPosts: ", data);
@@ -22,6 +22,18 @@ export const postsApi = {
 			})
 			.catch((error) => {
 				console.error("Error at createPost:", error);
+				return error.response?.data || null;
+			}),
+
+	getFollowingPosts: () =>
+		API.get("/timeline/post")
+			.then((resp) => {
+				const data = resp.data;
+				console.log("Resp getPosts: ", data);
+				return data;
+			})
+			.catch((error) => {
+				console.error("Error at getPosts:", error);
 				return error.response?.data || null;
 			}),
 };

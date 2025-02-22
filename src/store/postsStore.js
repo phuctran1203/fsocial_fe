@@ -16,4 +16,10 @@ export const postsStore = create((set) => ({
 			posts: newPosts,
 		}));
 	},
+
+	insertPost: (post) => {
+		set((state) => ({
+			posts: [post, ...state.posts],
+		}));
+	},
 }));

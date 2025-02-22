@@ -55,16 +55,3 @@ export function dateTimeToNotiTime(time) {
 		labelType: labelType,
 	};
 }
-
-export function dateTimeToPostTime(time) {
-	const date = new Date(time);
-
-	// Lấy giờ và phút
-	const hours = String(date.getHours()).padStart(2, "0");
-	const minutes = String(date.getMinutes()).padStart(2, "0");
-
-	// Lấy ngày, tháng, năm
-	const day = String(date.getDate()).padStart(2, "0");
-	const month = String(date.getMonth() + 1).padStart(2, "0"); // getMonth() trả về từ 0-11, nên cần cộng thêm 1
-	const year = date.getFullYear();
-}

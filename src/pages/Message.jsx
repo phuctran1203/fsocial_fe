@@ -1,37 +1,72 @@
 import React, { useState, useEffect, useRef } from "react";
-// import { FaPaperPlane } from "react-icons/fa";
+import { ArrowLeftIcon, Glyph, SearchIcon, SendIcon, SmileIcon } from "../components/Icon";
+import { dateTimeToNotiTime } from "../utils/convertDateTime";
+import { TextBox } from "../components/Field";
+
+const listUsers = [
+	{
+		userId: "1",
+		displayName: "Phúc Thịnh",
+		latestMessage: "Chào bạn!",
+		avatar: "./temp/user_2.png",
+		time: "2025-02-10 10:00:00",
+		read: true,
+	},
+	{
+		userId: "2",
+		displayName: "Phương Nam",
+		latestMessage: "Lấy dùm tui cái laptop nha 🤧",
+		avatar: "./temp/user_3.png",
+		time: "2025-02-10 10:00:00",
+		read: true,
+	},
+	{
+		userId: "3",
+		displayName: "Đức Khải",
+		latestMessage: "",
+		avatar: "./temp/user_4.png",
+		time: "",
+		read: false,
+	},
+	{
+		userId: "4",
+		displayName: "Cang Ngô",
+		latestMessage: "",
+		avatar: "./temp/user_5.png",
+		time: "",
+		read: false,
+	},
+	{
+		userId: "5",
+		displayName: "Tấn Đạt",
+		latestMessage: "Biết ông lích không?",
+		avatar: "./temp/user_6.png",
+		time: "2025-02-10 10:00:00",
+		read: false,
+	},
+];
+
+const message = [
+	{
+		idMessage: "4h7ad2",
+		data: {
+			userId: 1,
+			sendToId: 0,
+			message: "",
+		},
+	},
+];
 
 export default function Message() {
-	const [messages, setMessages] = useState({
-		"Phúc Thịnh": [
-			{ id: 1, text: "Chào bạn!", sender: "Phúc Thịnh" },
-			{ id: 2, text: "Chào bạn, có gì không?", sender: "user" },
-			{ id: 3, text: "Đi cà phê nhé!", sender: "Phúc Thịnh" },
-		],
-		"Phương Nam": [
-			{ id: 1, text: "Hello Nam!", sender: "user" },
-			{ id: 2, text: "Hello bạn, lâu quá!", sender: "Phương Nam" },
-		],
-		"Đức Khải": [
-			{ id: 1, text: "Anh rảnh không?", sender: "user" },
-			{ id: 2, text: "Có gì không em?", sender: "Đức Khải" },
-		],
-	});
+	const textbox = useRef(null);
 
-	const [input, setInput] = useState("");
 	const [selectedUser, setSelectedUser] = useState(null);
+
+	const [messages, setMessages] = useState(null);
 
 	const messagesEndRef = useRef(null);
 
-	const sendMessage = () => {
-		if (input.trim() && selectedUser) {
-			setMessages((prevMessages) => ({
-				...prevMessages,
-				[selectedUser]: [...prevMessages[selectedUser], { id: Date.now(), text: input, sender: "user" }],
-			}));
-			setInput("");
-		}
-	};
+	const sendMessage = () => {};
 
 	const handleKeyPress = (e) => {
 		if (e.key === "Enter") {
@@ -39,73 +74,97 @@ export default function Message() {
 		}
 	};
 
-	const handleUserClick = (userName) => {
-		setSelectedUser(userName);
+	const handleUserClick = (userId) => {
+		setSelectedUser(userId);
+		//call API lấy tin nhắn về
 	};
 
-	useEffect(() => {
-		messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
-	}, [messages]);
+	const handleGoBack = () => {
+		setSelectedUser(null);
+	};
 
 	return (
-		<div className="flex flex-grow h-screen bg-gray-100">
+		<div className={`${selectedUser && "z-10"} flex-grow sm:flex h-screen bg-background overflow-hidden`}>
 			{/* Danh sách hội thoại */}
-			<div className="w-1/4 bg-white border-r p-4">
-				<h2 className="text-lg font-semibold mb-4">Tin nhắn</h2>
-				<input type="text" placeholder="Tìm cuộc trò chuyện" className="w-full p-2 border rounded mb-4" />
-				<div className="space-y-2">
-					{Object.keys(messages).map((user) => (
+			<div
+				className="
+				flex flex-col pt-4 h-screen
+				sm:w-2/5 sm:min-w-[300px] sm:max-w-[350px] sm:gap-4 sm:border-r
+				w-screen gap-2"
+			>
+				<h2 className="px-4">Tin nhắn</h2>
+				{/* search bar */}
+				<label
+					htmlFor="search-message"
+					className="flex gap-2 p-2 mx-4 border rounded-full hover:border-[--gray-light-clr]"
+				>
+					<SearchIcon className="size-5 ms-1" color="stroke-[--gray-clr]" />
+					<input type="text" id="search-message" placeholder="Tìm cuộc trò chuyện" className="w-full outline-none" />
+				</label>
+				{/* list user's messages */}
+				<div className="px-2 flex-grow overflow-auto">
+					{listUsers.map((user) => (
 						<div
-							key={user}
-							className="p-2 bg-gray-200 rounded cursor-pointer hover:bg-gray-300"
-							onClick={() => handleUserClick(user)}
+							key={user.userId}
+							className="px-3 py-2.5 rounded-md flex items-center gap-3 hover:bg-gray-3light ct-transition cursor-pointer"
+							onClick={() => handleUserClick(user.userId)}
 						>
-							{user}
+							<div className="max-w-12 aspect-square rounded-full overflow-hidden">
+								<img src={user.avatar} className="size-full object-cover" alt="" />
+							</div>
+							<div>
+								<div className="flex items-center gap-3">
+									<span className="font-semibold">{user.displayName}</span>
+									{user.latestMessage !== "" && !user.read && <span className="size-2 bg-primary rounded-full" />}
+								</div>
+								{user.latestMessage !== "" && (
+									<div className="flex gap-1">
+										<p className={`line-clamp-1 ${!user.read && "font-semibold"}`}>{user.latestMessage}</p>
+										<span className="text-[--gray-clr] text-nowrap">{dateTimeToNotiTime(user.time).textTime}</span>
+									</div>
+								)}
+							</div>
 						</div>
 					))}
 				</div>
 			</div>
 
 			{/* Cửa sổ tin nhắn */}
-			<div className="flex-1 flex flex-col">
-				<div className="bg-white p-4 border-b">{selectedUser || "Chọn người để bắt đầu nhắn tin"}</div>
-
-				<div className="flex-1 p-4 overflow-auto bg-gray-50">
-					{selectedUser ? (
-						messages[selectedUser].map((msg) => (
-							<div key={msg.id} className={`mb-2 flex ${msg.sender === "user" ? "justify-end" : "justify-start"}`}>
-								<div>
-									<div className={`text-sm font-semibold mb-1 ${msg.sender === "user" ? "text-right" : "text-left"}`}>
-										{msg.sender === "user" ? "Bạn" : msg.sender}
-									</div>
-
-									<div
-										className={`p-2 rounded-lg ${msg.sender === "user" ? "bg-orange-500 text-white" : "bg-gray-300"}`}
-									>
-										{msg.text}
-									</div>
-								</div>
-							</div>
-						))
-					) : (
-						<div className="text-gray-500 text-center mt-20">Chọn người để bắt đầu nhắn tin</div>
-					)}
-					<div ref={messagesEndRef} />
+			<div
+				className={`w-screen flex flex-col bg-background h-screen ${
+					selectedUser && "sm:translate-y-0 -translate-y-full"
+				} transition duration-100`}
+			>
+				<div className={`py-3 px-4 border-b flex items-center justify-between ${!selectedUser && "hidden"} `}>
+					<div className="flex items-center">
+						<button onClick={handleGoBack}>
+							<ArrowLeftIcon className={"sm:hidden me-3"} />
+						</button>
+						<img src="./temp/default_avatar.svg" className="size-9 me-2" alt="" />
+						<p className="font-semibold">Phúc Trần</p>
+					</div>
+					<Glyph />
 				</div>
+
+				{!selectedUser && (
+					<div className="size-full grid place-content-center">Cùng bắt đầu trò chuyện với người theo dõi của bạn</div>
+				)}
+
+				<div className="flex-grow overflow-auto"></div>
 
 				{/* Thanh nhập tin nhắn */}
 				{selectedUser && (
-					<div className="bg-white p-4 flex items-center border-t">
-						<input
-							type="text"
-							value={input}
-							onChange={(e) => setInput(e.target.value)}
-							onKeyDown={handleKeyPress}
-							placeholder={`Nhắn tin với ${selectedUser}...`}
-							className="flex-1 p-2 border rounded mr-2"
+					<div className="border-t sm:px-6 px-4 sm:py-4 py-3 flex items-end gap-3">
+						<div className="md:py-2 py-1.5">
+							<SmileIcon className="size-6" />
+						</div>
+						<TextBox
+							texboxRef={textbox}
+							placeholder="Soạn tin nhắn"
+							className="sm:py-2 py-1.5 max-h-[120px] bg-gray-3light border rounded-3xl px-5 flex-grow scrollable-div"
 						/>
-						<button onClick={sendMessage} className="bg-orange-500 text-white p-2 rounded flex items-center">
-							{/* <FaPaperPlane /> */}
+						<button onClick={sendMessage} className="bg-primary sm:py-2 py-1.5 px-5 rounded-full">
+							<SendIcon color="stroke-secondary-text" />
 						</button>
 					</div>
 				)}
