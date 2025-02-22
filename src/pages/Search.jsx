@@ -18,10 +18,7 @@ export default function Search() {
 	const posts = postsStore((state) => state.posts);
 
 	const handleSendKeyword = async () => {
-		const [respUsers, respPosts] = await Promise.all([
-			searchAPI.searchUsers(query.toLowerCase()),
-			searchAPI.searchPosts(query.toLowerCase()),
-		]);
+		const [respUsers, respPosts] = await Promise.all([searchAPI.searchUsers(query), searchAPI.searchPosts(query)]);
 		const dataUsers = respUsers.data;
 		const dataPosts = respPosts.data;
 		setUsers(dataUsers);
@@ -42,7 +39,7 @@ export default function Search() {
 			className="flex-grow bg-[--background-clr] h-screen overflow-auto scrollable-div
            sm:pt-5 pt-16"
 		>
-			<div className="md:space-y-5 space-y-4 lg:max-w-[600px] mx-auto">
+			<div className="md:space-y-5 space-y-4 lg:max-w-[540px] mx-auto">
 				<label
 					htmlFor="search"
 					className="flex gap-2 mx-3 py-2 px-3 border rounded-full border-gray-2light hover:border-gray-light"
@@ -52,7 +49,7 @@ export default function Search() {
 						id="search"
 						type="text"
 						placeholder="Tìm kiếm..."
-						className="w-full outline-none"
+						className="w-full outline-none bg-transparent"
 						value={query}
 						onChange={(e) => setQuery(e.target.value)}
 					/>
@@ -86,12 +83,10 @@ export default function Search() {
 									<img src={user.avatar || "./temp/default_avatar.svg"} alt="avatar" className="size-12 rounded-full" />
 									<div>
 										<p className="font-semibold">{user.displayName}</p>
-										{user.followers > 0 && <p className="fs-xsm text-gray">{user.followers} người theo dõi</p>}
+										{user.followers > 0 && <p className="fs-xs text-gray">{user.followers} người theo dõi</p>}
 									</div>
 								</div>
-								<Button type="ghost" className="max-w-fit px-4 py-1 rounded">
-									Theo dõi
-								</Button>
+								<Button className="btn-ghost max-w-fit px-4 py-1 rounded">Theo dõi</Button>
 							</div>
 						))}
 					</div>

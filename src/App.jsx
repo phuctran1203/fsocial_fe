@@ -11,14 +11,23 @@ import ForgotPassword from "./pages/ForgotPassword";
 import Search from "./pages/Search";
 import Follow from "./pages/Follow";
 import Message from "./pages/Message";
-import AdminLayout from "./layout/AdminLayout";
+import { useEffect } from "react";
 import Complaint from "./pages/Complaint";
 
 function App() {
+	useEffect(() => {
+		const theme = localStorage.getItem("theme") || "light";
+		if (theme === "light") {
+			document.body.classList.remove("light");
+		} else if (theme === "dark") {
+			document.body.classList.add("dark");
+		}
+	}, []);
 
 	return (
 		<BrowserRouter basename={import.meta.env.BASE_URL}>
-			<Routes>
+			<Routes>import Complaint from './pages/Complaint';
+
 				<Route path="/login" element={<Login />} />
 				<Route path="/signup" element={<Signup />} />
 				<Route path="/forgot-password" element={<ForgotPassword />} />
@@ -31,11 +40,8 @@ function App() {
 					<Route path="/message" element={<Message />} />
 					<Route path="*" element={<NotFound />} />
 				</Route>
-				<Route path="/admin" element={<AdminLayout/>}>
-					<Route path="complaint" element={<Complaint />} />
-					<Route path="user-manament" element={<Complaint />} />
-					<Route path="statistical" element={<Complaint />} />
-					<Route path="policy-setting" element={<Complaint />} />
+				<Route path="/admin">
+					<Route path="/Complaint" element={<Complaint />} />
 				</Route>
 			</Routes>
 		</BrowserRouter>

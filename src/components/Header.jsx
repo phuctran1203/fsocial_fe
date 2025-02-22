@@ -1,8 +1,11 @@
 import React from "react";
-import { Bell, LogoNoBG } from "../components/Icon";
+
+import { Bell, HamburgerIcon, LogoNoBG } from "../components/Icon";
 import { popupNotificationtStore } from "../store/popupStore";
 import { NavLink, useLocation } from "react-router-dom";
-import { toast } from "sonner";
+import NavMorePopup from "./NavMorePopup";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+
 export default function Header() {
 	const isInMessage = useLocation().pathname === "/message";
 
@@ -11,20 +14,34 @@ export default function Header() {
 	const toggleShowNoti = () => {
 		setIsVisible(!isVisible);
 	};
+
+	const closeNotification = () => setIsVisible(false);
 	return (
 		<header
-			className={`z-10 px-3 py-1 bg-background ${
+			className={`z-10 px-3 py-2 bg-background ${
 				!isInMessage ? "sm:hidden" : "hidden"
-			} w-full absolute top-0 flex justify-between items-center border-gray-3light border-b`}
+			} w-full absolute flex items-center justify-between top-0 border-b`}
 		>
 			<NavLink to="/">
-				<LogoNoBG className="size-9" />
+				<LogoNoBG className="size-8" />
 			</NavLink>
-			<div className="relative">
-				<div className="cursor-pointer" onClick={toggleShowNoti}>
-					<Bell />
+
+			<div className="flex items-center gap-2">
+				<div className="relative w-fit">
+					<div className="cursor-pointer" onClick={toggleShowNoti}>
+						<Bell />
+					</div>
+					<div className="absolute size-2.5 -top-[1px] right-[1px] bg-primary rounded-full " />
 				</div>
-				<div className="absolute size-2.5 -top-[1px] right-[1px] bg-primary rounded-full " />
+
+				<Popover>
+					<PopoverTrigger onClick={closeNotification}>
+						<HamburgerIcon />
+					</PopoverTrigger>
+					<PopoverContent sideOffset={10} className="bg-background w-screen h-screen rounded-none shadow-xl p-2">
+						<NavMorePopup inMobile={true} />
+					</PopoverContent>
+				</Popover>
 			</div>
 		</header>
 	);

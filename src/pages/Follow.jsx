@@ -18,17 +18,17 @@ export default function Follow() {
 	}, []);
 
 	return (
-		<div className="bg-background flex flex-grow h-screen">
+		<div className="bg-background flex flex-grow h-[100dvh]">
 			<div className="overflow-y-auto scrollable-div w-full">
 				<div
 					className="
 						space-y-1 w-full pb-12 mt-12 mx-auto
-						lg:max-w-[580px]
+						lg:max-w-[540px]
 						md:space-y-4 md:pb-0
 						sm:mt-0"
 				>
 					{posts === null ? (
-						<div className="grid h-screen place-content-center">
+						<div className="grid h-[100dvh] place-content-center">
 							<h1>Lỗi lấy posts</h1>
 						</div>
 					) : (

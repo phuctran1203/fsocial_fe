@@ -12,8 +12,6 @@ export default function Signup() {
 
 	const { form, updateField } = useSignupStore();
 
-	const getFormData = useSignupStore.getState().getFormData;
-
 	// Handle animation cho các step
 	const formContainer = useRef();
 
@@ -173,7 +171,7 @@ export default function Signup() {
 		if (responseCreateAccount.statusCode === 200) {
 			setTimeout(() => {
 				navigate("/login");
-			}, 2500);
+			}, 4000);
 		}
 	};
 
@@ -201,7 +199,7 @@ export default function Signup() {
 		<div className="lg:w-[min(85%,1440px)] md:h-fit h-screen mx-auto relative bg-background xl:px-20 lg:px-12 lg:my-6 md:px-4  py-8 rounded-md">
 			<img className="w-[max(72px,8%)] absolute bottom-0 left-0" src="./decor/form_decor.svg" alt="" />
 			<div className="md:w-10/12 md:mx-auto mx-4 md:mb-2 grid grid-cols-[repeat(15,minmax(0,1fr))] grid-rows-2 items-center">
-				<h3 className="z-0 col-start-2 justify-self-center bg-primary text-secondary-text font-semibold md:w-12 w-10 aspect-square rounded-full grid place-content-center">
+				<h3 className="z-0 col-start-2 justify-self-center bg-primary font-semibold md:w-12 w-10 aspect-square rounded-full grid place-content-center">
 					1
 				</h3>
 				<div
@@ -214,7 +212,7 @@ export default function Signup() {
 				/>
 				<h3
 					className={`z-0 justify-self-center font-semibold md:w-12 w-10 aspect-square rounded-full grid place-content-center ${
-						currentStep >= 2 ? "bg-primary text-secondary-text" : "bg-secondary text-primary-text"
+						currentStep >= 2 ? "bg-primary" : "bg-secondary"
 					} transition-all duration-300 ease-in`}
 				>
 					2
@@ -229,7 +227,7 @@ export default function Signup() {
 				/>
 				<h3
 					className={`z-0 justify-self-center font-semibold md:w-12 w-10 aspect-square rounded-full grid place-content-center ${
-						currentStep >= 3 ? "bg-primary text-secondary-text" : "bg-secondary text-primary-text"
+						currentStep >= 3 ? "bg-primary" : "bg-secondary"
 					} transition-all duration-300 ease-in`}
 				>
 					3
@@ -244,7 +242,7 @@ export default function Signup() {
 				/>
 				<h3
 					className={`z-0 justify-self-center font-semibold md:w-12 w-10 aspect-square rounded-full grid place-content-center ${
-						currentStep >= 4 ? "bg-primary text-secondary-text" : "bg-secondary text-primary-text"
+						currentStep >= 4 ? "bg-primary" : "bg-secondary"
 					} transition-all duration-300 ease-in`}
 				>
 					4

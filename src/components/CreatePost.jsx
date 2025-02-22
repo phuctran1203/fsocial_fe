@@ -90,7 +90,7 @@ export default function CreatePost() {
 
 		const respCreatePost = await postsApi.createPost(formData);
 
-		if (respCreatePost.statusCode === 200) {
+		if (respCreatePost.statusCode === 0) {
 			const postCreated = {
 				...respCreatePost.data,
 				displayName: user.displayName,
@@ -114,15 +114,15 @@ export default function CreatePost() {
 			className={`z-20 fixed inset-0 sm:py-2 bg-black flex items-center justify-center ${
 				isVisible ? "bg-opacity-25 visible" : "bg-opacity-0 invisible"
 			} 
-			transition-[--transition]`}
+			transition`}
 		>
 			<div
 				className={`
-				pb-3 flex flex-col space-y-3 bg-background rounded-lg overflow-hidden w-[550px]
+				pb-3 flex flex-col space-y-3 bg-background rounded-lg overflow-hidden w-[550px] border
 				sm:h-fit sm:max-h-full
 				h-full
 				${isVisible ? "translate-y-0" : "translate-y-[100vh]"}	
-				transition-[--transition]`}
+				transition-all`}
 			>
 				<div className="bg-background border-b sticky top-0 py-2">
 					<h4 className="text-center">Tạo bài viết</h4>

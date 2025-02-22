@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { Outlet } from "react-router-dom";
 import Nav from "../components/Nav";
 import Notification from "../components/Notification";
@@ -11,7 +11,7 @@ export default function UserLayout() {
 		<>
 			{/* nav top appear in mobile */}
 			<Header />
-			<main className="flex">
+			<main className="flex relative h-[100dvh]">
 				<Nav />
 				<Outlet />
 				<Notification />
