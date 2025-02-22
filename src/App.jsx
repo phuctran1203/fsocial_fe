@@ -11,8 +11,11 @@ import ForgotPassword from "./pages/ForgotPassword";
 import Search from "./pages/Search";
 import Follow from "./pages/Follow";
 import Message from "./pages/Message";
+import AdminLayout from "./layout/AdminLayout";
+import Complaint from "./pages/Complaint";
 
 function App() {
+
 	return (
 		<BrowserRouter basename={import.meta.env.BASE_URL}>
 			<Routes>
@@ -28,7 +31,12 @@ function App() {
 					<Route path="/message" element={<Message />} />
 					<Route path="*" element={<NotFound />} />
 				</Route>
-				<Route pat="/admin"></Route>
+				<Route path="/admin" element={<AdminLayout/>}>
+					<Route path="complaint" element={<Complaint />} />
+					<Route path="user-manament" element={<Complaint />} />
+					<Route path="statistical" element={<Complaint />} />
+					<Route path="policy-setting" element={<Complaint />} />
+				</Route>
 			</Routes>
 		</BrowserRouter>
 	);
