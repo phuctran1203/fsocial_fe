@@ -3,7 +3,7 @@ import { Link, useLocation } from "react-router-dom";
 import { Glyph } from "./Icon";
 import { popupCommentStore } from "../store/popupStore";
 import { postsStore } from "../store/postsStore";
-import { dateTimeToNotiTime } from "../utils/convertDateTime";
+import { dateTimeToNotiTime, dateTimeToPostTime } from "../utils/convertDateTime";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import Button from "./Button";
 
@@ -44,14 +44,14 @@ export default function Post({ post, className = "" }) {
 						<Link to="" className="font-semibold">
 							{post.displayName}
 						</Link>
-						<span className="text-gray fs-xsm">{dateTimeToNotiTime(post.createdAt).textTime}</span>
+						<span className="text-gray fs-xs">{dateTimeToPostTime(post.createdAt)}</span>
 					</div>
 				</div>
 				<Popover>
 					<PopoverTrigger>
 						<Glyph />
 					</PopoverTrigger>
-					<PopoverContent className="bg-background w-52 shadow-2xl p-2">
+					<PopoverContent side="left" align="start" sideOffset={20} className="bg-background w-52 shadow-2xl p-2">
 						<Button className="btn-transparent !justify-start py-2 ps-3 text-nowrap">Báo cáo</Button>
 						<Button className="btn-transparent !justify-start text-nowrap py-2 ps-3">Chỉnh sửa</Button>
 						<Button className="btn-transparent !justify-start py-2 ps-3 text-nowrap">Xóa bài</Button>
@@ -64,7 +64,7 @@ export default function Post({ post, className = "" }) {
 
 				{/* assets post */}
 				{post.content.media.length > 0 && (
-					<div className="max-h-[200vh] border-y border-gray-3light overflow-hidden">
+					<div className="max-h-[200vh] border-y overflow-hidden">
 						<img src={`${post.content.media[0]}`} alt="Bài đăng" className="w-full" />
 					</div>
 				)}
@@ -87,7 +87,9 @@ export default function Post({ post, className = "" }) {
 							strokeWidth={1}
 						/>
 					</svg>
-					<span className={liked ? "text-primary" : ""}>{likes > 0 ? likes : "Tim"}</span>
+					<p className={liked ? "text-primary" : ""}>
+						{likes > 0 ? likes : <span className="fs-sm sm:inline hidden">Tim</span>}
+					</p>
 				</div>
 
 				{/* comment button */}
@@ -99,7 +101,9 @@ export default function Post({ post, className = "" }) {
 							strokeWidth="0.6"
 						/>
 					</svg>
-					<span>{post.countComments > 0 ? post.countComments : "Bình luận"}</span>
+					<p>
+						{post.countComments > 0 ? post.countComments : <span className="fs-sm sm:inline hidden">Bình luận</span>}
+					</p>
 				</div>
 
 				{/* re post button */}
@@ -112,9 +116,7 @@ export default function Post({ post, className = "" }) {
 						/>
 					</svg>
 
-					<span className={post.repost === 0 ? "sm:inline hidden" : "inline"}>
-						{post.repost > 0 ? post.repost : "Đăng lại"}
-					</span>
+					<p>{post.repost > 0 ? post.repost : <span className="fs-sm sm:inline hidden">Đăng lại</span>}</p>
 				</div>
 
 				{/* share */}
@@ -126,7 +128,7 @@ export default function Post({ post, className = "" }) {
 							strokeWidth="1.5"
 						/>
 					</svg>
-					<span className="sm:inline hidden">Chia sẻ</span>
+					<span className="fs-sm sm:inline hidden">Chia sẻ</span>
 				</div>
 			</div>
 		</div>

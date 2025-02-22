@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { Link, useLocation } from "react-router-dom";
-import { Check, CloseCollapseIcon, CommentNoti, Glyph, HeartNoti, TrashCanIcon, XMarkIcon } from "./Icon";
+import { Check, Bell, CloseCollapseIcon, CommentNoti, Glyph, HeartNoti, TrashCanIcon, XMarkIcon } from "./Icon";
 import { dateTimeToNotiTime } from "../utils/convertDateTime";
 import { popupNotificationtStore, popupExpandNoti3DotStore } from "../store/popupStore";
 import Button from "./Button";
@@ -56,7 +56,7 @@ const Noti = (props) => {
 			className={`
 			relative overflow-hidden ps-4 py-1 rounded-md flex justify-between
 			${idNotiShowing != null && idNotiShowing === index ? "" : "hover:bg-gray-3light active:bg-gray-2light"} 
-			transition-[--transition]`}
+			transition`}
 		>
 			{/* direct đến thông báo */}
 			<Link to="" className="flex items-center gap-2" onClick={notiClicked}>
@@ -73,7 +73,7 @@ const Noti = (props) => {
 						{notiMap[type].content}
 					</p>
 					<div className="flex items-center gap-2">
-						<span className={`fs-xsm ${read ? "text-gray-light" : ""} `}>{textTime}</span>
+						<span className={`fs-xs ${read ? "text-gray-light" : ""} `}>{textTime}</span>
 
 						{!read && <span className="size-2 bg-primary rounded-full" />}
 					</div>
@@ -85,15 +85,15 @@ const Noti = (props) => {
 			<div
 				className={`flex absolute top-0 h-full left-full ${
 					idNotiShowing != null && idNotiShowing === index && "-translate-x-full"
-				} transition-[--transition]`}
+				} transition`}
 			>
-				<Button className="btn-secondary rounded-none px-3 border-r-[1px]" onClick={deleteNoti}>
+				<Button className="btn-secondary !rounded-none px-3 border-r-[1px]" onClick={deleteNoti}>
 					<TrashCanIcon />
 				</Button>
-				<Button className="btn-secondary  rounded-none px-3 border-r-[1px]" onClick={markAsRead}>
+				<Button className="btn-secondary !rounded-none px-3 border-r-[1px]" onClick={markAsRead}>
 					<Check />
 				</Button>
-				<Button className="btn-secondary  rounded-none px-3" onClick={close}>
+				<Button className="btn-secondary !rounded-none px-3" onClick={close}>
 					<XMarkIcon />
 				</Button>
 			</div>
@@ -153,20 +153,20 @@ export default function Notification() {
 			lg:border-l-[1px]
 			left-0 absolute w-full bg-opacity-0
 			${isVisible ? "sm:bg-opacity-25" : "invisible sm:bg-opacity-0"}
-			transition-[--transition]
+			transition
 			`}
 			onClick={() => setIsVisible(false)}
 		>
 			<div
 				className={`
-				h-full relative bg-background lg:drop-shadow-none
-				${!isInMessage ? "lg:translate-x-0" : ""}
+				h-full relative bg-background 
+				${!isInMessage ? "lg:translate-x-0 lg:drop-shadow-none" : ""}
 				lg:translate-y-0
 				md:min-w-[340px] md:max-w-[340px]
 				sm:min-w-[310px] sm:max-w-[310px]
 				w-full
-				${isVisible ? "drop-shadow-[1px_0px_4px_hsla(0,0%,0%,0.15)]" : "sm:-translate-x-full sm:translate-y-0 translate-y-full"}
-				transition-[--transition]`}
+				${isVisible ? "drop-shadow-[1px_0px_1px_var(--drop-shadow)]" : "sm:-translate-x-full sm:translate-y-0 translate-y-full"}
+				transition`}
 			>
 				<CloseCollapseIcon
 					className={`absolute left-full top-1/2 -translate-x-[1px] -translate-y-1/2 cursor-pointer  ${
@@ -176,54 +176,44 @@ export default function Notification() {
 				/>
 				<div
 					className={`
-					h-full overflow-y-auto
-					${!isInMessage ? "" : "scrollable-div"}
+					h-full flex flex-col
 					md:space-y-4  
-					sm:pt-6 sm:pb-2 sm:ps-4 sm:pe-5
+					sm:pt-6 sm:pb-1 sm:ps-4
 					py-14 space-y-2`}
 					onClick={(e) => e.stopPropagation()}
 				>
-					<div className="flex justify-between px-4">
-						<div className="flex items-center gap-5">
-							<div className="relative">
-								<svg className="md:size-[28px] size-6" viewBox="0 0 26 26" fill="none">
-									<path
-										className={`fill-primary-text stroke-primary-text`}
-										d="M7.02161 9.83425C6.9321 6.35857 9.63221 3.25 13.1091 3.25C16.51 3.25 19.1273 6.22131 18.9953 9.61966C18.9721 10.2155 18.9583 10.8082 18.9583 11.375C18.9583 14.9296 22.75 19.5 22.75 19.5H3.25C3.25 19.5 7.04167 15.9454 7.04167 11.375C7.04167 10.8466 7.03442 10.3316 7.02161 9.83425Z"
-										strokeWidth="1.6"
-									/>
-									<path
-										className={`stroke-primary-text`}
-										d="M10.8335 22.75C11.3628 23.4143 12.1373 23.8333 13.0002 23.8333C13.863 23.8333 14.6375 23.4143 15.1668 22.75"
-										strokeWidth="1.6"
-									/>
-								</svg>
-								<span className="absolute bottom-1/2 left-1/2 px-1 bg-primary rounded-full text-secondary-text text-[12px]">
-									99+
-								</span>
-							</div>
-							<h5>Thông báo</h5>
+					<div className="px-4 flex items-center gap-5">
+						<div className="relative">
+							<Bell active={true} />
+							<span className="absolute bottom-1/2 left-1/2 px-1 bg-primary rounded-full text-txtWhite text-[12px]">
+								99+
+							</span>
 						</div>
+						<h5>Thông báo</h5>
 					</div>
 
-					{today.length > 0 && (
-						<div className="md:space-y-1 space-y-2">
-							<h6 className="px-4">Hôm nay</h6>
-							{today.map((noti, index) => Noti({ ...noti, index: index }))}
-						</div>
-					)}
-					{last7days.length > 0 && (
-						<div className="md:space-y-1 space-y-2">
-							<h6 className="px-4">7 ngày trước</h6>
-							{last7days.map((noti, index) => Noti({ ...noti, index: index + today.length }))}
-						</div>
-					)}
-					{old.length > 0 && (
-						<div className="md:space-y-1 space-y-2">
-							<h6 className="px-4">Trước đó</h6>
-							{old.map((noti, index) => Noti({ ...noti, index: index + today.length + last7days.length }))}
-						</div>
-					)}
+					<div className={`flex-grow overflow-y-auto sm:pe-4 ${!isInMessage ? "" : "scrollable-div"}`}>
+						{today.length > 0 && (
+							<div className="md:space-y-1 space-y-2">
+								<h6 className="px-4">Hôm nay</h6>
+								{today.map((noti, index) => Noti({ ...noti, index: index }))}
+							</div>
+						)}
+
+						{last7days.length > 0 && (
+							<div className="md:space-y-1 space-y-2">
+								<h6 className="px-4">7 ngày trước</h6>
+								{last7days.map((noti, index) => Noti({ ...noti, index: index + today.length }))}
+							</div>
+						)}
+
+						{old.length > 0 && (
+							<div className="md:space-y-1 space-y-2">
+								<h6 className="px-4">Trước đó</h6>
+								{old.map((noti, index) => Noti({ ...noti, index: index + today.length + last7days.length }))}
+							</div>
+						)}
+					</div>
 				</div>
 			</div>
 		</div>

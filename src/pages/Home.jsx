@@ -18,12 +18,12 @@ export default function Home() {
 	}, []);
 
 	return (
-		<div className="bg-background flex flex-grow h-screen">
+		<div className="bg-background flex flex-grow h-screen transition">
 			<div className="overflow-y-auto scrollable-div w-full">
 				<div
 					className="
 					w-full mx-auto
-					lg:max-w-[580px]
+					lg:max-w-[540px]
 					md:space-y-4 md:pb-0
 					sm:mt-0
 					mt-12 space-y-1.5 pb-12"
@@ -33,7 +33,7 @@ export default function Home() {
 							<h1>Lỗi lấy posts</h1>
 						</div>
 					) : (
-						posts.map((post) => <Post key={post.id} post={post} className="rounded ct-shadow-y" />)
+						posts.map((post) => <Post key={post.id} post={post} className="rounded shadow-y" />)
 					)}
 				</div>
 			</div>

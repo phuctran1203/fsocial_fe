@@ -1,11 +1,21 @@
 import React, { useEffect, useState } from "react";
-import RecentLogin from "../components/RecentLogin";
 import { Field } from "../components/Field";
 import { useLoginStore } from "../store/loginStore";
-import { AtIcon, EyeIcon, EyeSplashIcon, LoadingIcon, UserIcon } from "../components/Icon";
+import { EyeIcon, EyeSplashIcon, LoadingIcon, UserIcon, XMarkIcon } from "../components/Icon";
 import Button from "../components/Button";
 import { Link, useNavigate } from "react-router-dom";
 import { loginAPI } from "../api/loginApi";
+
+const list = [
+	{
+		avatar: "./temp/user_1.png",
+		name: "Ngô Tấn Hehe",
+	},
+	{
+		avatar: "./temp/user_1.png",
+		name: "Ngô Tấn Cang",
+	},
+];
 
 export default function Login() {
 	const navigate = useNavigate();
@@ -48,6 +58,8 @@ export default function Login() {
 		setSubmitClicked(false);
 	};
 
+	const handleRemoveSavedAccount = () => {};
+
 	return (
 		<div
 			className="
@@ -56,7 +68,7 @@ export default function Login() {
 			sm:bg-transparent
 			bg-background gap-4 flex-wrap"
 		>
-			<div className="h-fit w-[440px] rounded-lg bg-background sm:shadow-md sm:px-8 sm:py-10 px-3 py-6">
+			<div className="h-fit w-[440px] rounded-lg bg-background border sm:shadow-lg sm:px-8 sm:py-10 px-3 py-6">
 				<div className="mb-4">
 					<h2>
 						Chào mừng đến với <span className="font-semibold text-2xl text-primary">FSocial</span> 👋
@@ -144,7 +156,42 @@ export default function Login() {
 					<p className="text-gray">Chọn ảnh tài khoản hoặc ấn dấu “+” để thêm tài khoản mới</p>
 				</div>
 
-				<RecentLogin />
+				<div className="grid gap-4 md:grid-cols-3 grid-cols-2">
+					{list.map((user, index) => (
+						<div key={index} className="group relative max-w-52 border rounded cursor-pointer overflow-hidden">
+							<div className="aspect-square border-b">
+								<img src={user.avatar} alt={user.name} className="size-full object-cover" />
+							</div>
+
+							<p className="text-center py-2.5 font-semibold">{user.name}</p>
+
+							<Button
+								className="absolute right-1 top-1 btn-secondary border !size-7 opacity-0 group-hover:opacity-100 !rounded-full transition"
+								onClick={handleRemoveSavedAccount}
+							>
+								<XMarkIcon />
+							</Button>
+						</div>
+					))}
+
+					<div className="overflow-hidden max-w-52 border rounded cursor-pointer">
+						<div className=" aspect-square grid place-content-center border-b">
+							<div className="bg-primary lg:size-12 size-10 rounded-full">
+								<svg fill="none" viewBox="0 0 24 24">
+									<path
+										className="stroke-txtWhite"
+										strokeLinecap="round"
+										strokeLinejoin="round"
+										strokeWidth={2}
+										d="M6 12h12m-6-6v12"
+									/>
+								</svg>
+							</div>
+						</div>
+
+						<p className="text-center py-2.5 text-primary font-semibold">Thêm tài khoản</p>
+					</div>
+				</div>
 			</div>
 		</div>
 	);

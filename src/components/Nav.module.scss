@@ -7,3 +7,19 @@
 		transition: var(--transition);
 	}
 }
+
+.navBaseStyle {
+	@apply w-full flex items-center gap-4 px-2 py-3 rounded-md 
+	hover:bg-gray-3light active:bg-gray-2light 
+	sm:justify-start justify-center transition-[--transition];
+}
+
+.navMore {
+	@apply w-full flex items-center gap-4 px-2 py-3 rounded-md 
+	hover:bg-gray-3light active:bg-gray-2light 
+	justify-start transition-[--transition];
+}
+
+.hiddenNav {
+	@apply hidden;
+}
