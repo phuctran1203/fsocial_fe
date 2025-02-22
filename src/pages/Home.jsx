@@ -1,10 +1,10 @@
 
 import React, { useEffect } from "react";
-import { getPost, postsApi } from "../api/postsApi";
 import CommentModal from '../components/CommentModal';
 import Post from '../components/Post';
 import '../index.scss';
 import { postsStore } from "../store/postsStore";
+import { postsApi } from './../api/postsApi';
 
 export default function Home() {
 	const setPosts = postsStore((state) => state.setPosts);
