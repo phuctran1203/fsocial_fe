@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import "./button.scss";
+import "./Button.scss";
 
 export default function Button({ to, onClick = () => {}, className, children = "Need content", allowTab = true }) {
 	if (to) {

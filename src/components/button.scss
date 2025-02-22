@@ -1,6 +1,6 @@
 .btn-primary {
 	@apply flex justify-center items-center w-full rounded outline-none transition-[--transition] focus-visible:ring-2 focus-visible:ring-offset-2 
-    bg-primary text-secondary-text hover:bg-primary-hover focus-visible:ring-primary active:bg-primary-active;
+    bg-primary text-txtWhite hover:bg-primary-hover focus-visible:ring-primary active:bg-primary-active;
 }
 
 .btn-secondary {
@@ -15,8 +15,8 @@
 
 .btn-ghost {
 	@apply flex justify-center items-center w-full rounded outline-none transition-[--transition] focus-visible:ring-2 focus-visible:ring-offset-2
-    bg-primary-ghost text-primary-text;
+    bg-primary-ghost text-primary hover:bg-primary hover:text-txtWhite;
 }
 .disable-btn {
-	@apply relative overflow-hidden pointer-events-none before:absolute before:inset-0 before:bg-white/25;
+	@apply pointer-events-none opacity-80;
 }

@@ -84,11 +84,11 @@ export default function Message() {
 	};
 
 	return (
-		<div className={`${selectedUser && "z-10"} flex-grow sm:flex h-screen bg-background overflow-hidden`}>
+		<div className={`${selectedUser && "z-10"} flex-grow sm:flex h-full bg-background overflow-hidden`}>
 			{/* Danh sách hội thoại */}
 			<div
 				className="
-				flex flex-col pt-4 h-screen
+				flex flex-col pt-4 h-full
 				sm:w-2/5 sm:min-w-[300px] sm:max-w-[350px] sm:gap-4 sm:border-r
 				w-screen gap-2"
 			>
@@ -99,7 +99,12 @@ export default function Message() {
 					className="flex gap-2 p-2 mx-4 border rounded-full hover:border-[--gray-light-clr]"
 				>
 					<SearchIcon className="size-5 ms-1" color="stroke-[--gray-clr]" />
-					<input type="text" id="search-message" placeholder="Tìm cuộc trò chuyện" className="w-full outline-none" />
+					<input
+						type="text"
+						id="search-message"
+						placeholder="Tìm cuộc trò chuyện"
+						className="w-full outline-none bg-transparent"
+					/>
 				</label>
 				{/* list user's messages */}
 				<div className="px-2 flex-grow overflow-auto">
@@ -131,9 +136,9 @@ export default function Message() {
 
 			{/* Cửa sổ tin nhắn */}
 			<div
-				className={`w-screen flex flex-col bg-background h-screen ${
+				className={`w-screen flex flex-col bg-background h-full ${
 					selectedUser && "sm:translate-y-0 -translate-y-full"
-				} transition duration-100`}
+				} transition`}
 			>
 				<div className={`py-3 px-4 border-b flex items-center justify-between ${!selectedUser && "hidden"} `}>
 					<div className="flex items-center">
@@ -164,7 +169,7 @@ export default function Message() {
 							className="sm:py-2 py-1.5 max-h-[120px] bg-gray-3light border rounded-3xl px-5 flex-grow scrollable-div"
 						/>
 						<button onClick={sendMessage} className="bg-primary sm:py-2 py-1.5 px-5 rounded-full">
-							<SendIcon color="stroke-secondary-text" />
+							<SendIcon color="stroke-txtWhite" />
 						</button>
 					</div>
 				)}

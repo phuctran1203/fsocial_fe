@@ -55,11 +55,11 @@ export function Field({
 					placeholder=""
 					value={form[id].value}
 					className={`
-					peer md:p-3 p-3.5 w-full bg-transparent ring-1 ring-inset outline-none rounded
+					peer md:p-3 p-3.5 w-full bg-transparent border outline-none rounded
 					${
 						!form[id].isTouched || form[id].isValid
-							? "ring-gray-light hover:ring-gray focus:ring-gray"
-							: "ring-red-600 focus:ring-red-600 hover:ring-red-600"
+							? "hover:border-hover focus:border-hover"
+							: "border-red-600 focus:border-red-600 hover:border-red-600"
 					}
 					transition-all duration-100`}
 					tabIndex={allowTab ? 0 : -1}
@@ -84,7 +84,7 @@ export function Field({
 					{label}
 				</label>
 			</div>
-			<span className={`fs-xsm text-red-600 ${!form[id].isTouched || form[id].isValid ? "hidden" : "block"}`}>
+			<span className={`fs-xs text-red-600 ${!form[id].isTouched || form[id].isValid ? "hidden" : "block"}`}>
 				*{errorMessage}
 			</span>
 		</div>

@@ -1,0 +1,237 @@
+@use "sass:math";
+
+@import url("https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100..900;1,100..900&display=swap");
+
+@function round($number) {
+	@return calc(math.round($number * 50) / 50); //lam tron den 5 chu so
+}
+@function cal-font-size($base-size, $step) {
+	//base size * (ti le scale)^step
+	$result: $base-size * math.pow($scale-ratio, $step);
+	@return round($result);
+}
+
+@function font-to-rem($size) {
+	$result: calc($size / 16 * 1rem);
+	@return round($result);
+}
+
+@function scaling-factor($min, $max, $step) {
+	//tinh toan bien do dao dong scale cho tung tag -> tu dong responsive font size
+	$result: calc(($max - $min) / ($max-width - $min-width) * 1000vw);
+	@return round($result);
+}
+
+@function clamp-font-size($step) {
+	$min: cal-font-size($base-min-size, $step);
+	$max: cal-font-size($base-max-size, $step);
+	$scaling: scaling-factor($min, $max, $step);
+	@return clamp(font-to-rem($min), scaling-factor($min, $max, $step), font-to-rem($max));
+}
+
+$base-min-size: 14; //for mobile
+$base-max-size: 16; //for desktop
+$scale-ratio: 1.067; //ti le font scale
+$min-width: 320;
+$max-width: 1440;
+
+$fs-xs: clamp-font-size(-2);
+$fs-sm: clamp-font-size(-1);
+$fs-base: clamp-font-size(0);
+$fs-lg: clamp-font-size(1);
+$fs-xl: clamp-font-size(2);
+$fs-2xl: clamp-font-size(3);
+$fs-3xl: clamp-font-size(4);
+$fs-4xl: clamp-font-size(5);
+$fs-5xl: clamp-font-size(6);
+
+// init css variable
+@layer base {
+	:root {
+		--logo-clr: var(--primary-clr);
+
+		--primary-clr: #e76e23;
+		--primary-hover-clr: hsl(23, 80%, 47%);
+		--primary-active-clr: hsl(23, 80%, 44%);
+		--primary-ghost-clr: hsl(22, 70%, 95%);
+
+		--secondary-clr: #f2f2f2;
+		--secondary-hover-clr: #e8e8e8;
+		--secondary-active-clr: #d9d9d9;
+
+		--lower-background-clr: hsl(220, 16%, 96%);
+		--background-clr: #ffffff;
+		--gray-clr: hsl(0, 0%, 45%);
+		--gray-light-clr: hsl(0, 0%, 68%);
+		--gray-2light-clr: hsl(0, 0%, 90%);
+		--gray-3light-clr: hsl(0, 0%, 96%);
+
+		--border-clr: hsl(0, 0%, 89%);
+		--border-hover-clr: hsl(0, 0%, 88%);
+		--shadow-clr: hsla(0, 0%, 91%);
+		--drop-shadow: hsla(0, 0%, 0%, 0.15);
+
+		--text-white: hsl(0, 0%, 96%);
+		--text-primary-clr: #404040;
+		--text-secondary-clr: hsl(0, 0%, 96%);
+
+		--transition: all 0.12s ease-out;
+
+		--fs-xs: $fs-xs;
+		--fs-sm: $fs-sm;
+		--fs-base: $fs-base;
+		--fs-lg: $fs-lg;
+		--fs-xl: $fs-xl;
+		--fs-2xl: $fs-2xl;
+		--fs-3xl: $fs-3xl;
+		--fs-4xl: $fs-4xl;
+		--fs-5xl: $fs-5xl;
+
+		--ff: "Roboto", serif;
+	}
+
+	body.dark {
+		//ghi de dark mode o day
+		--logo-clr: var(--text-primary-clr);
+		--primary-ghost-clr: hsl(22, 70%, 5%);
+
+		--secondary-clr: hsl(0, 0%, 18%);
+		--secondary-hover-clr: hsl(0, 0%, 24%);
+		--secondary-active-clr: hsl(0, 0%, 50%);
+
+		--lower-background-clr: hsl(220, 14%, 2%);
+		--background-clr: hsl(0, 0%, 0%);
+
+		--gray-clr: hsl(0, 0%, 60%);
+		--gray-light-clr: hsl(0, 0%, 50%);
+		--gray-2light-clr: hsl(0, 0%, 8%);
+		--gray-3light-clr: hsl(0, 0%, 10%);
+
+		--border-clr: hsl(0, 0%, 14%);
+		--border-hover-clr: hsl(0, 0%, 80%);
+		--shadow-clr: hsla(0, 0%, 12%);
+		--drop-shadow: hsla(0, 0%, 30%);
+
+		--text-primary-clr: hsl(0, 0%, 96%);
+		--text-secondary-clr: hsl(0, 0%, 25%);
+	}
+}
+
+// init base style
+@layer base {
+	body {
+		font-size: $fs-base;
+		font-family: var(--ff);
+		background-color: var(--lower-background-clr);
+		color: var(--text-primary-clr);
+	}
+
+	/* Toàn bộ thanh scrollbar */
+	/* Track (background của scrollbar) */
+	::-webkit-scrollbar-track {
+		background: var(--backgroud-clr); /* Màu nền */
+		border-radius: 10px;
+	}
+
+	/* Handle (thanh kéo) */
+	::-webkit-scrollbar-thumb {
+		background: var(--gray-light-clr); /* Màu thanh kéo */
+		border-radius: 10px;
+	}
+
+	/* Hover vào thanh kéo */
+	::-webkit-scrollbar-thumb:hover {
+		background: var(--gray-clr);
+	}
+
+	::-webkit-scrollbar {
+		width: 0px; /* Độ rộng */
+		height: 0px; /* Dùng cho thanh cuộn ngang */
+	}
+	@media screen and (min-width: 1025px) {
+		::-webkit-scrollbar {
+			width: 8px; /* Độ rộng */
+			height: 8px; /* Dùng cho thanh cuộn ngang */
+		}
+	}
+
+	::-ms-reveal {
+		/* ẩn icon show password của MS Edge */
+		display: none;
+	}
+
+	h1 {
+		font-size: $fs-5xl;
+		font-weight: 600;
+	}
+
+	h2 {
+		font-size: $fs-4xl;
+		font-weight: 600;
+	}
+
+	h3 {
+		font-size: $fs-3xl;
+		font-weight: 600;
+	}
+
+	h4 {
+		font-size: $fs-2xl;
+		font-weight: 600;
+	}
+
+	h5 {
+		font-size: $fs-xl;
+		font-weight: 500;
+	}
+
+	h6 {
+		font-size: $fs-lg;
+		font-weight: 500;
+	}
+
+	p,
+	span,
+	a,
+	button,
+	input,
+	select,
+	textarea {
+		font-size: $fs-base;
+		font-weight: 400;
+	}
+
+	label {
+		font-size: $fs-sm;
+	}
+
+	input[type="checkbox"] {
+		accent-color: var(--primary-clr);
+		appearance: none;
+		-webkit-appearance: none;
+		-moz-appearance: none;
+		width: 20px;
+		height: 20px;
+		border: 2px solid var(--gray-light-clr); /* Thêm viền nếu cần */
+		cursor: pointer;
+		border-radius: 4px;
+		background-color: transparent;
+		&:checked {
+			border-color: var(--primary-clr);
+			background-color: var(--primary-clr);
+			position: relative;
+			&::after {
+				content: "✔"; /* Dấu check */
+				font-size: 16px;
+				color: var(--text-white);
+				position: absolute;
+				top: 50%;
+				left: 50%;
+				transform: translate(-50%, -50%);
+			}
+		}
+	}
+	input::placeholder {
+		color: var(--gray-light-clr);
+	}
+}
