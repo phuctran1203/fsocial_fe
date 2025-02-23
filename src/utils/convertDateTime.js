@@ -57,14 +57,49 @@ export function dateTimeToNotiTime(time) {
 }
 
 export function dateTimeToPostTime(time) {
-	const date = new Date(time);
+	const previousTime = new Date(time);
+	const currentTime = new Date();
+	const hoursTodayPassed = new Date().getHours();
 
-	// Lấy giờ và phút
-	const hours = String(date.getHours()).padStart(2, "0");
-	const minutes = String(date.getMinutes()).padStart(2, "0");
+	const diffMs = currentTime - previousTime;
+	const diffSeconds = Math.floor(diffMs / 1000); // Chuyển thành giây
 
-	// Lấy ngày, tháng, năm
-	const day = String(date.getDate()).padStart(2, "0");
-	const month = String(date.getMonth() + 1).padStart(2, "0"); // getMonth() trả về từ 0-11, nên cần cộng thêm 1
-	const year = date.getFullYear();
+	let text = "";
+	let flag = false;
+
+	//hôm nay
+	if (diffSeconds < 60) {
+		text = `${diffSeconds} giây`;
+		flag = true;
+	}
+	const diffMinutes = !flag ? Math.floor(diffSeconds / 60) : null; // Chuyển thành phút
+	if (diffMinutes && diffMinutes < 60) {
+		text = `${diffMinutes} phút`;
+		flag = true;
+	}
+	// bài lên hôm nay: chêch lệch giờ nhỏ hơn số giờ đã qua của hôm nay
+	const diffHours = !flag ? Math.floor(diffMinutes / 60) : null; // Chuyển thành giờ
+	if (diffHours && diffHours < hoursTodayPassed) {
+		text = `${diffHours} giờ`;
+		flag = true;
+	}
+
+	// bài lên hôm qua: chêch lệch giờ lớn hơn số giờ đã qua của hôm nay và nhỏ hơn 24h + số giờ đã qua của hôm nay
+	if (!flag && diffHours < 24 + hoursTodayPassed) {
+		text = `${previousTime.getMinutes()}:${previousTime.getHours()} hôm qua`;
+		flag = true;
+	}
+
+	//bài lên lớn hơn hôm qua -> format về mm:hh DD/MM/YYYY
+	if (!flag) {
+		text = `${previousTime.getMinutes().toString().padStart(2, "0")}:${previousTime
+			.getHours()
+			.toString()
+			.padStart(2, "0")} ${previousTime.getDate().toString().padStart(2, "0")}/${previousTime
+			.getMonth()
+			.toString()
+			.padStart(2, "0")}/${previousTime.getFullYear()}`;
+	}
+
+	return text;
 }

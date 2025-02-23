@@ -1,11 +1,21 @@
 import React, { useEffect, useState } from "react";
-import RecentLogin from "../components/RecentLogin";
 import { Field } from "../components/Field";
 import { useLoginStore } from "../store/loginStore";
-import { AtIcon, EyeIcon, EyeSplashIcon, LoadingIcon, UserIcon } from "../components/Icon";
+import { EyeIcon, EyeSplashIcon, LoadingIcon, UserIcon, XMarkIcon } from "../components/Icon";
 import Button from "../components/Button";
 import { Link, useNavigate } from "react-router-dom";
 import { loginAPI } from "../api/loginApi";
+
+const list = [
+	{
+		avatar: "./temp/user_1.png",
+		name: "Ngô Tấn Hehe",
+	},
+	{
+		avatar: "./temp/user_1.png",
+		name: "Ngô Tấn Cang",
+	},
+];
 
 export default function Login() {
 	const navigate = useNavigate();
@@ -48,18 +58,20 @@ export default function Login() {
 		setSubmitClicked(false);
 	};
 
+	const handleRemoveSavedAccount = () => {};
+
 	return (
 		<div
 			className="
 			flex items-center justify-center max-w-[1440px] mx-auto min-h-screen md:px-6
 			md:gap-20 md:flex-nowrap
 			sm:bg-transparent
-			bg-[--background-clr] gap-4 flex-wrap"
+			bg-background gap-4 flex-wrap"
 		>
-			<div className="h-fit w-[440px] rounded-lg bg-[--background-clr] sm:shadow-md sm:px-8 sm:py-10 px-3 py-6">
+			<div className="h-fit w-[440px] rounded-lg bg-background border sm:shadow-lg sm:px-8 sm:py-10 px-3 py-6">
 				<div className="mb-4">
 					<h2>
-						Chào mừng đến với <span className="font-semibold text-2xl text-[--primary-clr]">FSocial</span> 👋
+						Chào mừng đến với <span className="font-semibold text-2xl text-primary">FSocial</span> 👋
 					</h2>
 
 					<span>Nền tảng mạng xã hội giới trẻ mới</span>
@@ -95,7 +107,7 @@ export default function Login() {
 				</div>
 
 				<div className="flex justify-between mb-2">
-					<div className="flex justify-center items-center text-[var(--gray-clr)]">
+					<div className="flex justify-center items-center text-gray">
 						<label htmlFor="remmeberme" className="cursor-pointer flex items-center">
 							<input type="checkbox" name="remmeberme" id="remmeberme" className="size-4 mr-1" />
 							<span className="fs-sm">Ghi nhớ đăng nhập</span>
@@ -110,28 +122,27 @@ export default function Login() {
 				<div className="mb-4">
 					{!submitClicked && <p className="text-red-600">{loginErr}</p>}
 					<Button
-						className="py-3"
+						className={`btn-primary py-3 ${(isDisable || submitClicked) && "disable-btn"}`}
 						onClick={() => (isDisable || submitClicked ? "" : handleSubmitLogin())}
-						disabled={isDisable || submitClicked}
 					>
 						{submitClicked ? <LoadingIcon /> : "Đăng nhập"}
 					</Button>
 				</div>
 				<div className="flex items-center justify-center my-6">
-					<div className="border-t border-gray-300 flex-grow"></div>
-					<span className="px-4 text-gray-500">Hoặc</span>
-					<div className="border-t border-gray-300 flex-grow"></div>
+					<div className="border-t border-gray-light flex-grow"></div>
+					<span className="px-4 text-gray-light">Hoặc</span>
+					<div className="border-t border-gray-light flex-grow"></div>
 				</div>
 				<div className="mb-4">
-					<Button type="secondary" className="mb-5 gap-3 py-3">
+					<Button className="btn-secondary mb-5 gap-3 py-3">
 						<img className="size-6" src="./decor/google_icon.svg" alt="" />
 						Đăng nhập với Google
 					</Button>
 				</div>
 				<div className="flex justify-center items-center">
-					<span className="text-[--gray-clr]">
+					<span className="text-gray">
 						Chưa có tài khoản?{" "}
-						<Link to="/signup" className="underline cursor-pointer font-semibold text-[--text-black-clr]">
+						<Link to="/signup" className="underline cursor-pointer font-semibold text-primary-text">
 							Tạo tài khoản mới
 						</Link>
 					</span>
@@ -139,13 +150,48 @@ export default function Login() {
 			</div>
 
 			<div className="md:w-[550px] px-3 mb-28">
-				<h1 className="mb-2 md:text-5xl text-4xl text-[--primary-clr] hidden sm:block">FSocial</h1>
+				<h1 className="mb-2 md:text-5xl text-4xl text-primary hidden sm:block">FSocial</h1>
 				<div className="mb-3">
 					<h1>Đăng nhập gần đây</h1>
-					<p className="text-[var(--gray-clr)]">Chọn ảnh tài khoản hoặc ấn dấu “+” để thêm tài khoản mới</p>
+					<p className="text-gray">Chọn ảnh tài khoản hoặc ấn dấu “+” để thêm tài khoản mới</p>
 				</div>
 
-				<RecentLogin />
+				<div className="grid gap-4 md:grid-cols-3 grid-cols-2">
+					{list.map((user, index) => (
+						<div key={index} className="group relative max-w-52 border rounded cursor-pointer overflow-hidden">
+							<div className="aspect-square border-b">
+								<img src={user.avatar} alt={user.name} className="size-full object-cover" />
+							</div>
+
+							<p className="text-center py-2.5 font-semibold">{user.name}</p>
+
+							<Button
+								className="absolute right-1 top-1 btn-secondary border !size-7 opacity-0 group-hover:opacity-100 !rounded-full transition"
+								onClick={handleRemoveSavedAccount}
+							>
+								<XMarkIcon />
+							</Button>
+						</div>
+					))}
+
+					<div className="overflow-hidden max-w-52 border rounded cursor-pointer">
+						<div className=" aspect-square grid place-content-center border-b">
+							<div className="bg-primary lg:size-12 size-10 rounded-full">
+								<svg fill="none" viewBox="0 0 24 24">
+									<path
+										className="stroke-txtWhite"
+										strokeLinecap="round"
+										strokeLinejoin="round"
+										strokeWidth={2}
+										d="M6 12h12m-6-6v12"
+									/>
+								</svg>
+							</div>
+						</div>
+
+						<p className="text-center py-2.5 text-primary font-semibold">Thêm tài khoản</p>
+					</div>
+				</div>
 			</div>
 		</div>
 	);

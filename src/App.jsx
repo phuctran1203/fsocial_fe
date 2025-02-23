@@ -11,8 +11,18 @@ import ForgotPassword from "./pages/ForgotPassword";
 import Search from "./pages/Search";
 import Follow from "./pages/Follow";
 import Message from "./pages/Message";
+import { useEffect } from "react";
 
 function App() {
+	useEffect(() => {
+		const theme = localStorage.getItem("theme") || "light";
+		if (theme === "light") {
+			document.body.classList.remove("light");
+		} else if (theme === "dark") {
+			document.body.classList.add("dark");
+		}
+	}, []);
+
 	return (
 		<BrowserRouter basename={import.meta.env.BASE_URL}>
 			<Routes>
