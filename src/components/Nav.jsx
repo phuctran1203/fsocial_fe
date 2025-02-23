@@ -129,7 +129,7 @@ export default function Nav() {
 						<span className={`${!isInMessage ? "sm:inline" : "lg:inline"} hidden`}>Tạo bài viết</span>
 					</button>
 
-					<NavLink to={`/profile?id=${user.id}`} className={styles.navBaseStyle} onClick={closeNotification}>
+					<NavLink to={`/profile?id=${user.userId}`} className={styles.navBaseStyle} onClick={closeNotification}>
 						{({ isActive }) => (
 							<>
 								<div className="size-[26px] rounded-full overflow-hidden">

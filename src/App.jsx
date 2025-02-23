@@ -12,6 +12,7 @@ import Search from "./pages/Search";
 import Follow from "./pages/Follow";
 import Message from "./pages/Message";
 import { useEffect } from "react";
+import Profile from "./pages/Profile";
 
 function App() {
 	useEffect(() => {
@@ -36,6 +37,7 @@ function App() {
 					<Route path="/follow" element={<Follow />} />
 					<Route path="/search" element={<Search />} />
 					<Route path="/message" element={<Message />} />
+					<Route path="/profile" element={<Profile />} />
 					<Route path="*" element={<NotFound />} />
 				</Route>
 				<Route pat="/admin"></Route>
