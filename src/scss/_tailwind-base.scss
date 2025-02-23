@@ -61,10 +61,11 @@ $fs-5xl: clamp-font-size(6);
 
 		--lower-background-clr: hsl(220, 16%, 96%);
 		--background-clr: #ffffff;
+
 		--gray-clr: hsl(0, 0%, 45%);
-		--gray-light-clr: hsl(0, 0%, 68%);
-		--gray-2light-clr: hsl(0, 0%, 90%);
-		--gray-3light-clr: hsl(0, 0%, 96%);
+		--gray-light-clr: hsl(0, 0%, 68%); //for field border or st in slighly bright
+		--gray-2light-clr: hsl(0, 0%, 90%); //for others hover
+		--gray-3light-clr: hsl(0, 0%, 96%); //for others active
 
 		--border-clr: hsl(0, 0%, 89%);
 		--border-hover-clr: hsl(0, 0%, 88%);
@@ -103,9 +104,9 @@ $fs-5xl: clamp-font-size(6);
 		--background-clr: hsl(0, 0%, 0%);
 
 		--gray-clr: hsl(0, 0%, 60%);
-		--gray-light-clr: hsl(0, 0%, 50%);
-		--gray-2light-clr: hsl(0, 0%, 8%);
-		--gray-3light-clr: hsl(0, 0%, 10%);
+		--gray-light-clr: hsl(0, 0%, 30%); //for field border or st in slighly bright
+		--gray-2light-clr: hsl(0, 0%, 25%); //for others hover
+		--gray-3light-clr: hsl(0, 0%, 12%); //for others active
 
 		--border-clr: hsl(0, 0%, 14%);
 		--border-hover-clr: hsl(0, 0%, 80%);

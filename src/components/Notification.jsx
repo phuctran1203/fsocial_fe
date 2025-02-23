@@ -60,7 +60,7 @@ const Noti = (props) => {
 		>
 			{/* direct đến thông báo */}
 			<Link to="" className="flex items-center gap-2" onClick={notiClicked}>
-				<div className={`relative ${read ? "opacity-60" : ""}`}>
+				<div className={`relative ${read && "opacity-60"}`}>
 					<div className={`sm:size-12 size-11 rounded-full overflow-hidden`}>
 						<img className="size-full object-center object-cover" src={`./temp/${image}`} alt="" />
 					</div>
@@ -68,12 +68,12 @@ const Noti = (props) => {
 				</div>
 
 				<div>
-					<p className={`fs-sm ${read ? "text-gray-light" : ""}`}>
+					<p className={`fs-sm ${read && "opacity-60"}`}>
 						<span className="fs-sm font-semibold">{name} </span>
 						{notiMap[type].content}
 					</p>
 					<div className="flex items-center gap-2">
-						<span className={`fs-xs ${read ? "text-gray-light" : ""} `}>{textTime}</span>
+						<span className={`fs-xs ${read && "opacity-60"} `}>{textTime}</span>
 
 						{!read && <span className="size-2 bg-primary rounded-full" />}
 					</div>
