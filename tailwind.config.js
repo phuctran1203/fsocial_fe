@@ -89,7 +89,7 @@ export default {
 				DEFAULT: "all",
 			},
 			transitionDuration: {
-				DEFAULT: "120ms",
+				DEFAULT: "150ms",
 			},
 			transitionTimingFunction: {
 				DEFAULT: "ease-out",

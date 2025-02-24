@@ -10,14 +10,23 @@ export default function UserLayout() {
 	return (
 		<>
 			{/* nav top appear in mobile */}
-			<Header />
-			<main className="flex relative h-[100dvh]">
+			<main className="sm:flex relative h-[100dvh]">
+				<Header />
 				<Nav />
 				<Outlet />
 				<Notification />
 				<CreatePost />
 			</main>
-			<Toaster richColors position="top-right" />
+			<Toaster
+				position="top-right"
+				// toastOptions={{
+				// 	style: {
+				// 		background: "var(--background-clr)",
+				// 		color: "var(--text-primary-clr)",
+				// 		borderColor: "var(--gray-2light-clr)",
+				// 	},
+				// }}
+			/>
 		</>
 	);
 }

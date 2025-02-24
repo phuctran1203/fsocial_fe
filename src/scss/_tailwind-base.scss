@@ -235,4 +235,8 @@ $fs-5xl: clamp-font-size(6);
 	input::placeholder {
 		color: var(--gray-light-clr);
 	}
+
+	img {
+		-webkit-user-drag: none; /* Chặn drag trên Chrome, Safari */
+	}
 }

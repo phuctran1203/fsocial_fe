@@ -8,8 +8,6 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover
 import Button from "./Button";
 
 export default function Post({ post, className = "" }) {
-	const location = useLocation();
-
 	const { isVisible, setIsVisible, setId } = popupCommentStore();
 
 	const likes = post.countLikes;
@@ -30,7 +28,7 @@ export default function Post({ post, className = "" }) {
 	};
 
 	return (
-		<div className={`md:py-4 py-3 space-y-3 ${className}`}>
+		<div className={`md:py-4 py-3 space-y-3 ${className} transition`}>
 			<div className="flex items-center justify-between px-4">
 				<div className="flex space-x-2">
 					<Link to="">
@@ -38,6 +36,7 @@ export default function Post({ post, className = "" }) {
 							src={post.avatar || "./temp/default_avatar.svg"}
 							alt="avatar"
 							className="md:size-11 size-9 rounded-full"
+							draggable={false}
 						/>
 					</Link>
 					<div className="flex flex-col justify-center">
@@ -64,7 +63,7 @@ export default function Post({ post, className = "" }) {
 
 				{/* assets post */}
 				{post.content.media.length > 0 && (
-					<div className="max-h-[200vh] border-y overflow-hidden">
+					<div className="max-h-[200vh] border-y overflow-hidden transition">
 						<img src={`${post.content.media[0]}`} alt="Bài đăng" className="w-full" />
 					</div>
 				)}

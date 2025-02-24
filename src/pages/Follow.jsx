@@ -1,13 +1,12 @@
 import React, { useEffect } from "react";
-import Post from "../components/Post";
 import CommentModal from "../components/CommentModal";
 import { postsApi } from "../api/postsApi";
 import { postsStore } from "../store/postsStore";
 import "../index.scss";
+import RenderPosts from "@/components/RenderPosts";
 
 export default function Follow() {
 	const setPosts = postsStore((state) => state.setPosts);
-	const posts = postsStore((state) => state.posts);
 
 	useEffect(() => {
 		const fetchPosts = async () => {
@@ -18,22 +17,17 @@ export default function Follow() {
 	}, []);
 
 	return (
-		<div className="bg-background flex flex-grow h-[100dvh]">
+		<div className="bg-background flex flex-grow transition">
 			<div className="overflow-y-auto scrollable-div w-full">
 				<div
 					className="
-						space-y-1 w-full pb-12 mt-12 mx-auto
-						lg:max-w-[540px]
-						md:space-y-4 md:pb-0
-						sm:mt-0"
+							w-full mx-auto
+							lg:max-w-[540px]
+							md:space-y-4 md:pb-0
+							sm:mt-0
+							space-y-1.5 pb-12"
 				>
-					{posts === null ? (
-						<div className="grid h-[100dvh] place-content-center">
-							<h1>Lỗi lấy posts</h1>
-						</div>
-					) : (
-						posts.map((post) => <Post key={post.id} post={post} className="rounded ct-shadow-y" />)
-					)}
+					<RenderPosts className="sm:rounded shadow-y" />
 				</div>
 			</div>
 
