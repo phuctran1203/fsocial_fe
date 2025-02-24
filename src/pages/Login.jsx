@@ -63,12 +63,12 @@ export default function Login() {
 	return (
 		<div
 			className="
-			flex items-center justify-center max-w-[1440px] mx-auto min-h-screen md:px-6
+			flex items-center justify-center max-w-[1440px] mx-auto min-h-[100dvh] md:px-6
 			md:gap-20 md:flex-nowrap
 			sm:bg-transparent
 			bg-background gap-4 flex-wrap"
 		>
-			<div className="h-fit w-[440px] rounded-lg bg-background border sm:shadow-lg sm:px-8 sm:py-10 px-3 py-6">
+			<div className="h-fit w-[440px] rounded-lg bg-background sm:border sm:shadow-lg sm:px-8 sm:py-10 p-6">
 				<div className="mb-4">
 					<h2>
 						Chào mừng đến với <span className="font-semibold text-2xl text-primary">FSocial</span> 👋
@@ -149,7 +149,7 @@ export default function Login() {
 				</div>
 			</div>
 
-			<div className="md:w-[550px] px-3 mb-28">
+			<div className="md:w-[550px] px-6 mb-28">
 				<h1 className="mb-2 md:text-5xl text-4xl text-primary hidden sm:block">FSocial</h1>
 				<div className="mb-3">
 					<h1>Đăng nhập gần đây</h1>

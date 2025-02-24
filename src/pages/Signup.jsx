@@ -195,9 +195,9 @@ export default function Signup() {
 	const [OTPValue, setOTPValue] = useState(["", "", "", ""]);
 
 	return (
-		<div className="lg:w-[min(85%,1440px)] md:h-fit h-screen mx-auto relative bg-background xl:px-20 lg:px-12 lg:my-6 md:px-4  py-8 rounded-md">
+		<div className="lg:w-[min(85%,1440px)] md:h-fit h-[100dvh] mx-auto relative bg-background xl:px-20 lg:px-12 lg:my-4 md:px-4 py-6 rounded-md">
 			<img className="w-[max(72px,8%)] absolute bottom-0 left-0" src="./decor/form_decor.svg" alt="" />
-			<div className="md:w-10/12 md:mx-auto mx-4 md:mb-2 grid grid-cols-[repeat(15,minmax(0,1fr))] grid-rows-2 items-center">
+			<div className="md:w-10/12 md:mx-auto mx-6 md:mb-2 grid grid-cols-[repeat(15,minmax(0,1fr))] grid-rows-2 items-center">
 				<h3 className="z-0 col-start-2 justify-self-center bg-primary font-semibold md:w-12 w-10 aspect-square rounded-full grid place-content-center">
 					1
 				</h3>
@@ -255,16 +255,17 @@ export default function Signup() {
 				<div />
 				<span className="col-span-3 fs-sm font-light text-center">Hoàn tất tạo tài khoản</span>
 			</div>
+
 			<div className="flex md:gap-x-[5%] w-full justify-center">
 				<div
 					ref={formContainer}
-					className={`md:py-8 py-4 overflow-hidden xl:basis-5/12 lg:basis-6/12 md:basis-7/12 basis-full md:ring-1 ring-inset ring-gray-2light rounded w-14
+					className={`md:py-8 py-4 overflow-hidden xl:basis-5/12 lg:basis-6/12 md:basis-7/12 basis-full md:border rounded-lg w-14
 						${currentStep !== 4 ? "" : "hidden"}
 						`}
 				>
 					<div ref={stepsWrapper} className="grid" style={{ transition: "transform 0.3s, height 0.2s" }}>
 						{/* step 1 */}
-						<div ref={setStepsRef(1)} className={`md:px-8 px-4 h-fit ${currentStep === 1 ? "" : "invisible"}`}>
+						<div ref={setStepsRef(1)} className={`md:px-8 px-6 h-fit ${currentStep === 1 ? "" : "invisible"}`}>
 							<div className="mb-4">
 								<h2>Thông tin cơ bản</h2>
 								<p className="text-gray">Hãy điền vào form bên dưới để hoàn tất quá trình đăng ký nhé</p>
@@ -350,7 +351,7 @@ export default function Signup() {
 						</div>
 
 						{/* step 2 */}
-						<div ref={setStepsRef(2)} className={`md:px-8 px-4 h-fit ${currentStep === 2 ? "" : "invisible"}`}>
+						<div ref={setStepsRef(2)} className={`md:px-8 px-6 h-fit ${currentStep === 2 ? "" : "invisible"}`}>
 							<div className="mb-4">
 								<h2>Thông tin đăng nhập</h2>
 								<p className="text-gray">Đây là thông tin quan trọng. Hãy luôn giữ bảo mật nhé!</p>
@@ -432,7 +433,7 @@ export default function Signup() {
 						{/* step 3 */}
 						<div
 							ref={setStepsRef(3)}
-							className={`space-y-5 md:px-8 px-4 h-fit ${currentStep === 3 ? "" : "invisible"}`}
+							className={`space-y-5 md:px-8 px-6 h-fit ${currentStep === 3 ? "" : "invisible"}`}
 						>
 							<div className="mb-4">
 								<h2>Xác minh tài khoản</h2>
@@ -462,10 +463,10 @@ export default function Signup() {
 						</div>
 					</div>
 
-					<div className="relative md:px-8 px-4 bg-background pt-3 border-x">
+					<div className="relative md:px-8 px-6 bg-background pt-3 border-x">
 						<div
 							className="mt-6 mb-10
-								relative w-10/12 mx-auto border-b-[1px] border-[--gray-light-clr] overflow-visible text-[--gray-light-clr]
+								relative w-10/12 mx-auto border-b-[1px] border overflow-visible text-gray-light
 								before:absolute before:left-1/2 before:-translate-x-1/2 before:-translate-y-1/2 before:content-['Hoặc'] before:size-fit before:bg-background before:px-2"
 						/>
 						<div>

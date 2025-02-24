@@ -8,6 +8,7 @@ import { ownerAccountStore } from "../store/ownerAccountStore";
 import { TextBox } from "./Field";
 import { dateTimeToNotiTime } from "../utils/convertDateTime";
 import { Link } from "react-router-dom";
+import { toast } from "sonner";
 
 function CommentReuse(props) {
 	const { comment, selectCommentToReply, handleShowReplyComment, replies, isReply } = props;
@@ -127,6 +128,12 @@ export default function CommentModal() {
 	const handleStopReply = () => setSelectReply(null);
 
 	const handleSendComment = async () => {
+		if (textbox.current.innerText.trim() == "") {
+			setTimeout(() => {
+				textbox.current.innerHTML = "";
+			}, 1);
+			return;
+		}
 		setSubmitCmtClicked(true);
 		const formData = new FormData();
 		formData.append("userId", user.userId);
@@ -146,6 +153,7 @@ export default function CommentModal() {
 		}
 
 		if (respSendCmt.statusCode === 0) {
+			toast.success("Đã đăng bình luận", { position: "top-center" });
 			textbox.current.innerHTML = "";
 			if (selectReply?.id) {
 				const exist = commentsReply.find((commentReply) => commentReply.commentId === selectReply.id);
@@ -167,6 +175,8 @@ export default function CommentModal() {
 				setComments((prev) => [{ ...respSendCmt.data, displayName: user.displayName }, ...prev]);
 			}
 			updatePost(id, { countComments: post.countComments + 1 });
+		} else {
+			toast.error("Bình luận thất bại");
 		}
 		setTimeout(() => {
 			textbox.current.focus();

@@ -1,13 +1,12 @@
 import React, { useEffect } from "react";
-import Post from "../components/Post";
 import CommentModal from "../components/CommentModal";
 import { postsApi } from "../api/postsApi";
 import { postsStore } from "../store/postsStore";
 import "../index.scss";
+import RenderPosts from "@/components/RenderPosts";
 
 export default function Home() {
 	const setPosts = postsStore((state) => state.setPosts);
-	const posts = postsStore((state) => state.posts);
 
 	useEffect(() => {
 		const fetchPosts = async () => {
@@ -18,7 +17,7 @@ export default function Home() {
 	}, []);
 
 	return (
-		<div className="bg-background flex flex-grow h-screen transition">
+		<div className="bg-background flex flex-grow transition">
 			<div className="overflow-y-auto scrollable-div w-full">
 				<div
 					className="
@@ -26,15 +25,9 @@ export default function Home() {
 					lg:max-w-[540px]
 					md:space-y-4 md:pb-0
 					sm:mt-0
-					mt-12 space-y-1.5 pb-12"
+					space-y-1.5 pb-12"
 				>
-					{posts === null ? (
-						<div className="grid h-screen place-content-center">
-							<h1>Lỗi lấy posts</h1>
-						</div>
-					) : (
-						posts.map((post) => <Post key={post.id} post={post} className="rounded shadow-y" />)
-					)}
+					<RenderPosts className="sm:rounded shadow-y" />
 				</div>
 			</div>
 

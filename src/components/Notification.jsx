@@ -54,14 +54,14 @@ const Noti = (props) => {
 		<div
 			key={index}
 			className={`
-			relative overflow-hidden ps-4 py-1 rounded-md flex justify-between
+			relative overflow-hidden ps-4 py-2 rounded-md flex justify-between
 			${idNotiShowing != null && idNotiShowing === index ? "" : "hover:bg-gray-3light active:bg-gray-2light"} 
 			transition`}
 		>
 			{/* direct đến thông báo */}
 			<Link to="" className="flex items-center gap-2" onClick={notiClicked}>
 				<div className={`relative ${read && "opacity-60"}`}>
-					<div className={`sm:size-12 size-11 rounded-full overflow-hidden`}>
+					<div className={`size-12 rounded-full overflow-hidden`}>
 						<img className="size-full object-center object-cover" src={`./temp/${image}`} alt="" />
 					</div>
 					<div className="absolute size-fit -top-1 -left-0.5">{notiMap[type].icon}</div>
@@ -139,6 +139,7 @@ export default function Notification() {
 		<div
 			className={` 
 			z-0 bg-black h-screen overflow-hidden
+			lg:border-l-[1px]
 			lg:block ${
 				!isInMessage
 					? `
@@ -150,8 +151,7 @@ export default function Notification() {
 				sm:left-[76px] sm:w-[calc(100%-76px)]
 				`
 			}
-			lg:border-l-[1px]
-			left-0 absolute w-full bg-opacity-0
+			left-0 absolute top-0 w-full bg-opacity-0
 			${isVisible ? "sm:bg-opacity-25" : "invisible sm:bg-opacity-0"}
 			transition
 			`}
@@ -172,14 +172,15 @@ export default function Notification() {
 					className={`absolute left-full top-1/2 -translate-x-[1px] -translate-y-1/2 cursor-pointer  ${
 						!isInMessage ? "lg:hidden" : ""
 					} sm:block hidden
-						${isVisible ? "" : "-translate-x-full"}`}
+						${isVisible ? "" : "-translate-x-full"}
+						will-change-transform`}
 				/>
 				<div
 					className={`
 					h-full flex flex-col
 					md:space-y-4  
 					sm:pt-6 sm:pb-1 sm:ps-4
-					py-14 space-y-2`}
+					pt-16 space-y-2`}
 					onClick={(e) => e.stopPropagation()}
 				>
 					<div className="px-4 flex items-center gap-5">
@@ -194,21 +195,21 @@ export default function Notification() {
 
 					<div className={`flex-grow overflow-y-auto sm:pe-4 ${!isInMessage ? "" : "scrollable-div"}`}>
 						{today.length > 0 && (
-							<div className="md:space-y-1 space-y-2">
+							<div className="space-y-1">
 								<h6 className="px-4">Hôm nay</h6>
 								{today.map((noti, index) => Noti({ ...noti, index: index }))}
 							</div>
 						)}
 
 						{last7days.length > 0 && (
-							<div className="md:space-y-1 space-y-2">
+							<div className="space-y-1">
 								<h6 className="px-4">7 ngày trước</h6>
 								{last7days.map((noti, index) => Noti({ ...noti, index: index + today.length }))}
 							</div>
 						)}
 
 						{old.length > 0 && (
-							<div className="md:space-y-1 space-y-2">
+							<div className="space-y-1">
 								<h6 className="px-4">Trước đó</h6>
 								{old.map((noti, index) => Noti({ ...noti, index: index + today.length + last7days.length }))}
 							</div>
