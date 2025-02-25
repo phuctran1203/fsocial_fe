@@ -38,20 +38,20 @@ export default function Nav() {
 		<nav
 			className={`
 			z-10 bg-background
-			sm:border-r border-0
+			border-0
 			${
 				!isInMessage
 					? "md:min-w-[260px] md:max-w-[260px] sm:min-w-[210px] sm:max-w-[210px]"
 					: "lg:min-w-[260px] lg:max-w-[260px] sm:w-[76px]"
 			} 
-			sm:static sm:flex sm:flex-col sm:justify-between sm:h-screen sm:py-6
-			absolute bottom-0 w-full border-t
+			sm:border-r sm:border-t-0 sm:static sm:flex sm:flex-col sm:justify-between sm:h-screen sm:py-6
+			fixed bottom-0 w-full border-t
 			transition
 			${styles.transitionNav}`}
 		>
 			<div className="sm:space-y-8 sm:block w-full">
 				{/* logo */}
-				<NavLink to="/" className="sm:block hidden" onClick={() => toast.message("Clicked logo")}>
+				<NavLink to="/" className="sm:block hidden" onClick={() => toast.error("Clicked logo")}>
 					<LogoNoBG className={!isInMessage ? "ms-6" : "lg:ms-6 mx-auto"} />
 				</NavLink>
 
@@ -129,7 +129,7 @@ export default function Nav() {
 						<span className={`${!isInMessage ? "sm:inline" : "lg:inline"} hidden`}>Tạo bài viết</span>
 					</button>
 
-					<NavLink to={`/profile?id=${user.id}`} className={styles.navBaseStyle} onClick={closeNotification}>
+					<NavLink to={`/profile?id=${user.userId}`} className={styles.navBaseStyle} onClick={closeNotification}>
 						{({ isActive }) => (
 							<>
 								<div className="size-[26px] rounded-full overflow-hidden">
@@ -150,7 +150,7 @@ export default function Nav() {
 						<HamburgerIcon />
 						<span className={!isInMessage ? "" : "lg:inline hidden"}>Thêm</span>
 					</PopoverTrigger>
-					<PopoverContent sideOffset={10} className="ms-4 bg-background w-72 border shadow-xl p-2">
+					<PopoverContent sideOffset={10} className="ms-4 bg-background w-72 border shadow-xl p-2 transition">
 						<NavMorePopup />
 					</PopoverContent>
 				</Popover>

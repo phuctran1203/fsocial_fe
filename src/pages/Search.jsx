@@ -1,10 +1,10 @@
 import React, { useState, useEffect, useRef } from "react";
-import Post from "../components/Post";
 import Button from "../components/Button";
 import { SearchIcon } from "../components/Icon";
 import { searchAPI } from "../api/searchApi";
 import CommentModal from "../components/CommentModal";
 import { postsStore } from "../store/postsStore";
+import RenderPosts from "@/components/RenderPosts";
 
 export default function Search() {
 	const [query, setQuery] = useState("");
@@ -14,8 +14,6 @@ export default function Search() {
 	const [users, setUsers] = useState([]);
 
 	const setPosts = postsStore((state) => state.setPosts);
-
-	const posts = postsStore((state) => state.posts);
 
 	const handleSendKeyword = async () => {
 		const [respUsers, respPosts] = await Promise.all([searchAPI.searchUsers(query), searchAPI.searchPosts(query)]);
@@ -36,8 +34,8 @@ export default function Search() {
 
 	return (
 		<div
-			className="flex-grow bg-[--background-clr] h-screen overflow-auto scrollable-div
-           sm:pt-5 pt-16"
+			className="flex-grow bg-background overflow-auto scrollable-div
+           sm:pt-5 pt-2"
 		>
 			<div className="md:space-y-5 space-y-4 lg:max-w-[540px] mx-auto">
 				<label
@@ -59,19 +57,19 @@ export default function Search() {
 						className={`btn-transparent py-2.5 rounded-r-none ${tab === "all" && "bg-secondary"}`}
 						onClick={() => setTab("all")}
 					>
-						<p className={tab !== "all" && "text-gray"}> Tất cả</p>
+						<p className={tab != "all" ? "text-gray" : ""}> Tất cả</p>
 					</Button>
 					<Button
 						className={`btn-transparent py-2.5 rounded-none ${tab === "users" && "bg-secondary"}`}
 						onClick={() => setTab("users")}
 					>
-						<p className={tab !== "users" && "text-gray"}>Mọi người</p>
+						<p className={tab != "users" ? "text-gray" : ""}>Mọi người</p>
 					</Button>
 					<Button
 						className={`btn-transparent py-2.5 rounded-l-none ${tab === "posts" && "bg-secondary"}`}
 						onClick={() => setTab("posts")}
 					>
-						<p className={tab !== "posts" && "text-gray"}>Bài viết</p>
+						<p className={tab != "posts" ? "text-gray" : ""}>Bài viết</p>
 					</Button>
 				</div>
 				{tab === "all" || tab === "users" ? (
@@ -94,9 +92,7 @@ export default function Search() {
 				{tab === "all" || tab === "posts" ? (
 					<div className="sm:space-y-3 space-y-2 lg:px-3">
 						<h5 className="font-medium lg:px-0 px-3">Bài viết liên quan</h5>
-						{posts?.map((post) => (
-							<Post key={post.id} post={post} className="sm:rounded ct-shadow-y" />
-						))}
+						<RenderPosts className="sm:rounded shadow-y" />
 					</div>
 				) : null}
 			</div>

@@ -20,7 +20,7 @@ export default function Header() {
 		<header
 			className={`z-10 px-3 py-2 bg-background ${
 				!isInMessage ? "sm:hidden" : "hidden"
-			} w-full absolute flex items-center justify-between top-0 border-b`}
+			} w-full sticky top-0 flex items-center justify-between border-b`}
 		>
 			<NavLink to="/">
 				<LogoNoBG className="size-8" />

@@ -48,7 +48,7 @@ export default function NavMorePopup({ inMobile }) {
 					side={!inMobile ? "right" : "top"}
 					align="start"
 					sideOffset={!inMobile ? 20 : 0}
-					className="bg-background p-2 sm:w-44 space-y-2"
+					className="bg-background p-2 sm:w-44 space-y-2 transition"
 				>
 					<button
 						className={`${styles.navMore} !gap-2 border ${mode == "light" && "shadow-md"}`}
@@ -75,7 +75,7 @@ export default function NavMorePopup({ inMobile }) {
 				<span>Đổi mật khẩu</span>
 			</button>
 
-			<hr className="my-1" />
+			<hr className="my-1 transition" />
 
 			<button className={styles.navMore}>
 				<SwitchIcon />
