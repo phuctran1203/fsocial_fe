@@ -8,6 +8,7 @@ import { ownerAccountStore } from "../store/ownerAccountStore";
 import { toast } from "sonner";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import NavMorePopup from "./NavMorePopup";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
 export default function Nav() {
 	const user = ownerAccountStore((state) => state.user);
@@ -132,9 +133,13 @@ export default function Nav() {
 					<NavLink to={`/profile?id=${user.userId}`} className={styles.navBaseStyle} onClick={closeNotification}>
 						{({ isActive }) => (
 							<>
-								<div className="size-[26px] rounded-full overflow-hidden">
-									<img className="size-full object-cover object-center" src={user.avatar} alt="navbar avatar account" />
-								</div>
+								<Avatar className={`size-[26px]`}>
+									<AvatarImage src={user.avatar} />
+									<AvatarFallback className="text-[12px] font-semibold">
+										{user.firstName.charAt(0) ?? "?"}
+									</AvatarFallback>
+								</Avatar>
+
 								<span className={`${!isInMessage ? "sm:inline" : "lg:inline"} hidden ${isActive && "font-semibold"}`}>
 									Hồ sơ
 								</span>

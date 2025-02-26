@@ -5,7 +5,9 @@ import { useSignupStore } from "../store/signupStore";
 import { useEffect, useRef, useState } from "react";
 import EnterOTPCode from "../components/EnterOTPCode";
 import { ArrowLeftIcon, AtIcon, EyeIcon, EyeSplashIcon, LoadingIcon, UserIcon } from "../components/Icon";
-import { signupAPI } from "../api/signupApi";
+import { checkDuplicate, requestOTP, validOTP, sendingCreateAccount } from "../api/signupApi";
+import { getCookie } from "@/utils/cookie";
+import { removeVietnameseAccents } from "@/utils/removeSpecialWord";
 
 export default function Signup() {
 	const navigate = useNavigate();
@@ -81,7 +83,10 @@ export default function Signup() {
 	};
 
 	const goToStep2 = () => {
-		hoten.current = form.ten.value + form.ho.value + (Math.floor(Math.random() * 9000) + 1000);
+		hoten.current =
+			removeVietnameseAccents(form.ten.value) +
+			removeVietnameseAccents(form.ho.value) +
+			(Math.floor(Math.random() * 9000) + 10000);
 		setCurrentStep(2);
 		autoFocusOTP.current = false;
 	};
@@ -101,7 +106,7 @@ export default function Signup() {
 			email: form.email.value,
 		};
 
-		const respCheckDuplicateInto = await signupAPI.checkDuplicate(dataCheck);
+		const respCheckDuplicateInto = await checkDuplicate(dataCheck);
 
 		console.log(respCheckDuplicateInto);
 
@@ -114,7 +119,7 @@ export default function Signup() {
 			return;
 		}
 		// gửi yêu cầu lấy OTP
-		const result = await signupAPI.requestOTP({
+		const result = await requestOTP({
 			email: form.email.value,
 			type: "REGISTER",
 		});
@@ -156,7 +161,7 @@ export default function Signup() {
 			type: "REGISTER",
 		};
 
-		const respValidOTP = await signupAPI.validOTP(sendingOTP);
+		const respValidOTP = await validOTP(sendingOTP);
 
 		if (respValidOTP.statusCode != 200) {
 			setOTPErr(respValidOTP.message);
@@ -165,7 +170,7 @@ export default function Signup() {
 		}
 
 		setCurrentStep(4);
-		const responseCreateAccount = await signupAPI.sendingCreateAccount(sending);
+		const responseCreateAccount = await sendingCreateAccount(sending);
 		console.log(responseCreateAccount);
 		if (responseCreateAccount.statusCode === 200) {
 			setTimeout(() => {
@@ -194,11 +199,15 @@ export default function Signup() {
 	// Handle nhập mã OTP xác minh email
 	const [OTPValue, setOTPValue] = useState(["", "", "", ""]);
 
+	useEffect(() => {
+		if (getCookie("refresh-token")) navigate("/home");
+	}, []);
+
 	return (
 		<div className="lg:w-[min(85%,1440px)] md:h-fit h-[100dvh] mx-auto relative bg-background xl:px-20 lg:px-12 lg:my-4 md:px-4 py-6 rounded-md">
 			<img className="w-[max(72px,8%)] absolute bottom-0 left-0" src="./decor/form_decor.svg" alt="" />
 			<div className="md:w-10/12 md:mx-auto mx-6 md:mb-2 grid grid-cols-[repeat(15,minmax(0,1fr))] grid-rows-2 items-center">
-				<h3 className="z-0 col-start-2 justify-self-center bg-primary font-semibold md:w-12 w-10 aspect-square rounded-full grid place-content-center">
+				<h3 className="z-0 col-start-2 justify-self-center bg-primary text-txtWhite font-semibold md:w-12 w-10 aspect-square rounded-full grid place-content-center">
 					1
 				</h3>
 				<div
@@ -211,7 +220,7 @@ export default function Signup() {
 				/>
 				<h3
 					className={`z-0 justify-self-center font-semibold md:w-12 w-10 aspect-square rounded-full grid place-content-center ${
-						currentStep >= 2 ? "bg-primary" : "bg-secondary"
+						currentStep >= 2 ? "bg-primary text-txtWhite" : "bg-secondary"
 					} transition-all duration-300 ease-in`}
 				>
 					2
@@ -226,7 +235,7 @@ export default function Signup() {
 				/>
 				<h3
 					className={`z-0 justify-self-center font-semibold md:w-12 w-10 aspect-square rounded-full grid place-content-center ${
-						currentStep >= 3 ? "bg-primary" : "bg-secondary"
+						currentStep >= 3 ? "bg-primary text-txtWhite" : "bg-secondary"
 					} transition-all duration-300 ease-in`}
 				>
 					3
@@ -241,7 +250,7 @@ export default function Signup() {
 				/>
 				<h3
 					className={`z-0 justify-self-center font-semibold md:w-12 w-10 aspect-square rounded-full grid place-content-center ${
-						currentStep >= 4 ? "bg-primary" : "bg-secondary"
+						currentStep >= 4 ? "bg-primary text-txtWhite" : "bg-secondary"
 					} transition-all duration-300 ease-in`}
 				>
 					4

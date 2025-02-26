@@ -193,20 +193,20 @@ export default function Message() {
 	return (
 		<div
 			style={{ height: realHeight }}
-			className={`${selectedUser && "fixed top-0 z-10"} flex-grow sm:flex bg-background overflow-hidden`}
+			className={`${selectedUser && "fixed top-0 z-10"} flex-grow sm:flex bg-background overflow-hidden transition`}
 		>
 			{/* Danh sách hội thoại */}
 			<div
 				className="
 				flex flex-col pt-4 h-full
 				sm:w-2/5 sm:min-w-[300px] sm:max-w-[350px] sm:gap-4 sm:border-r
-				w-screen gap-2"
+				w-screen gap-2 transition"
 			>
 				<h2 className="px-4">Tin nhắn</h2>
 				{/* search bar */}
 				<label
 					htmlFor="search-message"
-					className="flex gap-2 p-2 mx-4 border rounded-full hover:border-[--gray-light-clr]"
+					className="flex gap-2 p-2 mx-4 border rounded-full hover:border-gray-light transition"
 				>
 					<SearchIcon className="size-5 ms-1" color="stroke-[--gray-clr]" />
 					<input

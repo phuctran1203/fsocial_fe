@@ -13,16 +13,17 @@ import Follow from "./pages/Follow";
 import Message from "./pages/Message";
 import { useEffect } from "react";
 import Profile from "./pages/Profile";
+import { themeStore } from "./store/themeStore";
 
 function App() {
+	const theme = themeStore((state) => state.theme);
 	useEffect(() => {
-		const theme = localStorage.getItem("theme") || "light";
 		if (theme === "light") {
-			document.body.classList.remove("light");
+			document.body.classList.remove("dark");
 		} else if (theme === "dark") {
 			document.body.classList.add("dark");
 		}
-	}, []);
+	}, [theme]);
 
 	return (
 		<BrowserRouter basename={import.meta.env.BASE_URL}>
@@ -39,7 +40,6 @@ function App() {
 					<Route path="/message" element={<Message />} />
 					<Route path="/profile" element={<Profile />} />
 					<Route path="*" element={<NotFound />} />
-					
 				</Route>
 				<Route pat="/admin"></Route>
 			</Routes>

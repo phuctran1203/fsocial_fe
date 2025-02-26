@@ -13,7 +13,7 @@ import Button from "@/components/Button";
 import { useLocation } from "react-router-dom";
 import { postsStore } from "@/store/postsStore";
 import CommentModal from "@/components/CommentModal";
-import { postsApi } from "@/api/postsApi";
+import { getPosts } from "@/api/postsApi";
 import RenderPosts from "@/components/RenderPosts";
 
 const listFriends = [
@@ -53,7 +53,7 @@ export default function Profile() {
 	const location = useLocation();
 	const queryParams = new URLSearchParams(location.search);
 
-	const user = ownerAccountStore.getState().user;
+	const user = ownerAccountStore((state) => state.user);
 
 	const maxPreviewFriendsAvatar = useRef(7);
 
@@ -66,7 +66,7 @@ export default function Profile() {
 	const setPosts = postsStore((state) => state.setPosts);
 
 	const showPosts = async () => {
-		const resp = await postsApi.getPosts();
+		const resp = await getPosts();
 		setPosts(resp?.statusCode === 200 ? resp.data : null);
 	};
 
@@ -170,22 +170,25 @@ export default function Profile() {
 				<div className="sm:-mt-6 -mt-4 mx-auto lg:max-w-[600px] ">
 					{/* profile detail */}
 					<div className="flex sm:flex-row sm:items-start flex-col items-center gap-4 sm:px-3 px-1">
-						<div className="bg-background border-4 rounded-full p-1 w-fit">
-							<div className="size-[120px] overflow-hidden rounded-full">
+						<div className="bg-background border-4 rounded-full p-1 w-fit transition">
+							<Avatar className={`size-[120px]`}>
+								<AvatarImage src={user.avatar} />
+								<AvatarFallback className="text-[40px] transition">{user.firstName.charAt(0) ?? "?"}</AvatarFallback>
+							</Avatar>
+							{/* <div className="size-[120px] overflow-hidden rounded-full">
 								<img src={user.avatar} alt="" className="size-full object-cover object-center" />
-							</div>
+							</div> */}
 						</div>
 
 						<div className="sm:self-end sm:block flex flex-col items-center flex-grow sm:mb-2">
-							<h3>{user.displayName}</h3>
+							<h3>{user.firstName + " " + user.lastName}</h3>
 							<p>12 người theo dõi</p>
 							<div className="mt-1 flex -space-x-2">
 								{listFriends.slice(0, maxPreviewFriendsAvatar.current).map((friend, index) => (
 									<div className="relative">
-										<Avatar className={`size-7 ring-[2px] ring-background`}>
+										<Avatar className={`size-7 ring-[2px] ring-background transition`}>
 											<AvatarImage src={friend.avatar} />
 											<AvatarFallback>{friend?.firstName?.charAt(0) ?? "?"}</AvatarFallback>
-											<button>abc</button>
 										</Avatar>
 										{index + 1 ===
 											(listFriends.length > maxPreviewFriendsAvatar.current

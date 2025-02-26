@@ -4,8 +4,9 @@ import Button from "./Button";
 import { popupCreatePostStore } from "../store/popupStore";
 import { TextBox } from "./Field";
 import { ownerAccountStore } from "../store/ownerAccountStore";
-import { postsApi } from "../api/postsApi";
+import { createPost } from "../api/postsApi";
 import { postsStore } from "../store/postsStore";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
 export default function CreatePost() {
 	const { isVisible, setIsVisible } = popupCreatePostStore();
@@ -88,7 +89,7 @@ export default function CreatePost() {
 			formData.append("media", file);
 		});
 
-		const respCreatePost = await postsApi.createPost(formData);
+		const respCreatePost = await createPost(formData);
 
 		if (respCreatePost.statusCode === 0) {
 			const postCreated = {
@@ -133,9 +134,13 @@ export default function CreatePost() {
 
 				<div className="px-3 overflow-y-auto flex-grow scrollable-div space-y-2">
 					<div className="flex space-x-2">
-						<img src={`${user.avatar}`} alt="avatar" className="md:size-11 size-9 rounded-full" />
+						<Avatar className={`md:size-11 size-9`}>
+							<AvatarImage src={user.avatar} />
+							<AvatarFallback className="fs-xm">{user.firstName.charAt(0) ?? "?"}</AvatarFallback>
+						</Avatar>
+
 						<div className="flex flex-col justify-center">
-							<span className="font-semibold">{user.displayName}</span>
+							<span className="font-semibold">{user.firstName + " " + user.lastName}</span>
 						</div>
 					</div>
 

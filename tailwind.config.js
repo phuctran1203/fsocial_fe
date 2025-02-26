@@ -48,7 +48,7 @@ export default {
 				// 	foreground: "hsl(var(--popover-foreground))",
 				// },
 				muted: {
-					DEFAULT: "hsl(var(--muted))",
+					DEFAULT: "var(--gray-3light-clr)",
 					foreground: "hsl(var(--muted-foreground))",
 				},
 				// accent: {
@@ -89,7 +89,7 @@ export default {
 				DEFAULT: "all",
 			},
 			transitionDuration: {
-				DEFAULT: "150ms",
+				DEFAULT: "120ms",
 			},
 			transitionTimingFunction: {
 				DEFAULT: "ease-out",

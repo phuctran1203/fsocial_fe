@@ -2,13 +2,14 @@ import React, { useEffect, useRef, useState } from "react";
 import { LoadingIcon, SendIcon, XMarkIcon } from "./Icon";
 import Post from "./Post";
 import { popupCommentStore } from "../store/popupStore";
-import { commentsApi } from "../api/commentsApi";
+import { getComments, sendComment, replyComment } from "../api/commentsApi";
 import { postsStore } from "../store/postsStore";
 import { ownerAccountStore } from "../store/ownerAccountStore";
 import { TextBox } from "./Field";
 import { dateTimeToNotiTime } from "../utils/convertDateTime";
 import { Link } from "react-router-dom";
 import { toast } from "sonner";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
 function CommentReuse(props) {
 	const { comment, selectCommentToReply, handleShowReplyComment, replies, isReply } = props;
@@ -146,10 +147,10 @@ export default function CommentModal() {
 		if (selectReply?.id) {
 			//id là id của comment được chọn để phản hồi
 			formData.append("commentId", selectReply.id);
-			respSendCmt = await commentsApi.replyComment(formData);
+			respSendCmt = await replyComment(formData);
 		} else {
 			formData.append("postId", id);
-			respSendCmt = await commentsApi.sendComment(formData);
+			respSendCmt = await sendComment(formData);
 		}
 
 		if (respSendCmt.statusCode === 0) {
@@ -176,7 +177,7 @@ export default function CommentModal() {
 			}
 			updatePost(id, { countComments: post.countComments + 1 });
 		} else {
-			toast.error("Bình luận thất bại");
+			toast.error("Bình luận thất bại", { position: "top-center" });
 		}
 		setTimeout(() => {
 			textbox.current.focus();
@@ -195,7 +196,7 @@ export default function CommentModal() {
 	};
 
 	const getComment = async () => {
-		const respGetComment = await commentsApi.getComments(post.id);
+		const respGetComment = await getComments(post.id);
 		setComments(respGetComment.data);
 	};
 
@@ -220,8 +221,8 @@ export default function CommentModal() {
 		>
 			<div
 				className={`
-				flex flex-col bg-background rounded-lg w-[600px] overflow-y-auto h-full scrollable-div border
-				${isVisible ? "translate-y-0" : "translate-y-[100vh]"}	
+				flex flex-col bg-background rounded-lg w-[600px] overflow-y-auto h-full scrollable-div 
+				${isVisible ? "translate-y-0" : "translate-y-[100vh]"}
 				transition-all`}
 				onClick={(e) => e.stopPropagation()}
 			>
@@ -232,7 +233,7 @@ export default function CommentModal() {
 					</button>
 				</div>
 
-				{post && <Post post={post} className="border-b" />}
+				{post && <Post post={post} className="border-b " />}
 
 				<div className="space-y-3 py-3 px-5 flex-grow">
 					{comments.length > 0 ? (
@@ -267,7 +268,10 @@ export default function CommentModal() {
 					</div>
 
 					<div className="bg-background flex items-end gap-4 px-4 pt-2 pb-3 border-t">
-						<img src={user.avatar} alt="avatar" className="size-9 rounded-full" />
+						<Avatar className={`size-9`}>
+							<AvatarImage src={user.avatar} />
+							<AvatarFallback className="fs-xm">{user.firstName.charAt(0) ?? "?"}</AvatarFallback>
+						</Avatar>
 						<TextBox
 							texboxRef={textbox}
 							className="py-2 w-full max-h-[40vh]"

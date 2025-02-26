@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from "react";
 import Button from "../components/Button";
 import { SearchIcon } from "../components/Icon";
-import { searchAPI } from "../api/searchApi";
+import { searchUsers, searchPosts } from "../api/searchApi";
 import CommentModal from "../components/CommentModal";
 import { postsStore } from "../store/postsStore";
 import RenderPosts from "@/components/RenderPosts";
@@ -16,7 +16,7 @@ export default function Search() {
 	const setPosts = postsStore((state) => state.setPosts);
 
 	const handleSendKeyword = async () => {
-		const [respUsers, respPosts] = await Promise.all([searchAPI.searchUsers(query), searchAPI.searchPosts(query)]);
+		const [respUsers, respPosts] = await Promise.all([searchUsers(query), searchPosts(query)]);
 		const dataUsers = respUsers.data;
 		const dataPosts = respPosts.data;
 		setUsers(dataUsers);
@@ -35,7 +35,7 @@ export default function Search() {
 	return (
 		<div
 			className="flex-grow bg-background overflow-auto scrollable-div
-           sm:pt-5 pt-2"
+           sm:pt-5 pt-2 transition"
 		>
 			<div className="md:space-y-5 space-y-4 lg:max-w-[540px] mx-auto">
 				<label
@@ -76,7 +76,7 @@ export default function Search() {
 					<div className="px-3">
 						<h5 className="font-medium">Người dùng</h5>
 						{users.map((user) => (
-							<div key={user.userId} className="flex items-center justify-between border-b py-3">
+							<div key={user.userId} className="flex items-center justify-between border-b py-3 transition">
 								<div className="flex items-center space-x-3">
 									<img src={user.avatar || "./temp/default_avatar.svg"} alt="avatar" className="size-12 rounded-full" />
 									<div>

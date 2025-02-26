@@ -4,7 +4,9 @@ import { useLoginStore } from "../store/loginStore";
 import { EyeIcon, EyeSplashIcon, LoadingIcon, UserIcon, XMarkIcon } from "../components/Icon";
 import Button from "../components/Button";
 import { Link, useNavigate } from "react-router-dom";
-import { loginAPI } from "../api/loginApi";
+import { login } from "../api/loginApi";
+import { getCookie, setCookie } from "@/utils/cookie";
+import { ownerAccountStore } from "@/store/ownerAccountStore";
 
 const list = [
 	{
@@ -47,9 +49,13 @@ export default function Login() {
 			password: form.password.value.trim(),
 		};
 
-		const result = await loginAPI.login(data);
+		const result = await login(data);
 
 		if (result.statusCode === 200) {
+			// save token and refresh token
+			setCookie("access-token", result.data.accessToken, 360 * 10); // 10 năm
+			setCookie("refresh-token", result.data.refreshToken, 360 * 10); // 10 năm
+
 			navigate("/home");
 		} else {
 			setLoginErr(result.message);
@@ -59,6 +65,10 @@ export default function Login() {
 	};
 
 	const handleRemoveSavedAccount = () => {};
+
+	useEffect(() => {
+		if (getCookie("refresh-token")) navigate("/home");
+	}, []);
 
 	return (
 		<div
@@ -84,7 +94,7 @@ export default function Login() {
 						label="Tên đăng nhập/Email"
 						store={useLoginStore}
 						required={true}
-						errorMessage="Không để trống"
+						errorMessage="Không được để trống"
 					>
 						<UserIcon />
 					</Field>
