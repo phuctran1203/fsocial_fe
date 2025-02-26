@@ -39,6 +39,7 @@ function App() {
 					<Route path="/message" element={<Message />} />
 					<Route path="/profile" element={<Profile />} />
 					<Route path="*" element={<NotFound />} />
+					
 				</Route>
 				<Route pat="/admin"></Route>
 			</Routes>
