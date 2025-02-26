@@ -7,6 +7,7 @@ import CreatePost from "../components/CreatePost";
 import { Toaster } from "sonner";
 import { getOwnerProfile } from "@/api/profileApi";
 import { ownerAccountStore } from "@/store/ownerAccountStore";
+import ReportModal from "@/components/ReportModal";
 
 export default function UserLayout() {
 	const setUser = ownerAccountStore((state) => state.setUser);
@@ -31,17 +32,9 @@ export default function UserLayout() {
 				<Outlet />
 				<Notification />
 				<CreatePost />
+				<ReportModal />
 			</main>
-			<Toaster
-				position="top-right"
-				// toastOptions={{
-				// 	style: {
-				// 		background: "var(--background-clr)",
-				// 		color: "var(--text-primary-clr)",
-				// 		borderColor: "var(--gray-2light-clr)",
-				// 	},
-				// }}
-			/>
+			<Toaster position="top-right" />
 		</>
 	);
 }

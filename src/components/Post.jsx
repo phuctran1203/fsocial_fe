@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { Link, useLocation } from "react-router-dom";
-import { Glyph } from "./Icon";
-import { popupCommentStore } from "../store/popupStore";
+import { ComplaintIcon, Glyph, TrashCanIcon, PencilIcon } from "./Icon";
+import { popupCommentStore, popupDeletePostStore, popupEditPostStore, popupReportPostStore } from "../store/popupStore";
 import { postsStore } from "../store/postsStore";
 import { dateTimeToNotiTime, dateTimeToPostTime } from "../utils/convertDateTime";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
@@ -27,6 +27,12 @@ export default function Post({ post, className = "" }) {
 		updatePost(post.id, { liked: !liked, countLikes: liked ? likes - 1 : likes + 1 });
 	};
 
+	const setPopupReportVisible = popupReportPostStore((state) => state.setIsVisible);
+
+	const setPopupEditVisible = popupEditPostStore((state) => state.setIsVisible);
+
+	const setPopupDeleteVisible = popupDeletePostStore((state) => state.setIsVisible);
+
 	return (
 		<div className={`md:py-4 py-3 space-y-3 ${className} transition`}>
 			<div className="flex items-center justify-between px-4">
@@ -48,12 +54,29 @@ export default function Post({ post, className = "" }) {
 				</div>
 				<Popover>
 					<PopoverTrigger>
-						<Glyph />
+						<Button className="btn-transparent px-1.5 rounded-lg">
+							<Glyph />
+						</Button>
 					</PopoverTrigger>
-					<PopoverContent side="left" align="start" sideOffset={20} className="bg-background w-52 shadow-2xl p-2">
-						<Button className="btn-transparent !justify-start py-2 ps-3 text-nowrap">Báo cáo</Button>
-						<Button className="btn-transparent !justify-start text-nowrap py-2 ps-3">Chỉnh sửa</Button>
-						<Button className="btn-transparent !justify-start py-2 ps-3 text-nowrap">Xóa bài</Button>
+					<PopoverContent side="left" align="start" sideOffset={20} className="z-10 bg-background w-52 shadow-2xl p-2">
+						<Button
+							className="btn-transparent !justify-start py-2 ps-3 text-nowrap gap-3"
+							onClick={() => setPopupReportVisible(true)}
+						>
+							<ComplaintIcon /> Báo cáo
+						</Button>
+						<Button
+							className="btn-transparent !justify-start text-nowrap py-2 ps-3 gap-3"
+							onClick={() => setPopupEditVisible(true)}
+						>
+							<PencilIcon /> Chỉnh sửa
+						</Button>
+						<Button
+							className="btn-transparent !justify-start py-2 ps-3 text-nowrap gap-3"
+							onClick={() => setPopupDeleteVisible(true)}
+						>
+							<TrashCanIcon className="size-5" /> Xóa bài
+						</Button>
 					</PopoverContent>
 				</Popover>
 			</div>

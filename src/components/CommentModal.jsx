@@ -10,6 +10,7 @@ import { dateTimeToNotiTime } from "../utils/convertDateTime";
 import { Link } from "react-router-dom";
 import { toast } from "sonner";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { themeStore } from "@/store/themeStore";
 
 function CommentReuse(props) {
 	const { comment, selectCommentToReply, handleShowReplyComment, replies, isReply } = props;
@@ -185,6 +186,7 @@ export default function CommentModal() {
 		setSubmitCmtClicked(false);
 	};
 	const [refresh, setRefresh] = useState(true);
+
 	const handleShowReplyComment = (commendId) => {};
 
 	const textBoxOnKeyDown = (e) => {
@@ -211,6 +213,8 @@ export default function CommentModal() {
 		}
 	}, [isVisible]);
 
+	const theme = themeStore((state) => state.theme);
+
 	return (
 		<div
 			className={`z-20 fixed inset-0 sm:py-2 bg-black flex items-center justify-center ${
@@ -221,7 +225,9 @@ export default function CommentModal() {
 		>
 			<div
 				className={`
-				flex flex-col bg-background rounded-lg w-[600px] overflow-y-auto h-full scrollable-div 
+				flex flex-col bg-background rounded-lg w-[600px] overflow-y-auto h-full scrollable-div ${
+					theme === "dark" && "sm:border"
+				}
 				${isVisible ? "translate-y-0" : "translate-y-[100vh]"}
 				transition-all`}
 				onClick={(e) => e.stopPropagation()}

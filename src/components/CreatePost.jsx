@@ -7,6 +7,7 @@ import { ownerAccountStore } from "../store/ownerAccountStore";
 import { createPost } from "../api/postsApi";
 import { postsStore } from "../store/postsStore";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { themeStore } from "@/store/themeStore";
 
 export default function CreatePost() {
 	const { isVisible, setIsVisible } = popupCreatePostStore();
@@ -110,6 +111,8 @@ export default function CreatePost() {
 		}, 100);
 	}, [isVisible]);
 
+	const theme = themeStore((state) => state.theme);
+
 	return (
 		<div
 			className={`z-20 fixed inset-0 sm:py-2 bg-black flex items-center justify-center ${
@@ -119,7 +122,7 @@ export default function CreatePost() {
 		>
 			<div
 				className={`
-				pb-3 flex flex-col space-y-3 bg-background rounded-lg overflow-hidden w-[550px] border
+				pb-3 flex flex-col space-y-3 bg-background rounded-lg overflow-hidden w-[550px] ${theme === "dark" && "sm:border"}
 				sm:h-fit sm:max-h-full
 				h-full
 				${isVisible ? "translate-y-0" : "translate-y-[100vh]"}	
@@ -134,9 +137,9 @@ export default function CreatePost() {
 
 				<div className="px-3 overflow-y-auto flex-grow scrollable-div space-y-2">
 					<div className="flex space-x-2">
-						<Avatar className={`md:size-11 size-9`}>
+						<Avatar className={`md:size-11 size-9 grid`}>
 							<AvatarImage src={user.avatar} />
-							<AvatarFallback className="fs-xm">{user.firstName.charAt(0) ?? "?"}</AvatarFallback>
+							<AvatarFallback className="font-semibold">{user.firstName.charAt(0) ?? "?"}</AvatarFallback>
 						</Avatar>
 
 						<div className="flex flex-col justify-center">
@@ -206,7 +209,7 @@ export default function CreatePost() {
 						</Button>
 					)}
 					<Button
-						className={`btn-primary py-2 w-full rounded-[4px] ${submitClicked && "disable-btn"}`}
+						className={`btn-primary py-2.5 w-full rounded-[4px] ${submitClicked && "disable-btn"}`}
 						onClick={handleSubmitPost}
 					>
 						{submitClicked ? <LoadingIcon /> : "Đăng bài"}

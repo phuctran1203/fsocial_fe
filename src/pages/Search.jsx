@@ -42,7 +42,7 @@ export default function Search() {
 					htmlFor="search"
 					className="flex gap-2 mx-3 py-2 px-3 border rounded-full border-gray-2light hover:border-gray-light"
 				>
-					<SearchIcon color="stroke-gray" className="size-6" />
+					<SearchIcon color="stroke-gray" className="size-5" />
 					<input
 						id="search"
 						type="text"
@@ -52,25 +52,33 @@ export default function Search() {
 						onChange={(e) => setQuery(e.target.value)}
 					/>
 				</label>
-				<div className="flex px-3">
-					<Button
-						className={`btn-transparent py-2.5 rounded-r-none ${tab === "all" && "bg-secondary"}`}
+				<div className="flex gap-6 px-3">
+					<button
+						className={`py-2 w-full rounded-t-sm border-b hover:border-primary hover:text-primary active:bg-gray-3light ${
+							tab === "all" ? "border-primary text-primary" : "border-transparent text-gray"
+						} transition`}
 						onClick={() => setTab("all")}
 					>
-						<p className={tab != "all" ? "text-gray" : ""}> Tất cả</p>
-					</Button>
-					<Button
-						className={`btn-transparent py-2.5 rounded-none ${tab === "users" && "bg-secondary"}`}
+						Tất cả
+					</button>
+
+					<button
+						className={`py-2 w-full rounded-t-sm border-b hover:border-primary hover:text-primary active:bg-gray-3light ${
+							tab === "users" ? "border-primary text-primary" : "border-transparent text-gray"
+						} transition`}
 						onClick={() => setTab("users")}
 					>
-						<p className={tab != "users" ? "text-gray" : ""}>Mọi người</p>
-					</Button>
-					<Button
-						className={`btn-transparent py-2.5 rounded-l-none ${tab === "posts" && "bg-secondary"}`}
+						Mọi người
+					</button>
+
+					<button
+						className={`py-2 w-full rounded-t-sm border-b hover:border-primary hover:text-primary active:bg-gray-3light ${
+							tab === "posts" ? "border-primary text-primary" : "border-transparent text-gray"
+						} transition`}
 						onClick={() => setTab("posts")}
 					>
-						<p className={tab != "posts" ? "text-gray" : ""}>Bài viết</p>
-					</Button>
+						Bài viết
+					</button>
 				</div>
 				{tab === "all" || tab === "users" ? (
 					<div className="px-3">

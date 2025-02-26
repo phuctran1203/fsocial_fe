@@ -83,14 +83,14 @@ const Noti = (props) => {
 				<Glyph className="rotate-90" />
 			</button>
 			<div
-				className={`flex absolute top-0 h-full left-full ${
+				className={`flex absolute top-0 h-full left-full bg-secondary ${
 					idNotiShowing != null && idNotiShowing === index && "-translate-x-full"
 				} transition`}
 			>
-				<Button className="btn-secondary !rounded-none px-3 border-r-[1px]" onClick={deleteNoti}>
+				<Button className="btn-secondary !rounded-none px-3 border-r" onClick={deleteNoti}>
 					<TrashCanIcon />
 				</Button>
-				<Button className="btn-secondary !rounded-none px-3 border-r-[1px]" onClick={markAsRead}>
+				<Button className="btn-secondary !rounded-none px-3 border-r" onClick={markAsRead}>
 					<Check />
 				</Button>
 				<Button className="btn-secondary !rounded-none px-3" onClick={close}>

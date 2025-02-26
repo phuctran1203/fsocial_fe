@@ -9,18 +9,12 @@ export const popupCommentStore = create((set) => ({
 
 export const popupCreatePostStore = create((set) => ({
 	isVisible: false,
-	setIsVisible: (value) =>
-		set(() => ({
-			isVisible: value,
-		})),
+	setIsVisible: (value) => set({ isVisible: value }),
 }));
 
 export const popupNotificationtStore = create((set) => ({
 	isVisible: false,
-	setIsVisible: (value) =>
-		set(() => ({
-			isVisible: value,
-		})),
+	setIsVisible: (value) => set({ isVisible: value }),
 }));
 
 export const popupExpandNoti3DotStore = create((set) => ({
@@ -29,4 +23,19 @@ export const popupExpandNoti3DotStore = create((set) => ({
 		set(() => ({
 			idNotiShowing: value,
 		})),
+}));
+
+export const popupReportPostStore = create((set) => ({
+	isVisible: false,
+	setIsVisible: (value) => set({ isVisible: value }),
+}));
+
+export const popupEditPostStore = create((set) => ({
+	isVisible: false,
+	setIsVisible: (value) => set({ isVisible: value }),
+}));
+
+export const popupDeletePostStore = create((set) => ({
+	isVisible: false,
+	setIsVisible: (value) => set({ isVisible: value }),
 }));

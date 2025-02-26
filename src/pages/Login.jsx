@@ -117,14 +117,14 @@ export default function Login() {
 				</div>
 
 				<div className="flex justify-between mb-2">
-					<div className="flex justify-center items-center text-gray">
-						<label htmlFor="remmeberme" className="cursor-pointer flex items-center">
+					<div className="order-2 flex justify-center items-center text-gray">
+						{/* <label htmlFor="remmeberme" className="cursor-pointer flex items-center">
 							<input type="checkbox" name="remmeberme" id="remmeberme" className="size-4 mr-1" />
 							<span className="fs-sm">Ghi nhớ đăng nhập</span>
-						</label>
+						</label> */}
 					</div>
 					<div>
-						<Link to="/forgot-password" className="underline fs-sm font-semibold">
+						<Link to="/forgot-password" className="order-1s underline fs-sm font-semibold">
 							Quên mật khẩu?
 						</Link>
 					</div>

@@ -4,18 +4,12 @@ import { LogoutIcon, KeyIcon, SunIcon, SwitchIcon, MoonIcon, CheckIcon } from ".
 import styles from "./Nav.module.scss";
 import { useNavigate } from "react-router-dom";
 import { deleteCookie } from "@/utils/cookie";
-import { ownerAccountStore } from "@/store/ownerAccountStore";
 import { themeStore } from "@/store/themeStore";
 
 export default function NavMorePopup({ inMobile }) {
-	const updateUser = ownerAccountStore((state) => state.updateUser);
-
-	const [mode, setMode] = useState(localStorage.getItem("theme") || "light");
-
 	const { theme, setTheme } = themeStore();
 
 	const handleSetMode = (modePicked) => {
-		setMode(modePicked);
 		setTheme(modePicked);
 	};
 
