@@ -235,6 +235,12 @@ $fs-5xl: clamp-font-size(6);
 	input::placeholder {
 		color: var(--gray-light-clr);
 	}
+	input[type="radio"] {
+		accent-color: var(--primary-clr);
+		width: 14px;
+		height: 14px;
+		border-radius: 50%;
+	}
 
 	img {
 		-webkit-user-drag: none; /* Chặn drag trên Chrome, Safari */

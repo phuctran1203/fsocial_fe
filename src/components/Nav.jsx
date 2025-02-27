@@ -3,11 +3,13 @@ import { NavLink, useLocation } from "react-router-dom";
 import styles from "./Nav.module.scss";
 // import "./Nav.scss";
 import { Bell, FriendsIcon, HamburgerIcon, HomeIcon, LogoNoBG, SearchIcon } from "./Icon";
-import { popupCreatePostStore, popupNotificationtStore } from "../store/popupStore";
+import { popupNotificationtStore, usePopupStore } from "../store/popupStore";
 import { ownerAccountStore } from "../store/ownerAccountStore";
 import { toast } from "sonner";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import NavMorePopup from "./NavMorePopup";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import CreatePost from "./CreatePost";
 
 export default function Nav() {
 	const user = ownerAccountStore((state) => state.user);
@@ -18,20 +20,21 @@ export default function Nav() {
 
 	const isInHome = ["/", "/home"].includes(location.pathname);
 
-	const { isVisible, setIsVisible } = popupNotificationtStore();
-
-	const isVisibleCreatePost = popupCreatePostStore((state) => state.isVisible);
-	const setIsVisibleCreatePost = popupCreatePostStore((state) => state.setIsVisible);
+	const isVisibleNoti = popupNotificationtStore((state) => state.isVisible);
+	const setIsVisibleNoti = popupNotificationtStore((state) => state.setIsVisible);
 
 	const toggleShowNotification = () => {
-		setIsVisible(!isVisible);
+		setIsVisibleNoti(!isVisibleNoti);
 	};
 
-	const closeNotification = () => setIsVisible(false);
+	const closeNotification = () => {
+		setIsVisibleNoti(false);
+	};
+
+	const { showPopup } = usePopupStore();
 
 	const handlePopupCreatePost = () => {
-		isVisible ? closeNotification() : "";
-		setIsVisibleCreatePost(!isVisibleCreatePost);
+		showPopup("Tạo bài viết", <CreatePost />);
 	};
 
 	return (
@@ -113,7 +116,7 @@ export default function Nav() {
 						onClick={toggleShowNotification}
 					>
 						<div className="relative">
-							<Bell active={isVisible} />
+							<Bell active={isVisibleNoti} />
 							<div className="absolute size-2.5 -top-[1px] right-[1px]  bg-primary rounded-full " />
 						</div>
 						<span className={`${!isInMessage ? "sm:inline" : "lg:inline"} hidden`}>Thông báo</span>
@@ -132,9 +135,13 @@ export default function Nav() {
 					<NavLink to={`/profile?id=${user.userId}`} className={styles.navBaseStyle} onClick={closeNotification}>
 						{({ isActive }) => (
 							<>
-								<div className="size-[26px] rounded-full overflow-hidden">
-									<img className="size-full object-cover object-center" src={user.avatar} alt="navbar avatar account" />
-								</div>
+								<Avatar className={`size-[26px]`}>
+									<AvatarImage src={user.avatar} />
+									<AvatarFallback className="text-[12px] font-semibold">
+										{user.firstName.charAt(0) ?? "?"}
+									</AvatarFallback>
+								</Avatar>
+
 								<span className={`${!isInMessage ? "sm:inline" : "lg:inline"} hidden ${isActive && "font-semibold"}`}>
 									Hồ sơ
 								</span>

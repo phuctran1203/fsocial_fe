@@ -80,17 +80,19 @@ const Noti = (props) => {
 				</div>
 			</Link>
 			<button className="px-4" onClick={open}>
-				<Glyph className="rotate-90" />
+				<div className="rotate-90">
+					<Glyph />
+				</div>
 			</button>
 			<div
-				className={`flex absolute top-0 h-full left-full ${
+				className={`flex absolute top-0 h-full left-full bg-secondary ${
 					idNotiShowing != null && idNotiShowing === index && "-translate-x-full"
 				} transition`}
 			>
-				<Button className="btn-secondary !rounded-none px-3 border-r-[1px]" onClick={deleteNoti}>
+				<Button className="btn-secondary !rounded-none px-3 border-r" onClick={deleteNoti}>
 					<TrashCanIcon />
 				</Button>
-				<Button className="btn-secondary !rounded-none px-3 border-r-[1px]" onClick={markAsRead}>
+				<Button className="btn-secondary !rounded-none px-3 border-r" onClick={markAsRead}>
 					<Check />
 				</Button>
 				<Button className="btn-secondary !rounded-none px-3" onClick={close}>
@@ -151,7 +153,7 @@ export default function Notification() {
 				sm:left-[76px] sm:w-[calc(100%-76px)]
 				`
 			}
-			left-0 absolute top-0 w-full bg-opacity-0
+			left-0 fixed top-0 w-full bg-opacity-0
 			${isVisible ? "sm:bg-opacity-25" : "invisible sm:bg-opacity-0"}
 			transition
 			`}
@@ -163,8 +165,8 @@ export default function Notification() {
 				${!isInMessage ? "lg:translate-x-0 lg:drop-shadow-none" : ""}
 				lg:translate-y-0
 				md:min-w-[340px] md:max-w-[340px]
-				sm:min-w-[310px] sm:max-w-[310px]
-				w-full
+				sm:min-w-[310px] sm:max-w-[310px] sm:pb-0
+				w-full pb-14
 				${isVisible ? "drop-shadow-[1px_0px_1px_var(--drop-shadow)]" : "sm:-translate-x-full sm:translate-y-0 translate-y-full"}
 				transition`}
 			>
@@ -195,21 +197,21 @@ export default function Notification() {
 
 					<div className={`flex-grow overflow-y-auto sm:pe-4 ${!isInMessage ? "" : "scrollable-div"}`}>
 						{today.length > 0 && (
-							<div className="space-y-1">
+							<div className="sm:space-y-0 space-y-1">
 								<h6 className="px-4">Hôm nay</h6>
 								{today.map((noti, index) => Noti({ ...noti, index: index }))}
 							</div>
 						)}
 
 						{last7days.length > 0 && (
-							<div className="space-y-1">
+							<div className="sm:space-y-0 space-y-1">
 								<h6 className="px-4">7 ngày trước</h6>
 								{last7days.map((noti, index) => Noti({ ...noti, index: index + today.length }))}
 							</div>
 						)}
 
 						{old.length > 0 && (
-							<div className="space-y-1">
+							<div className="sm:space-y-0 space-y-1">
 								<h6 className="px-4">Trước đó</h6>
 								{old.map((noti, index) => Noti({ ...noti, index: index + today.length + last7days.length }))}
 							</div>

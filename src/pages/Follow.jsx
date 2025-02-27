@@ -1,6 +1,6 @@
 import React, { useEffect } from "react";
 import CommentModal from "../components/CommentModal";
-import { postsApi } from "../api/postsApi";
+import { getPosts } from "../api/postsApi";
 import { postsStore } from "../store/postsStore";
 import "../index.scss";
 import RenderPosts from "@/components/RenderPosts";
@@ -10,7 +10,7 @@ export default function Follow() {
 
 	useEffect(() => {
 		const fetchPosts = async () => {
-			const resp = await postsApi.getPosts();
+			const resp = await getPosts();
 			setPosts(resp?.statusCode === 200 ? resp.data : null);
 		};
 		fetchPosts();
@@ -30,8 +30,6 @@ export default function Follow() {
 					<RenderPosts className="sm:rounded shadow-y" />
 				</div>
 			</div>
-
-			<CommentModal />
 		</div>
 	);
 }

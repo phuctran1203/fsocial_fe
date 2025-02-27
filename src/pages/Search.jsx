@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from "react";
 import Button from "../components/Button";
-import { SearchIcon } from "../components/Icon";
-import { searchAPI } from "../api/searchApi";
+import { LoadingIcon, SearchIcon } from "../components/Icon";
+import { searchUsers, searchPosts } from "../api/searchApi";
 import CommentModal from "../components/CommentModal";
 import { postsStore } from "../store/postsStore";
 import RenderPosts from "@/components/RenderPosts";
@@ -16,33 +16,36 @@ export default function Search() {
 	const setPosts = postsStore((state) => state.setPosts);
 
 	const handleSendKeyword = async () => {
-		const [respUsers, respPosts] = await Promise.all([searchAPI.searchUsers(query), searchAPI.searchPosts(query)]);
+		setSearchAction(true);
+		const [respUsers, respPosts] = await Promise.all([searchUsers(query), searchPosts(query)]);
 		const dataUsers = respUsers.data;
 		const dataPosts = respPosts.data;
 		setUsers(dataUsers);
 		setPosts(dataPosts);
+		setSearchAction(false);
 	};
 
 	const timeout = useRef(null);
+	const [searchAction, setSearchAction] = useState(false);
 
 	useEffect(() => {
 		timeout.current = setTimeout(() => {
 			handleSendKeyword();
-		}, 500);
+		}, 400);
 		return () => clearTimeout(timeout.current);
 	}, [query]);
 
 	return (
 		<div
-			className="flex-grow bg-background overflow-auto scrollable-div
-           sm:pt-5 pt-2"
+			className="min-h-[100dvh] flex-grow bg-background overflow-auto scrollable-div
+           sm:pt-5 pt-2 transition"
 		>
-			<div className="md:space-y-5 space-y-4 lg:max-w-[540px] mx-auto">
+			<div className="mx-auto md:space-y-5 space-y-4 lg:max-w-[540px]">
 				<label
 					htmlFor="search"
-					className="flex gap-2 mx-3 py-2 px-3 border rounded-full border-gray-2light hover:border-gray-light"
+					className="mx-3 xl:mx-0 bg-background flex items-center gap-2 py-2 px-3 border rounded-full border-gray-2light hover:drop-shadow hover:border-gray-light"
 				>
-					<SearchIcon color="stroke-gray" className="size-6" />
+					<SearchIcon color="stroke-gray" className="size-5" />
 					<input
 						id="search"
 						type="text"
@@ -51,32 +54,41 @@ export default function Search() {
 						value={query}
 						onChange={(e) => setQuery(e.target.value)}
 					/>
+					{searchAction && <LoadingIcon stroke="stroke-gray" />}
 				</label>
-				<div className="flex px-3">
-					<Button
-						className={`btn-transparent py-2.5 rounded-r-none ${tab === "all" && "bg-secondary"}`}
+				<div className="mx-3 xl:mx-0 flex gap-6">
+					<button
+						className={`py-2 w-full rounded-t-sm border-b hover:border-primary hover:text-primary active:bg-gray-3light ${
+							tab === "all" ? "border-primary text-primary" : "border-transparent text-gray"
+						} transition`}
 						onClick={() => setTab("all")}
 					>
-						<p className={tab != "all" ? "text-gray" : ""}> Tất cả</p>
-					</Button>
-					<Button
-						className={`btn-transparent py-2.5 rounded-none ${tab === "users" && "bg-secondary"}`}
+						Tất cả
+					</button>
+
+					<button
+						className={`py-2 w-full rounded-t-sm border-b hover:border-primary hover:text-primary active:bg-gray-3light ${
+							tab === "users" ? "border-primary text-primary" : "border-transparent text-gray"
+						} transition`}
 						onClick={() => setTab("users")}
 					>
-						<p className={tab != "users" ? "text-gray" : ""}>Mọi người</p>
-					</Button>
-					<Button
-						className={`btn-transparent py-2.5 rounded-l-none ${tab === "posts" && "bg-secondary"}`}
+						Mọi người
+					</button>
+
+					<button
+						className={`py-2 w-full rounded-t-sm border-b hover:border-primary hover:text-primary active:bg-gray-3light ${
+							tab === "posts" ? "border-primary text-primary" : "border-transparent text-gray"
+						} transition`}
 						onClick={() => setTab("posts")}
 					>
-						<p className={tab != "posts" ? "text-gray" : ""}>Bài viết</p>
-					</Button>
+						Bài viết
+					</button>
 				</div>
 				{tab === "all" || tab === "users" ? (
-					<div className="px-3">
+					<div className="mx-3 xl:mx-0">
 						<h5 className="font-medium">Người dùng</h5>
 						{users.map((user) => (
-							<div key={user.userId} className="flex items-center justify-between border-b py-3">
+							<div key={user.userId} className="flex items-center justify-between border-b py-3 transition">
 								<div className="flex items-center space-x-3">
 									<img src={user.avatar || "./temp/default_avatar.svg"} alt="avatar" className="size-12 rounded-full" />
 									<div>
@@ -90,13 +102,12 @@ export default function Search() {
 					</div>
 				) : null}
 				{tab === "all" || tab === "posts" ? (
-					<div className="sm:space-y-3 space-y-2 lg:px-3">
+					<div className="sm:space-y-3 space-y-2">
 						<h5 className="font-medium lg:px-0 px-3">Bài viết liên quan</h5>
 						<RenderPosts className="sm:rounded shadow-y" />
 					</div>
 				) : null}
 			</div>
-			<CommentModal />
 		</div>
 	);
 }

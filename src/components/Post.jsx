@@ -1,35 +1,55 @@
-import React, { useEffect, useState } from "react";
-import { Link, useLocation } from "react-router-dom";
-import { Glyph } from "./Icon";
-import { popupCommentStore } from "../store/popupStore";
+import { Link } from "react-router-dom";
+import { ComplaintIcon, Glyph, TrashCanIcon, PencilIcon } from "./Icon";
+import { usePopupStore } from "../store/popupStore";
 import { postsStore } from "../store/postsStore";
-import { dateTimeToNotiTime, dateTimeToPostTime } from "../utils/convertDateTime";
+import { dateTimeToPostTime } from "../utils/convertDateTime";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import Button from "./Button";
+import { likePost } from "@/api/postsApi";
+import CommentModal from "./CommentModal";
+import ReportModal from "./ReportModal";
+import EditPostModal from "./EditPostModal";
+import DeletePostModal from "./DeletePostModal";
+import { useState } from "react";
 
-export default function Post({ post, className = "" }) {
-	const { isVisible, setIsVisible, setId } = popupCommentStore();
+export default function Post({ post, isChildren, className = "" }) {
+	const { showPopup } = usePopupStore();
+
+	const [popoverOpen, setPopoverOpen] = useState(false);
+
+	const showCommentPopup = () => {
+		showPopup(`Bài viết của ${post.displayName}`, <CommentModal id={post.id} />, "h-full");
+	};
+
+	const handlePopupReport = () => {
+		setPopoverOpen(false);
+		showPopup("Báo cáo vi phạm", <ReportModal id={post.id} />, " sm:max-h-[60dvh] max-h-full");
+	};
+
+	const handlePopupEdit = () => {
+		setPopoverOpen(false);
+		showPopup("Chỉnh sửa bài viết", <EditPostModal id={post.id} />);
+	};
+
+	const handlePopupDelete = () => {
+		setPopoverOpen(false);
+		showPopup("Xóa bài viết", <DeletePostModal id={post.id} />);
+	};
 
 	const likes = post.countLikes;
 
-	const liked = post.liked;
+	const liked = post.like;
 
 	const updatePost = postsStore((state) => state.updatePost);
 
-	const showCommentPopup = () => {
-		if (isVisible) return;
-		setIsVisible(true);
-		setId(post.id);
-	};
-
-	const handleLike = () => {
-		//call API
-		updatePost(post.id, { liked: !liked, countLikes: liked ? likes - 1 : likes + 1 });
+	const handleLike = async () => {
+		updatePost(post.id, { like: !liked, countLikes: liked ? likes - 1 : likes + 1 });
+		likePost(post.id);
 	};
 
 	return (
-		<div className={`md:py-4 py-3 space-y-3 ${className} transition`}>
-			<div className="flex items-center justify-between px-4">
+		<div className={`${className} transition`}>
+			<div className="flex items-center justify-between px-4 pt-4 pb-3">
 				<div className="flex space-x-2">
 					<Link to="">
 						<img
@@ -46,21 +66,27 @@ export default function Post({ post, className = "" }) {
 						<span className="text-gray fs-xs">{dateTimeToPostTime(post.createdAt)}</span>
 					</div>
 				</div>
-				<Popover>
-					<PopoverTrigger>
+				<Popover open={popoverOpen} onOpenChange={setPopoverOpen}>
+					<PopoverTrigger className={`btn-transparent !w-fit px-2 py-3 ${isChildren && "!hidden"}`}>
 						<Glyph />
 					</PopoverTrigger>
-					<PopoverContent side="left" align="start" sideOffset={20} className="bg-background w-52 shadow-2xl p-2">
-						<Button className="btn-transparent !justify-start py-2 ps-3 text-nowrap">Báo cáo</Button>
-						<Button className="btn-transparent !justify-start text-nowrap py-2 ps-3">Chỉnh sửa</Button>
-						<Button className="btn-transparent !justify-start py-2 ps-3 text-nowrap">Xóa bài</Button>
+					<PopoverContent side="left" align="start" sideOffset={20} className="z-10 bg-background w-52 shadow-2xl p-2">
+						<Button className="btn-transparent !justify-start py-2 ps-3 text-nowrap gap-3" onClick={handlePopupReport}>
+							<ComplaintIcon /> Báo cáo
+						</Button>
+						<Button className="btn-transparent !justify-start text-nowrap py-2 ps-3 gap-3" onClick={handlePopupEdit}>
+							<PencilIcon /> Chỉnh sửa
+						</Button>
+						<Button className="btn-transparent !justify-start py-2 ps-3 text-nowrap gap-3" onClick={handlePopupDelete}>
+							<TrashCanIcon className="size-5" /> Xóa bài
+						</Button>
 					</PopoverContent>
 				</Popover>
 			</div>
 
-			<div className="space-y-2">
-				<div className="px-4" dangerouslySetInnerHTML={{ __html: post.content.htmltext }}></div>
-
+			<div className="">
+				{/* post content */}
+				<div className="px-4 mb-2" dangerouslySetInnerHTML={{ __html: post.content.htmltext }}></div>
 				{/* assets post */}
 				{post.content.media.length > 0 && (
 					<div className="max-h-[200vh] border-y overflow-hidden transition">
@@ -69,7 +95,7 @@ export default function Post({ post, className = "" }) {
 				)}
 			</div>
 
-			<div className="flex justify-between px-4">
+			<div className="px-4 sm:py-4 py-3  flex justify-between">
 				{/* like button */}
 				<div className="flex items-center sm:gap-2 gap-1 cursor-pointer" onClick={handleLike}>
 					<svg className="sm:h-6 h-5" width="25" height="22" viewBox="0 0 25 22" fill="none">
@@ -92,7 +118,7 @@ export default function Post({ post, className = "" }) {
 				</div>
 
 				{/* comment button */}
-				<div className="flex items-center sm:gap-2 gap-1 cursor-pointer" onClick={showCommentPopup}>
+				<div className="flex items-center sm:gap-2 gap-1 cursor-pointer" onClick={() => showCommentPopup()}>
 					<svg className="sm:h-6 h-5" width="22" height="22" viewBox="0 0 22 22" fill="none">
 						<path
 							className="fill-primary-text stroke-primary-text"

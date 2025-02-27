@@ -4,7 +4,7 @@
 	path,
 	span,
 	button {
-		transition: var(--transition);
+		@apply transition;
 	}
 }
 

@@ -1,14 +1,14 @@
 import React, { useEffect, useRef, useState } from "react";
 import { LoadingIcon, SendIcon, XMarkIcon } from "./Icon";
 import Post from "./Post";
-import { popupCommentStore } from "../store/popupStore";
-import { commentsApi } from "../api/commentsApi";
+import { getComments, sendComment, replyComment } from "../api/commentsApi";
 import { postsStore } from "../store/postsStore";
 import { ownerAccountStore } from "../store/ownerAccountStore";
 import { TextBox } from "./Field";
 import { dateTimeToNotiTime } from "../utils/convertDateTime";
 import { Link } from "react-router-dom";
 import { toast } from "sonner";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
 function CommentReuse(props) {
 	const { comment, selectCommentToReply, handleShowReplyComment, replies, isReply } = props;
@@ -88,10 +88,8 @@ function CommentReuse(props) {
 	);
 }
 
-export default function CommentModal() {
+export default function CommentModal({ id }) {
 	const user = ownerAccountStore((state) => state.user);
-
-	const { isVisible, setIsVisible, id } = popupCommentStore();
 
 	const textbox = useRef(null);
 
@@ -112,17 +110,7 @@ export default function CommentModal() {
 		setSelectReply(props);
 		console.log(id, userId, displayName);
 		textbox.current.innerHTML = `<span class="text-primary font-semibold">${displayName}</span>&nbsp`;
-		textbox.current.focus();
-		// Di chuyển con trỏ đến cuối nội dung trong div
-		const range = document.createRange();
-		const selection = window.getSelection();
-
-		if (textbox.current.lastChild) {
-			range.setStartAfter(textbox.current.lastChild); // Đặt con trỏ sau thẻ <a>
-			range.collapse(true); // true => con trỏ sẽ đặt sau phần tử cuối
-			selection.removeAllRanges();
-			selection.addRange(range);
-		}
+		setTrigger(!trigger);
 	};
 
 	const handleStopReply = () => setSelectReply(null);
@@ -146,15 +134,17 @@ export default function CommentModal() {
 		if (selectReply?.id) {
 			//id là id của comment được chọn để phản hồi
 			formData.append("commentId", selectReply.id);
-			respSendCmt = await commentsApi.replyComment(formData);
+			respSendCmt = await replyComment(formData);
 		} else {
 			formData.append("postId", id);
-			respSendCmt = await commentsApi.sendComment(formData);
+			respSendCmt = await sendComment(formData);
 		}
 
-		if (respSendCmt.statusCode === 0) {
-			toast.success("Đã đăng bình luận", { position: "top-center" });
+		if (respSendCmt.statusCode === 200) {
+			toast.success("Đã đăng bình luận");
+
 			textbox.current.innerHTML = "";
+			// nếu đang reply sẽ đẩy comment mới vào reply
 			if (selectReply?.id) {
 				const exist = commentsReply.find((commentReply) => commentReply.commentId === selectReply.id);
 				let processNewReplies;
@@ -167,23 +157,23 @@ export default function CommentModal() {
 				} else {
 					processNewReplies = [{ commentId: selectReply.id, reply: [respSendCmt.data] }, ...commentsReply];
 				}
-				console.log(processNewReplies);
-
 				setCommentsReply(processNewReplies);
+
 				console.log("phản hồi bình luận");
 			} else {
+				// không phải reply sẽ đẩy data mới vào list comment
 				setComments((prev) => [{ ...respSendCmt.data, displayName: user.displayName }, ...prev]);
 			}
 			updatePost(id, { countComments: post.countComments + 1 });
 		} else {
 			toast.error("Bình luận thất bại");
 		}
-		setTimeout(() => {
-			textbox.current.focus();
-		}, 100);
+		setTrigger(!trigger);
 		setSubmitCmtClicked(false);
 	};
+
 	const [refresh, setRefresh] = useState(true);
+
 	const handleShowReplyComment = (commendId) => {};
 
 	const textBoxOnKeyDown = (e) => {
@@ -195,44 +185,20 @@ export default function CommentModal() {
 	};
 
 	const getComment = async () => {
-		const respGetComment = await commentsApi.getComments(post.id);
+		const respGetComment = await getComments(post.id);
 		setComments(respGetComment.data);
 	};
 
+	const [trigger, setTrigger] = useState(false);
+
 	useEffect(() => {
-		if (isVisible) {
-			setTimeout(() => {
-				textbox.current.focus();
-			}, 100);
-			getComment();
-		} else {
-			textbox.current.innerHTML = "";
-		}
-	}, [isVisible]);
+		getComment();
+	}, []);
 
 	return (
-		<div
-			className={`z-20 fixed inset-0 sm:py-2 bg-black flex items-center justify-center ${
-				isVisible ? "bg-opacity-30 visible" : "bg-opacity-0 invisible"
-			}
-			transition`}
-			onClick={() => setIsVisible(false)}
-		>
-			<div
-				className={`
-				flex flex-col bg-background rounded-lg w-[600px] overflow-y-auto h-full scrollable-div border
-				${isVisible ? "translate-y-0" : "translate-y-[100vh]"}	
-				transition-all`}
-				onClick={(e) => e.stopPropagation()}
-			>
-				<div className="bg-background border-b sticky top-0 py-2">
-					<h4 className="text-center">Bài viết của {post?.displayName}</h4>
-					<button className="absolute right-0 top-0 h-full px-4" onClick={() => setIsVisible(false)}>
-						<XMarkIcon />
-					</button>
-				</div>
-
-				{post && <Post post={post} className="border-b" />}
+		<div className="relative flex-grow flex flex-col sm:w-[560px] sm:h-[90dvh] h-[100dvh]">
+			<div className="overflow-y-auto scrollable-div flex-grow flex flex-col">
+				<Post post={post} isChildren={true} className="border-b " />
 
 				<div className="space-y-3 py-3 px-5 flex-grow">
 					{comments.length > 0 ? (
@@ -250,40 +216,44 @@ export default function CommentModal() {
 						<p>Hãy là người đầu tiên bình luận bài viết này</p>
 					)}
 				</div>
+			</div>
+			{/* Ô nhập bình luận */}
+			<div className="sticky bottom-0">
+				<div
+					className={`absolute w-full -z-10 bg-background top-0 border-t py-2 px-4 flex items-center justify-between
+					${selectReply?.id ? "-translate-y-full" : "translate-y-0"}
+					transition`}
+				>
+					<p>
+						Đang phản hồi <span className="font-semibold">{selectReply?.displayName}</span>
+					</p>
+					<div onClick={handleStopReply} className="cursor-pointer">
+						<XMarkIcon />
+					</div>
+				</div>
 
-				{/* Ô nhập bình luận */}
-				<div className="sticky bottom-0">
-					<div
-						className={`absolute w-full -z-10 bg-background top-0 border-t py-2 px-4 flex items-center justify-between
-						${selectReply?.id ? "-translate-y-full" : "translate-y-0"}
-						transition`}
+				<div className=" bg-background flex items-end gap-4 px-4 pt-2 pb-3 border-t">
+					<Avatar className={`size-9`}>
+						<AvatarImage src={user.avatar} />
+						<AvatarFallback className="fs-xm">{user.firstName.charAt(0) ?? "?"}</AvatarFallback>
+					</Avatar>
+					<TextBox
+						texboxRef={textbox}
+						className="py-2 w-full max-h-[40vh]"
+						placeholder="Viết bình luận"
+						contentEditable={!submitCmtClicked}
+						onKeyDown={textBoxOnKeyDown}
+						autoFocus={true}
+						trigger={trigger}
+					/>
+
+					<button
+						className="py-2"
+						onClick={handleSendComment}
+						disabled={textbox.current?.innerText == "" || submitCmtClicked}
 					>
-						<p>
-							Đang phản hồi <span className="font-semibold">{selectReply?.displayName}</span>
-						</p>
-						<div onClick={handleStopReply} className="cursor-pointer">
-							<XMarkIcon />
-						</div>
-					</div>
-
-					<div className="bg-background flex items-end gap-4 px-4 pt-2 pb-3 border-t">
-						<img src={user.avatar} alt="avatar" className="size-9 rounded-full" />
-						<TextBox
-							texboxRef={textbox}
-							className="py-2 w-full max-h-[40vh]"
-							placeholder="Viết bình luận"
-							contentEditable={!submitCmtClicked}
-							onKeyDown={textBoxOnKeyDown}
-						/>
-
-						<button
-							className="py-2"
-							onClick={handleSendComment}
-							disabled={textbox.current?.innerText == "" || submitCmtClicked}
-						>
-							{submitCmtClicked ? <LoadingIcon color="stroke-gray-light" /> : <SendIcon />}
-						</button>
-					</div>
+						{submitCmtClicked ? <LoadingIcon stroke="stroke-gray-light" /> : <SendIcon />}
+					</button>
 				</div>
 			</div>
 		</div>

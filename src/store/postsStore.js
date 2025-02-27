@@ -22,4 +22,6 @@ export const postsStore = create((set) => ({
 			posts: [post, ...state.posts],
 		}));
 	},
+
+	findPost: (id) => postsStore.getState().posts.find((post) => post.id === id),
 }));

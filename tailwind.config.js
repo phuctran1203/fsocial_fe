@@ -48,7 +48,7 @@ export default {
 				// 	foreground: "hsl(var(--popover-foreground))",
 				// },
 				muted: {
-					DEFAULT: "hsl(var(--muted))",
+					DEFAULT: "var(--gray-3light-clr)",
 					foreground: "hsl(var(--muted-foreground))",
 				},
 				// accent: {
@@ -92,7 +92,7 @@ export default {
 				DEFAULT: "150ms",
 			},
 			transitionTimingFunction: {
-				DEFAULT: "ease-out",
+				DEFAULT: "cubic-bezier(0.22, 0.16, 0.06, 0.93)",
 			},
 			// borderRadius: {
 			// 	lg: "var(--radius)",
