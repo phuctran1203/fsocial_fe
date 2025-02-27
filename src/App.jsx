@@ -12,6 +12,8 @@ import Search from "./pages/Search";
 import Follow from "./pages/Follow";
 import Message from "./pages/Message";
 import { useEffect } from "react";
+import AdminLayout from "./layout/AdminLayout";
+import ManagerUser from "./pages/ManageUser";
 import Complaint from "./pages/Complaint";
 
 function App() {
@@ -40,8 +42,9 @@ function App() {
 					<Route path="/message" element={<Message />} />
 					<Route path="*" element={<NotFound />} />
 				</Route>
-				<Route path="/admin">
-					<Route path="/Complaint" element={<Complaint />} />
+				<Route path="/admin" element={<AdminLayout/>}>
+					<Route path="complaint" element={<Complaint/>} />
+					<Route path="user-management" element={<ManagerUser/>} />
 				</Route>
 			</Routes>
 		</BrowserRouter>

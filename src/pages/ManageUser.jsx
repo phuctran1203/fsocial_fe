@@ -10,156 +10,146 @@ import Table from "@/components/Table";
 import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 
-export default function Complaint() {
+export default function ManagerUser() {
   const [searchValue, setSearchValue] = useState("");
 
-  const buttonItems = ["Tất cả", "Bài viết", "Người dùng"];
+  const buttonItems = ["Tất cả", "Bị cấm", "Bình thường"];
   const [data, setData] = useState([]);
   const [filteredData, setFilteredData] = useState([]);
   const [loading, setLoading] = useState(false);
   const [selected, setSelected] = useState("Tất cả");
   const headers = [
     "Người báo cáo",
-    "Loại báo cáo",
-    "Người dùng/Bài viết bị báo cáo",
-    "Nội dung báo cáo",
-    "Ngày báo cáo",
+    "Đường dẫn tài khoản",
+    "Ngày tạo tài khoản",
+    "Lần hoạt động cuối cùng",
     "Hành động",
   ];
   const fetchComplant = () => {
     const currenData = [
       {
-        status: false,
+        status: true,
         id: "lạdlfka",
-        userComplaint: "Cang Ngô 123",
-        complaintType: "Bài viết",
+        displayName: "Cang Ngô 123",
         complaint: "http://localhost:3000/postId?=bai-viet-hoi-nhay-cam-hihi",
-        content: "Bài viết hơi kì",
-        dataTime: "11/02/2025",
+        createDate: "11/02/2004",
+        onlineLated: "11/02/2025",
         userName: "cangngo",
       },
       {
         status: false,
         id: "lạdlfkaư",
-        userComplaint: "Cang Ngô",
+        displayName: "Cang Ngô",
         complaintType: "Người dùng",
         complaint: "http://localhost:3000/postId?=bai-viet-hoi-nhay-cam-hihi",
-        content: "Nội dung nhạy cảm",
-        dataTime: "11/02/2025",
+        createDate: "11/02/2004",
+        onlineLated: "11/02/2025",
         userName: "cangngo",
       },
       {
         status: false,
         id: "lạdlfkea",
-        userComplaint: "Cang Ngô",
+        displayName: "Cang Ngô",
         complaintType: "Người dùng",
         complaint: "http://localhost:3000/postId?=bai-viet-hoi-nhay-cam-hihi",
-        content: "Nội dung nhạy cảm",
-        dataTime: "11/02/2025",
+        createDate: "11/02/2004",
+        onlineLated: "11/02/2025",
         userName: "cangngo",
       },
       {
         status: false,
         id: "lạdlưfka",
-        userComplaint: "Cang Ngô",
+        displayName: "Cang Ngô",
         complaintType: "Người dùng",
         complaint: "http://localhost:3000/postId?=bai-viet-hoi-nhay-cam-hihi",
-        content: "Nội dung nhạy cảm",
-        dataTime: "11/02/2025",
+        createDate: "11/02/2004",
+        onlineLated: "11/02/2025",
         userName: "cangngo",
       },
       {
         status: false,
         id: "lạdlfqka",
-        userComplaint: "Cang Ngô",
-        complaintType: "Bài viết",
+        displayName: "Cang Ngô",
         complaint: "http://localhost:3000/postId?=bai-viet-hoi-nhay-cam-hihi",
-        content: "Nội dung nhạy cảm",
-        dataTime: "11/02/2025",
+        createDate: "11/02/2004",
+        onlineLated: "11/02/2025",
         userName: "cangngo",
       },
       {
         status: false,
         id: "lạdlfska",
-        userComplaint: "Cang Ngô",
-        complaintType: "Bài viết",
+        displayName: "Cang Ngô",
         complaint: "http://localhost:3000/postId?=bai-viet-hoi-nhay-cam-hihi",
-        content: "Nội dung nhạy cảm",
-        dataTime: "11/02/2025",
+        createDate: "11/02/2004",
+        onlineLated: "11/02/2025",
         userName: "cangngo",
       },
       {
         status: false,
         id: "lạdlfkfa",
-        userComplaint: "Cang Ngô",
-        complaintType: "Bài viết",
+        displayName: "Cang Ngô",
         complaint: "http://localhost:3000/postId?=bai-viet-hoi-nhay-cam-hihi",
-        content: "Nội dung nhạy cảm",
-        dataTime: "11/02/2025",
+        createDate: "11/02/2004",
+        onlineLated: "11/02/2025",
         userName: "cangngo",
       },
       {
         status: false,
         id: "lạdlfkca",
-        userComplaint: "Cang Ngô",
-        complaintType: "Bài viết",
+        displayName: "Cang Ngô",
         complaint: "http://localhost:3000/postId?=bai-viet-hoi-nhay-cam-hihi",
-        content: "Nội dung nhạy cảm",
-        dataTime: "11/02/2025",
+        createDate: "11/02/2004",
+        onlineLated: "11/02/2025",
         userName: "cangngo",
       },
 
       {
         status: false,
         id: "lạdlfxka",
-        userComplaint: "Cang Ngô",
-        complaintType: "Bài viết",
+        displayName: "Cang Ngô",
         complaint: "http://localhost:3000/postId?=bai-viet-hoi-nhay-cam-hihi",
-        content: "Nội dung nhạy cảm",
-        dataTime: "11/02/2025",
+        createDate: "11/02/2004",
+        onlineLated: "11/02/2025",
         userName: "cangngo",
       },
       {
         status: false,
         id: "lạdlzfka",
-        userComplaint: "Cang Ngô",
-        complaintType: "Bài viết",
+        displayName: "Cang Ngô",
         complaint: "http://localhost:3000/postId?=bai-viet-hoi-nhay-cam-hihi",
-        content: "Nội dung nhạy cảm",
-        dataTime: "11/02/2025",
+        createDate: "11/02/2004",
+        onlineLated: "11/02/2025",
         userName: "cangngo",
       },
       {
         status: false,
         id: "lạdvlfka",
-        userComplaint: "Cang Ngô",
-        complaintType: "Bài viết",
+        displayName: "Cang Ngô",
         complaint: "http://localhost:3000/postId?=bai-viet-hoi-nhay-cam-hihi",
-        content: "Nội dung nhạy cảm",
-        dataTime: "11/02/2025",
+        createDate: "11/02/2004",
+        onlineLated: "11/02/2025",
         userName: "cangngo",
       },
       {
         status: false,
         id: "lạdlfkba",
-        userComplaint: "Cang Ngô",
-        complaintType: "Bài viết",
+        displayName: "Cang Ngô",
         complaint: "http://localhost:3000/postId?=bai-viet-hoi-nhay-cam-hihi",
-        content: "Nội dung nhạy cảm",
-        dataTime: "11/02/2025",
+        createDate: "11/02/2004",
+        onlineLated: "11/02/2025",
         userName: "cangngo",
       },
       {
         status: false,
         id: "lạdlfka",
-        userComplaint: "Cang Ngô",
-        complaintType: "Bài viết",
+        displayName: "Cang Ngô",
         complaint: "http://localhost:3000/postId?=bai-viet-hoi-nhay-cam-hihi",
-        content: "Nội dung nhạy cảm",
-        dataTime: "11/02/2025",
+        createDate: "11/02/2004",
+        onlineLated: "11/02/2025",
         userName: "cangngo",
       },
     ];
+
     return currenData;
   };
   useEffect(() => {
@@ -185,13 +175,14 @@ export default function Complaint() {
     const currentSelected = buttonItems[value];
     console.log(currentSelected.toLowerCase());
 
-    if (currentSelected.toLowerCase() != "tất cả") {
+    if (currentSelected.toLowerCase() != buttonItems[0].toLowerCase()) {
       setFilteredData(
         data.filter((item) => {
-          return (
-            item.complaintType.toLowerCase() ===
-            currentSelected.toLocaleLowerCase()
-          );
+          if (currentSelected.toLowerCase() === buttonItems[1].toLowerCase()) {
+            return item.status == false;
+          } else {
+            return item.status == true;
+          }
         })
       );
     } else {
@@ -200,10 +191,10 @@ export default function Complaint() {
     setSelected(currentSelected);
   };
 
-  const handleReadComplaint = (id) => {
+  const handlechecked = (id) => {
     setData(
       filteredData.map((item) => {
-        if (item.id === id) item.status = true;
+        if (item.id === id) item.status = !item.status;
         return {
           ...item,
         };
@@ -226,21 +217,26 @@ export default function Complaint() {
     return (
       <>
         <td className=" text-[#404040]">
-          <div className="text-black">{item.userComplaint}</div>
+          <div className="text-black">{item.displayName}</div>
           <div className="text-gray">{item.userName}</div>
         </td>
-        <td>{item.complaintType}</td>
         <td className="text-primary hover:cursor-pointer">
           <Link to={item.complaint}>{item.complaint}</Link>
         </td>
-        <td>{item.content}</td>
-        <td>{item.dataTime}</td>
+        <td>{item.createDate}</td>
+        <td>{item.onlineLated}</td>
         <td className="flex">
           <div onClick={() => handleRemoveComplaint(item.id)}>
             <RemoveIcon />
           </div>
-          <div onClick={() => handleReadComplaint(item.id)}>
-            {item.status ? <ReadIcon /> : <UnReadIcon />}
+          <div>
+            <input
+              type="checkbox"
+              name="status-user"
+              id="status-user"
+              checked={item.status === true}
+              onChange={() => handlechecked(item.id)}
+            />
           </div>
         </td>
       </>
@@ -273,7 +269,6 @@ export default function Complaint() {
           headers={headers}
         />
       </div>
-      <div></div>
     </div>
   );
 }

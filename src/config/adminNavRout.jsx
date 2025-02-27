@@ -2,23 +2,23 @@ import { ComplaintIcon, PolicySettingIcon, StatisticalIcon, UserManagementIcon }
 
 export const adminNavRout = [
     {
-        name:"Khiếu nại", 
+        name: "Khiếu nại",
         to: "/admin/complaint",
-        icon:<ComplaintIcon />
+        icon: <ComplaintIcon />
     },
     {
-        name:"Quản lý người dùng", 
+        name: "Quản lý người dùng",
         to: "/admin/user-management",
-        icon:<UserManagementIcon />
+        icon: <UserManagementIcon />
     },
     {
-        name:"Thống kê", 
+        name: "Thống kê",
         to: "/admin/statistical",
-        icon:<StatisticalIcon />
+        icon: <StatisticalIcon />
     },
     {
-        name:"Cài đặt chính sách", 
+        name: "Cài đặt chính sách",
         to: "/admin/policy-setting",
-        icon:<PolicySettingIcon />
+        icon: <PolicySettingIcon />
     }
 ]
