@@ -27,8 +27,9 @@ export default function ReportModal({ id }) {
 
 	const [submitClicked, setSubmitClicked] = useState(false);
 
-	const submitReport = () => {
+	const submitReport = async () => {
 		setSubmitClicked(true);
+
 		setTimeout(() => {
 			toast.success("Đã gửi báo cáo");
 			hidePopup();

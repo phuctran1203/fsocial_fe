@@ -155,7 +155,7 @@ export default function ForgotPassword() {
 			setCurrentStep(3);
 			setTimeout(() => {
 				navigate("/login");
-			}, 4000);
+			}, 2500);
 		} else {
 			console.log("Lỗi đổi mật khẩu");
 		}
