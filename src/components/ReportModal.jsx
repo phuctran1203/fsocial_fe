@@ -8,7 +8,7 @@ export default function ReportModal() {
 	const [selectedReason, setSelectedReason] = useState("");
 	const [reportOptions, setReportOptions] = useState([]);
 
-	const { isVisible, setIsVisible } = popupReportPostStore();
+	const { id, isVisible, setIsVisible } = popupReportPostStore();
 
 	const reportOptionsJson = [
 		{
@@ -43,21 +43,21 @@ export default function ReportModal() {
 		>
 			<div
 				className={` 
-				pb-4 flex flex-col bg-background rounded-lg w-[550px] min-h-full sm:min-h-[70dvh] max-h-full overflow-hidden ${
+				pb-3 flex flex-col bg-background rounded-lg w-[550px] min-h-full sm:min-h-[70dvh] max-h-full overflow-hidden ${
 					theme === "dark" && "sm:border"
 				}
 				${isVisible ? "translate-y-0" : "translate-y-[100vh]"}
 				transition-all`}
 				onClick={(e) => e.stopPropagation()}
 			>
-				<div className="sticky top-0 py-2">
+				<div className="sticky top-0 py-3 border-b">
 					<h4 className="text-center">Báo cáo vi phạm</h4>
 					<button className="absolute right-0 top-0 h-full px-4" onClick={() => setIsVisible(false)}>
 						<XMarkIcon />
 					</button>
 				</div>
 
-				<div className="px-4 flex-grow flex flex-col relative overflow-y-auto">
+				<div className="px-3 flex-grow flex flex-col relative overflow-y-auto">
 					<div className=" flex-grow space-y-3 my-4">
 						{reportOptions.map((option) => (
 							<label

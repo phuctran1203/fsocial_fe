@@ -8,15 +8,17 @@ import { Toaster } from "sonner";
 import { getOwnerProfile } from "@/api/profileApi";
 import { ownerAccountStore } from "@/store/ownerAccountStore";
 import ReportModal from "@/components/ReportModal";
+import EditPostModal from "@/components/EditPostModal";
+import DeletePostModal from "@/components/DeletePostModal";
 
 export default function UserLayout() {
 	const setUser = ownerAccountStore((state) => state.setUser);
 
 	const getUserDetail = async () => {
 		const resp = await getOwnerProfile();
-		if (resp.statusCode === 200) {
-			setUser(resp.data);
-		}
+		// if (resp.statusCode === 200) {
+		setUser(resp);
+		// }
 	};
 
 	useEffect(() => {
@@ -33,8 +35,10 @@ export default function UserLayout() {
 				<Notification />
 				<CreatePost />
 				<ReportModal />
+				<EditPostModal />
+				<DeletePostModal />
 			</main>
-			<Toaster position="top-right" />
+			<Toaster position="top-center" />
 		</>
 	);
 }

@@ -114,17 +114,7 @@ export default function CommentModal() {
 		setSelectReply(props);
 		console.log(id, userId, displayName);
 		textbox.current.innerHTML = `<span class="text-primary font-semibold">${displayName}</span>&nbsp`;
-		textbox.current.focus();
-		// Di chuyển con trỏ đến cuối nội dung trong div
-		const range = document.createRange();
-		const selection = window.getSelection();
-
-		if (textbox.current.lastChild) {
-			range.setStartAfter(textbox.current.lastChild); // Đặt con trỏ sau thẻ <a>
-			range.collapse(true); // true => con trỏ sẽ đặt sau phần tử cuối
-			selection.removeAllRanges();
-			selection.addRange(range);
-		}
+		setTrigger(!trigger);
 	};
 
 	const handleStopReply = () => setSelectReply(null);
@@ -154,9 +144,11 @@ export default function CommentModal() {
 			respSendCmt = await sendComment(formData);
 		}
 
-		if (respSendCmt.statusCode === 0) {
-			toast.success("Đã đăng bình luận", { position: "top-center" });
+		if (respSendCmt.statusCode === 200) {
+			toast.success("Đã đăng bình luận");
+
 			textbox.current.innerHTML = "";
+			// nếu đang reply sẽ đẩy comment mới vào reply
 			if (selectReply?.id) {
 				const exist = commentsReply.find((commentReply) => commentReply.commentId === selectReply.id);
 				let processNewReplies;
@@ -169,22 +161,21 @@ export default function CommentModal() {
 				} else {
 					processNewReplies = [{ commentId: selectReply.id, reply: [respSendCmt.data] }, ...commentsReply];
 				}
-				console.log(processNewReplies);
-
 				setCommentsReply(processNewReplies);
+
 				console.log("phản hồi bình luận");
 			} else {
+				// không phải reply sẽ đẩy data mới vào list comment
 				setComments((prev) => [{ ...respSendCmt.data, displayName: user.displayName }, ...prev]);
 			}
 			updatePost(id, { countComments: post.countComments + 1 });
 		} else {
-			toast.error("Bình luận thất bại", { position: "top-center" });
+			toast.error("Bình luận thất bại");
 		}
-		setTimeout(() => {
-			textbox.current.focus();
-		}, 100);
+		setTrigger(!trigger);
 		setSubmitCmtClicked(false);
 	};
+
 	const [refresh, setRefresh] = useState(true);
 
 	const handleShowReplyComment = (commendId) => {};
@@ -202,11 +193,11 @@ export default function CommentModal() {
 		setComments(respGetComment.data);
 	};
 
+	const [trigger, setTrigger] = useState(false);
+
 	useEffect(() => {
 		if (isVisible) {
-			setTimeout(() => {
-				textbox.current.focus();
-			}, 100);
+			setTrigger(!trigger);
 			getComment();
 		} else {
 			textbox.current.innerHTML = "";
@@ -217,7 +208,7 @@ export default function CommentModal() {
 
 	return (
 		<div
-			className={`z-20 fixed inset-0 sm:py-2 bg-black flex items-center justify-center ${
+			className={`z-10 fixed inset-0 sm:py-2 bg-black flex items-center justify-center ${
 				isVisible ? "bg-opacity-30 visible" : "bg-opacity-0 invisible"
 			}
 			transition`}
@@ -284,6 +275,8 @@ export default function CommentModal() {
 							placeholder="Viết bình luận"
 							contentEditable={!submitCmtClicked}
 							onKeyDown={textBoxOnKeyDown}
+							autoFocus={true}
+							trigger={trigger}
 						/>
 
 						<button

@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 
 export function Field({
 	type = "text",
@@ -143,10 +143,38 @@ export function Select({
 	);
 }
 
-export function TextBox({ texboxRef, placeholder, contentEditable = true, onKeyDown = () => {}, className }) {
+export function TextBox({
+	texboxRef,
+	placeholder,
+	innerHTML,
+	contentEditable = true,
+	onKeyDown = () => {},
+	autoFocus = false,
+	trigger = false,
+	className,
+}) {
 	const onInput = (e) => {
 		if (e.target.innerHTML == "<br>") e.target.innerHTML = "";
 	};
+
+	useEffect(() => {
+		if (autoFocus) {
+			setTimeout(() => {
+				if (!texboxRef.current) return;
+				texboxRef.current.focus();
+				const range = document.createRange();
+				const selection = window.getSelection();
+
+				if (texboxRef.current.lastChild) {
+					range.setStartAfter(texboxRef.current.lastChild); // Đặt con trỏ sau thẻ <a>
+					range.collapse(true); // true => con trỏ sẽ đặt sau phần tử cuối
+					selection.removeAllRanges();
+					selection.addRange(range);
+				}
+			}, 200);
+		}
+	}, [trigger]);
+
 	return (
 		<div
 			ref={texboxRef}
@@ -158,6 +186,7 @@ export function TextBox({ texboxRef, placeholder, contentEditable = true, onKeyD
 			data-placeholder={placeholder}
 			onKeyDown={onKeyDown}
 			onInput={onInput}
+			dangerouslySetInnerHTML={{ __html: innerHTML }}
 		></div>
 	);
 }

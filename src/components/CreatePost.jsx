@@ -8,6 +8,7 @@ import { createPost } from "../api/postsApi";
 import { postsStore } from "../store/postsStore";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { themeStore } from "@/store/themeStore";
+import { toast } from "sonner";
 
 export default function CreatePost() {
 	const { isVisible, setIsVisible } = popupCreatePostStore();
@@ -82,7 +83,6 @@ export default function CreatePost() {
 		setSubmitClicked(true);
 
 		const formData = new FormData();
-
 		formData.append("userId", user.userId);
 		formData.append("text", textbox.current.innerText);
 		formData.append("HTMLText", textbox.current.innerHTML);
@@ -92,23 +92,27 @@ export default function CreatePost() {
 
 		const respCreatePost = await createPost(formData);
 
-		if (respCreatePost.statusCode === 0) {
+		if (respCreatePost.statusCode === 200) {
 			const postCreated = {
 				...respCreatePost.data,
-				displayName: user.displayName,
+				displayName: user.firstName + " " + user.lastName,
 				avatar: user.avatar,
 			};
 			insertPost(postCreated);
 			closePopup();
+			toast.success("Bài viết của bạn đã được đăng tải");
 		}
 		setSubmitClicked(false);
 	};
 
+	const [trigger, setTrigger] = useState(false);
+
 	useEffect(() => {
-		if (!isVisible) return;
-		setTimeout(() => {
-			textbox.current.focus();
-		}, 100);
+		if (isVisible) {
+			setTrigger(!trigger);
+		} else {
+			textbox.current.innerHTML = "";
+		}
 	}, [isVisible]);
 
 	const theme = themeStore((state) => state.theme);
@@ -147,7 +151,7 @@ export default function CreatePost() {
 						</div>
 					</div>
 
-					<TextBox texboxRef={textbox} className="" placeholder="Nói gì đó về bài viết của bạn" />
+					<TextBox texboxRef={textbox} autoFocus={true} trigger={trigger} placeholder="Nói gì đó về bài viết của bạn" />
 
 					<label
 						htmlFor="file-upload"

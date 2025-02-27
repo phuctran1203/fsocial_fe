@@ -18,7 +18,7 @@ export default function Header() {
 	const closeNotification = () => setIsVisible(false);
 	return (
 		<>
-			<div className="h-12" /> {/* =)) thật thông minh, đỉnh cao trí tuệ */}
+			{!isInMessage && <div className="h-12" />} {/* =)) thật thông minh, đỉnh cao trí tuệ */}
 			<header
 				className={`z-10 px-3 h-12 bg-background ${
 					!isInMessage ? "sm:hidden" : "hidden"

@@ -1,10 +1,10 @@
 import { create } from "zustand";
 
 export const popupCommentStore = create((set) => ({
-	isVisible: false,
 	id: null,
-	setIsVisible: (value) => set({ isVisible: value }),
+	isVisible: false,
 	setId: (id) => set({ id }),
+	setIsVisible: (value) => set({ isVisible: value }),
 }));
 
 export const popupCreatePostStore = create((set) => ({
@@ -26,16 +26,22 @@ export const popupExpandNoti3DotStore = create((set) => ({
 }));
 
 export const popupReportPostStore = create((set) => ({
+	id: null,
 	isVisible: false,
+	setId: (id) => set({ id }),
 	setIsVisible: (value) => set({ isVisible: value }),
 }));
 
 export const popupEditPostStore = create((set) => ({
+	id: null,
 	isVisible: false,
+	setId: (id) => set({ id }),
 	setIsVisible: (value) => set({ isVisible: value }),
 }));
 
 export const popupDeletePostStore = create((set) => ({
+	id: null,
 	isVisible: false,
+	setId: (id) => set({ id }),
 	setIsVisible: (value) => set({ isVisible: value }),
 }));

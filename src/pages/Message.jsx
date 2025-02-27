@@ -66,10 +66,10 @@ export default function Message() {
 
 	const messagesEndRef = useRef(null);
 
+	const [trigger, setTrigger] = useState(true);
+
 	const handleUserClick = (userId) => {
-		setTimeout(() => {
-			textbox.current.focus();
-		}, 500);
+		setTrigger(!trigger);
 		setSelectedUser(userId);
 		//call API lấy tin nhắn về
 	};
@@ -78,8 +78,6 @@ export default function Message() {
 		setRealHeight(window.innerHeight);
 		setSelectedUser(null);
 	};
-
-	const typingMessageRef = useRef(null);
 
 	const [submitMsgClicked, setSubmitMsgClicked] = useState(false);
 
@@ -100,6 +98,7 @@ export default function Message() {
 		setSubmitMsgClicked(true);
 
 		console.log("message sent");
+
 		setTimeout(() => {
 			textbox.current.innerHTML = "";
 			textbox.current.focus();
@@ -193,7 +192,9 @@ export default function Message() {
 	return (
 		<div
 			style={{ height: realHeight }}
-			className={`${selectedUser && "fixed top-0 z-10"} flex-grow sm:flex bg-background overflow-hidden transition`}
+			className={`${
+				selectedUser && "sm:relative fixed top-0 z-10"
+			} flex-grow sm:flex bg-background overflow-hidden transition`}
 		>
 			{/* Danh sách hội thoại */}
 			<div
@@ -246,9 +247,8 @@ export default function Message() {
 
 			{/* Cửa sổ tin nhắn */}
 			<div
-				ref={typingMessageRef}
 				style={{ height: realHeight }}
-				className={`w-screen flex flex-col bg-background ${
+				className={` sm:flex-grow flex flex-col bg-background ${
 					selectedUser && "sm:translate-y-0 -translate-y-full"
 				} transition`}
 			>
@@ -267,7 +267,7 @@ export default function Message() {
 				{!selectedUser ? (
 					<div className="size-full grid place-content-center">Cùng bắt đầu trò chuyện với người theo dõi của bạn</div>
 				) : (
-					<div className="flex-grow overflow-auto" id="allow-scroll">
+					<div className="overflow-auto px-5" id="allow-scroll">
 						Lorem ipsum dolor sit amet consectetur adipisicing elit. Error quibusdam alias voluptatibus quisquam
 						sapiente accusamus similique culpa beatae amet recusandae ab nobis obcaecati repudiandae possimus vero,
 						exercitationem quo repellat rerum! Suscipit ut eligendi exercitationem vitae beatae? Rem ratione maxime
@@ -327,6 +327,8 @@ export default function Message() {
 							className="sm:py-2 py-1.5 max-h-[120px] bg-gray-3light border rounded-3xl px-5 flex-grow scrollable-div"
 							contentEditable={!submitMsgClicked}
 							onKeyDown={textBoxOnKeyDown}
+							autoFocus={true}
+							trigger={trigger}
 						/>
 						<button onClick={sendMessage} className="bg-primary sm:py-2 py-1.5 px-5 rounded-full">
 							<SendIcon color="stroke-txtWhite" />

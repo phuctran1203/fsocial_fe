@@ -167,7 +167,7 @@ export default function Profile() {
 				<div className="sm:mt-5 mt-2 aspect-[3/1] overflow-hidden rounded-lg">
 					<img src="./temp/banner.png" alt="Ảnh bìa" className="object-cover size-full object-center" />
 				</div>
-				<div className="sm:-mt-6 -mt-4 mx-auto lg:max-w-[600px] ">
+				<div className="sm:-mt-6 -mt-4 mx-auto lg:max-w-[630px] ">
 					{/* profile detail */}
 					<div className="flex sm:flex-row sm:items-start flex-col items-center gap-4 sm:px-3 px-1">
 						<div className="bg-background border-4 rounded-full p-1 w-fit transition">
@@ -175,9 +175,6 @@ export default function Profile() {
 								<AvatarImage src={user.avatar} />
 								<AvatarFallback className="text-[40px] transition">{user.firstName.charAt(0) ?? "?"}</AvatarFallback>
 							</Avatar>
-							{/* <div className="size-[120px] overflow-hidden rounded-full">
-								<img src={user.avatar} alt="" className="size-full object-cover object-center" />
-							</div> */}
 						</div>
 
 						<div className="sm:self-end sm:block flex flex-col items-center flex-grow sm:mb-2">
@@ -185,7 +182,7 @@ export default function Profile() {
 							<p>12 người theo dõi</p>
 							<div className="mt-1 flex -space-x-2">
 								{listFriends.slice(0, maxPreviewFriendsAvatar.current).map((friend, index) => (
-									<div className="relative">
+									<div key={index} className="relative">
 										<Avatar className={`size-7 ring-[2px] ring-background transition`}>
 											<AvatarImage src={friend.avatar} />
 											<AvatarFallback>{friend?.firstName?.charAt(0) ?? "?"}</AvatarFallback>
@@ -203,11 +200,14 @@ export default function Profile() {
 							</div>
 						</div>
 
-						{queryParams.get("id") === user.userId && (
-							<div className="self-center">
-								<Button className="btn-primary px-8 py-2">Theo dõi</Button>
-							</div>
-						)}
+						<div className="self-center flex gap-4 ">
+							<Button className="!hidden sm:!block btn-transparent px-3 h-10">
+								<Glyph />
+							</Button>
+							{queryParams.get("id") !== user.userId && (
+								<Button className="btn-primary px-8 text-nowrap h-10">Theo dõi</Button>
+							)}
+						</div>
 					</div>
 
 					{/* bio */}
@@ -270,7 +270,7 @@ export default function Profile() {
 													<path
 														className="stroke-txtWhite"
 														d="M11.9949 5.41155C13.335 6.1039 13.335 7.8961 11.9949 8.58844L3.90312 12.7687C2.60064 13.4416 1 12.5658 1 11.1803V2.81974C1 1.43421 2.60064 0.558412 3.90312 1.23129L11.9949 5.41155Z"
-														stroke-width="1.5"
+														strokeWidth="1.5"
 													/>
 												</svg>
 											</button>

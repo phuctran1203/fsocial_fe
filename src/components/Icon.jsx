@@ -1,3 +1,5 @@
+import { cn } from "@/lib/utils";
+
 export const LogoNoBG = ({ className }) => (
 	<svg className={className} width="49" height="44" viewBox="0 0 49 44" fill="none" xmlns="http://www.w3.org/2000/svg">
 		<path
@@ -27,23 +29,21 @@ export const LogoNoBG = ({ className }) => (
 	</svg>
 );
 
-export const Glyph = ({ className, color = "fill-primary-text" }) => (
-	<div className={`py-3 cursor-pointer ${className} transition`}>
-		<svg width="17" height="4" viewBox="0 0 17 4" fill="none">
-			<path
-				className={`${color} transition`}
-				d="M8.125 0C7.09125 0 6.25 0.84125 6.25 1.875C6.25 2.90875 7.09125 3.75 8.125 3.75C9.15875 3.75 10 2.90875 10 1.875C10 0.84125 9.15875 0 8.125 0Z"
-			/>
-			<path
-				className={`${color} transition`}
-				d="M1.875 0C0.84125 0 0 0.84125 0 1.875C0 2.90875 0.84125 3.75 1.875 3.75C2.90875 3.75 3.75 2.90875 3.75 1.875C3.75 0.84125 2.90875 0 1.875 0Z"
-			/>
-			<path
-				className={`${color} transition`}
-				d="M14.375 0C13.3412 0 12.5 0.84125 12.5 1.875C12.5 2.90875 13.3412 3.75 14.375 3.75C15.4088 3.75 16.25 2.90875 16.25 1.875C16.25 0.84125 15.4088 0 14.375 0Z"
-			/>
-		</svg>
-	</div>
+export const Glyph = ({ color = "fill-primary-text" }) => (
+	<svg width="17" height="4" viewBox="0 0 17 4" fill="none">
+		<path
+			className={`${color} transition`}
+			d="M8.125 0C7.09125 0 6.25 0.84125 6.25 1.875C6.25 2.90875 7.09125 3.75 8.125 3.75C9.15875 3.75 10 2.90875 10 1.875C10 0.84125 9.15875 0 8.125 0Z"
+		/>
+		<path
+			className={`${color} transition`}
+			d="M1.875 0C0.84125 0 0 0.84125 0 1.875C0 2.90875 0.84125 3.75 1.875 3.75C2.90875 3.75 3.75 2.90875 3.75 1.875C3.75 0.84125 2.90875 0 1.875 0Z"
+		/>
+		<path
+			className={`${color} transition`}
+			d="M14.375 0C13.3412 0 12.5 0.84125 12.5 1.875C12.5 2.90875 13.3412 3.75 14.375 3.75C15.4088 3.75 16.25 2.90875 16.25 1.875C16.25 0.84125 15.4088 0 14.375 0Z"
+		/>
+	</svg>
 );
 
 export const HeartNoti = () => (
@@ -473,7 +473,7 @@ export const VideoProfileTabIcon = () => (
 
 export const FollowerProfileTabIcon = () => (
 	<svg width="21" height="20" viewBox="0 0 21 20" fill="inherit" xmlns="http://www.w3.org/2000/svg">
-		<g clip-path="url(#clip0_460_11053)">
+		<g clipPath="url(#clip0_460_11053)">
 			<path
 				fill="inherit"
 				fillRule="evenodd"
@@ -505,7 +505,7 @@ export const ComplaintIcon = () => (
 		<path
 			className="stroke-primary-text"
 			d="M17.4993 2.5H2.49935C2.08268 2.5 1.66602 2.91667 1.66602 3.33333V14.1667C1.66602 14.5833 2.08268 15 2.49935 15H3.74935C4.58268 15 4.58268 15 4.58268 15.8333V17.5C4.58268 18.75 4.58268 18.75 6.24935 17.5L8.74935 15.4167C9.16602 15.0833 9.16602 15 9.99935 15H17.4993C17.916 15 18.3327 14.5833 18.3327 14.1667V3.33333C18.3327 2.91667 17.916 2.5 17.4993 2.5Z"
-			stroke-width="1.3"
+			strokeWidth="1.3"
 		/>
 		<path
 			className="fill-primary-text"
@@ -520,13 +520,13 @@ export const ComplaintIcon = () => (
 
 export const PencilIcon = () => (
 	<svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
-		<g clip-path="url(#clip0_898_7945)">
+		<g clipPath="url(#clip0_898_7945)">
 			<path
 				className="stroke-primary-text"
 				d="M14.166 2.49999C14.3849 2.28112 14.6447 2.1075 14.9307 1.98905C15.2167 1.8706 15.5232 1.80963 15.8327 1.80963C16.1422 1.80963 16.4487 1.8706 16.7347 1.98905C17.0206 2.1075 17.2805 2.28112 17.4993 2.49999C17.7182 2.71886 17.8918 2.97869 18.0103 3.26466C18.1287 3.55063 18.1897 3.85713 18.1897 4.16665C18.1897 4.47618 18.1287 4.78268 18.0103 5.06865C17.8918 5.35461 17.7182 5.61445 17.4993 5.83332L6.24935 17.0833L1.66602 18.3333L2.91602 13.75L14.166 2.49999Z"
-				stroke-width="1.66667"
-				stroke-linecap="round"
-				stroke-linejoin="round"
+				strokeWidth="1.66667"
+				strokeLinecap="round"
+				strokeLinejoin="round"
 			/>
 		</g>
 		<defs>
