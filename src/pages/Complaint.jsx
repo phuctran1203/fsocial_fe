@@ -9,7 +9,7 @@ import Search from "@/components/Search";
 import Table from "@/components/Table";
 import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-
+// , "/post/**", "/timeline/**", "/profile/**"
 export default function Complaint() {
   const [searchValue, setSearchValue] = useState("");
 
