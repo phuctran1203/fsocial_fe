@@ -18,7 +18,7 @@ export default function Popup() {
 		>
 			<div
 				className={`
-				flex flex-col bg-background max-h-screen rounded-lg overflow-hidden ${theme === "dark" && "sm:border"}
+				flex flex-col bg-background max-h-screen rounded-lg overflow-hidden ${theme === "dark" && "border"}
 				${isOpen ? "translate-y-0" : "translate-y-[100dvh]"}
 				transition`}
 				onClick={(e) => e.stopPropagation()}
