@@ -45,6 +45,30 @@ export const createPost = (data) =>
 			return error.response?.data || null;
 		});
 
+export const updatePost = (data) =>
+	API.put("/post/actions", data)
+		.then((resp) => {
+			const data = resp.data;
+			console.log("Resp updatePost: ", data);
+			return data;
+		})
+		.catch((error) => {
+			console.error("Error at updatePost:", error);
+			return error.response?.data || null;
+		});
+
+export const deletePost = (id) =>
+	API.delete(`/post/actions?postId=${id}`)
+		.then((resp) => {
+			const data = resp.data;
+			console.log("Resp deletePost: ", data);
+			return data;
+		})
+		.catch((error) => {
+			console.error("Error at deletePost:", error);
+			return error.response?.data || null;
+		});
+
 export const getFollowingPosts = () =>
 	API.get("/timeline/post")
 		.then((resp) => {
@@ -54,5 +78,17 @@ export const getFollowingPosts = () =>
 		})
 		.catch((error) => {
 			console.error("Error at getPosts:", error);
+			return error.response?.data || null;
+		});
+
+export const reportPost = (data) =>
+	API.post("/post/complaint", data)
+		.then((resp) => {
+			const data = resp.data;
+			console.log("Resp reportPost: ", data);
+			return data;
+		})
+		.catch((error) => {
+			console.error("Error at reportPost:", error);
 			return error.response?.data || null;
 		});

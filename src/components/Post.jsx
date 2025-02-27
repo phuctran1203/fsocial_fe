@@ -11,11 +11,14 @@ import ReportModal from "./ReportModal";
 import EditPostModal from "./EditPostModal";
 import DeletePostModal from "./DeletePostModal";
 import { useState } from "react";
+import { ownerAccountStore } from "@/store/ownerAccountStore";
 
 export default function Post({ post, isChildren, className = "" }) {
 	const { showPopup } = usePopupStore();
 
 	const [popoverOpen, setPopoverOpen] = useState(false);
+
+	const user = ownerAccountStore.getState().user;
 
 	const showCommentPopup = () => {
 		showPopup(`Bài viết của ${post.displayName}`, <CommentModal id={post.id} />, "h-full");
@@ -74,12 +77,19 @@ export default function Post({ post, isChildren, className = "" }) {
 						<Button className="btn-transparent !justify-start py-2 ps-3 text-nowrap gap-3" onClick={handlePopupReport}>
 							<ComplaintIcon /> Báo cáo
 						</Button>
-						<Button className="btn-transparent !justify-start text-nowrap py-2 ps-3 gap-3" onClick={handlePopupEdit}>
-							<PencilIcon /> Chỉnh sửa
-						</Button>
-						<Button className="btn-transparent !justify-start py-2 ps-3 text-nowrap gap-3" onClick={handlePopupDelete}>
-							<TrashCanIcon className="size-5" /> Xóa bài
-						</Button>
+						{post.userId === user.userId && (
+							<Button className="btn-transparent !justify-start text-nowrap py-2 ps-3 gap-3" onClick={handlePopupEdit}>
+								<PencilIcon /> Chỉnh sửa
+							</Button>
+						)}
+						{post.userId === user.userId && (
+							<Button
+								className="btn-transparent !justify-start py-2 ps-3 text-nowrap gap-3"
+								onClick={handlePopupDelete}
+							>
+								<TrashCanIcon className="size-5" /> Xóa bài
+							</Button>
+						)}
 					</PopoverContent>
 				</Popover>
 			</div>

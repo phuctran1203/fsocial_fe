@@ -3,9 +3,13 @@ import { LoadingIcon, TrashCanIcon } from "../components/Icon";
 import { usePopupStore } from "@/store/popupStore";
 import Button from "./Button";
 import { toast } from "sonner";
+import { deletePost } from "@/api/postsApi";
+import { postsStore } from "@/store/postsStore";
 
 export default function DeletePostModal({ id }) {
 	const hidePopup = usePopupStore((state) => state.hidePopup);
+
+	const deletePostInStore = postsStore((state) => state.deletePost);
 
 	const closePopup = () => {
 		hidePopup();
@@ -13,12 +17,17 @@ export default function DeletePostModal({ id }) {
 
 	const [deleteClicked, setDeleteClicked] = useState(false);
 
-	const handleDelete = () => {
+	const handleDelete = async () => {
 		setDeleteClicked(true);
-		setTimeout(() => {
+		const respDelete = await deletePost(id);
+		if (respDelete?.statusCode === 200) {
 			toast.success("Đã xóa bài viết");
+			deletePostInStore(id);
 			hidePopup();
-		}, 1000);
+		} else {
+			toast.error("Xóa bài viết thất bại");
+			setDeleteClicked(false);
+		}
 	};
 
 	return (
