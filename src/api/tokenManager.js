@@ -10,7 +10,7 @@ export const refreshToken = async () => {
 		setCookie("access-token", data.data.accessToken, 360 * 10);
 		return data;
 	} catch (error) {
-		console.log("Error at refreshToken: ", error);
+		console.error("Error at refreshToken: ", error);
 		deleteCookie("refresh-token");
 		deleteCookie("access-token");
 		window.location.href = "/fsocial_fe/login";

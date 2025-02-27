@@ -8,7 +8,7 @@ export const searchUsers = (keyword) =>
 			return data;
 		})
 		.catch((error) => {
-			console.log(`Error at searchUsers for keyword ${keyword}: `, error);
+			console.error(`Error at searchUsers for keyword ${keyword}: `, error);
 			return error.response?.data || null;
 		});
 
@@ -20,6 +20,6 @@ export const searchPosts = (keyword) =>
 			return data;
 		})
 		.catch((error) => {
-			console.log(`Error at searchPosts for keyword ${keyword}: `, error);
+			console.error(`Error at searchPosts for keyword ${keyword}: `, error);
 			return error.response?.data || null;
 		});

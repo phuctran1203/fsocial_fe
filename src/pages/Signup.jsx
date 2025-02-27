@@ -107,14 +107,13 @@ export default function Signup() {
 		};
 
 		const respCheckDuplicateInto = await checkDuplicate(dataCheck);
-
 		console.log(respCheckDuplicateInto);
 
-		if (respCheckDuplicateInto.message != "Thông tin hợp lệ.") {
-			updateField("username", { isValid: false });
-			updateField("email", { isValid: false });
-			setErrMessageUsernname(respCheckDuplicateInto.data.username);
-			setErrMessageEmail(respCheckDuplicateInto.data.email);
+		if (respCheckDuplicateInto?.status === 500 || respCheckDuplicateInto.message != "Thông tin hợp lệ.") {
+			// updateField("username", { isValid: false });
+			// updateField("email", { isValid: false });
+			// setErrMessageUsernname(respCheckDuplicateInto.data.username);
+			// setErrMessageEmail(respCheckDuplicateInto.data.email);
 			setRequestOTPClicked(false);
 			return;
 		}
@@ -399,8 +398,8 @@ export default function Signup() {
 									label="Mật khẩu"
 									store={useSignupStore}
 									required={true}
-									pattern="^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{6,20}$"
-									errorMessage="Mật khẩu từ 6-20 kí tự, bao gồm cả chữ và số"
+									pattern="^(?=.*[A-Za-z])[A-Za-z\d]{7,20}$"
+									errorMessage="Mật khẩu từ 7-20 kí tự, bao gồm cả chữ và số"
 									allowTab={currentStep === 2}
 								>
 									<div onClick={() => setIsShowPassword(!isShowPassword)}>

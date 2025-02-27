@@ -8,6 +8,6 @@ export const login = (data) =>
 			return data;
 		})
 		.catch((error) => {
-			console.log("Error at login: ", error);
+			console.error("Error at login: ", error);
 			return error.response?.data || {};
 		});
