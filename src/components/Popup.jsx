@@ -1,4 +1,4 @@
-import { popupStore, usePopupStore } from "@/store/popupStore";
+import { usePopupStore } from "@/store/popupStore";
 import { themeStore } from "@/store/themeStore";
 import React from "react";
 import { XMarkIcon } from "./Icon";

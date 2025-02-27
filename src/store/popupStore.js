@@ -17,16 +17,16 @@ export const popupDeletePostStore = create((set) => ({
 	setIsVisible: (value) => set({ isVisible: value }),
 }));
 
-export const popupStore = create((set) => ({
-	isVisible: false,
-	setIsVisible: (value) => set({ isVisible: value }),
-}));
-
 export const usePopupStore = create((set) => ({
 	popupHeading: null,
 	isOpen: false,
 	children: null,
 	className: null,
 	showPopup: (popupHeading, children, className) => set({ isOpen: true, popupHeading, children, className }),
-	hidePopup: () => set({ isOpen: false, popupHeading: null, children: null, className: null }),
+	hidePopup: () => {
+		set({ isOpen: false });
+		setTimeout(() => {
+			set({ popupHeading: null, children: null, className: null });
+		}, 50);
+	},
 }));
