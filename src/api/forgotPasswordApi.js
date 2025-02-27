@@ -8,7 +8,7 @@ export const requestOTP = (data) =>
 			return data;
 		})
 		.catch((error) => {
-			console.log("Error at requestOTP: ", error);
+			console.error("Error at requestOTP: ", error);
 			return error.response?.data || {};
 		});
 
@@ -20,7 +20,7 @@ export const validOTP = (data) =>
 			return data;
 		})
 		.catch((error) => {
-			console.log("Error at validOTP: ", error);
+			console.error("Error at validOTP: ", error);
 			return error.response?.data || {};
 		});
 
@@ -32,6 +32,6 @@ export const changePassword = (data) =>
 			return data;
 		})
 		.catch((error) => {
-			console.log("Error at validOTP: ", error);
+			console.error("Error at validOTP: ", error);
 			return error.response?.data || {};
 		});

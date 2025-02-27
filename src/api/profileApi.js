@@ -9,7 +9,7 @@ export async function getOwnerProfile() {
 		console.log("Resp getOwnerProfile: ", data);
 		return data;
 	} catch (error) {
-		console.log("Error at getOwnerProfile: ", error);
+		console.error("Error at getOwnerProfile: ", error);
 		return error.response?.data || {};
 	}
 }

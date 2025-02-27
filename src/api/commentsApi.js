@@ -8,7 +8,7 @@ export const getComments = (postId) =>
 			return data;
 		})
 		.catch((error) => {
-			console.log(`Error at getComments for id ${postId}: `, error);
+			console.error(`Error at getComments for id ${postId}: `, error);
 			return error.response.data;
 		});
 
@@ -20,7 +20,7 @@ export const sendComment = (data) =>
 			return data;
 		})
 		.catch((error) => {
-			console.log(`Error at sendComment: `, error);
+			console.error(`Error at sendComment: `, error);
 			return error.response.data;
 		});
 
@@ -32,6 +32,6 @@ export const replyComment = (data) =>
 			return data;
 		})
 		.catch((error) => {
-			console.log(`Error at sendComment: `, error);
+			console.error(`Error at sendComment: `, error);
 			return error.response.data;
 		});
