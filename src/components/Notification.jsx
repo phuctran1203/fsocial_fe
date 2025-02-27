@@ -197,21 +197,21 @@ export default function Notification() {
 
 					<div className={`flex-grow overflow-y-auto sm:pe-4 ${!isInMessage ? "" : "scrollable-div"}`}>
 						{today.length > 0 && (
-							<div className="space-y-1">
+							<div className="sm:space-y-0 space-y-1">
 								<h6 className="px-4">Hôm nay</h6>
 								{today.map((noti, index) => Noti({ ...noti, index: index }))}
 							</div>
 						)}
 
 						{last7days.length > 0 && (
-							<div className="space-y-1">
+							<div className="sm:space-y-0 space-y-1">
 								<h6 className="px-4">7 ngày trước</h6>
 								{last7days.map((noti, index) => Noti({ ...noti, index: index + today.length }))}
 							</div>
 						)}
 
 						{old.length > 0 && (
-							<div className="space-y-1">
+							<div className="sm:space-y-0 space-y-1">
 								<h6 className="px-4">Trước đó</h6>
 								{old.map((noti, index) => Noti({ ...noti, index: index + today.length + last7days.length }))}
 							</div>

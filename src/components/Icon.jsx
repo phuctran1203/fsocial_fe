@@ -1,5 +1,3 @@
-import { cn } from "@/lib/utils";
-
 export const LogoNoBG = ({ className }) => (
 	<svg className={className} width="49" height="44" viewBox="0 0 49 44" fill="none" xmlns="http://www.w3.org/2000/svg">
 		<path
@@ -32,15 +30,15 @@ export const LogoNoBG = ({ className }) => (
 export const Glyph = ({ color = "fill-primary-text" }) => (
 	<svg width="17" height="4" viewBox="0 0 17 4" fill="none">
 		<path
-			className={`${color} transition`}
+			className={`${color}`}
 			d="M8.125 0C7.09125 0 6.25 0.84125 6.25 1.875C6.25 2.90875 7.09125 3.75 8.125 3.75C9.15875 3.75 10 2.90875 10 1.875C10 0.84125 9.15875 0 8.125 0Z"
 		/>
 		<path
-			className={`${color} transition`}
+			className={`${color}`}
 			d="M1.875 0C0.84125 0 0 0.84125 0 1.875C0 2.90875 0.84125 3.75 1.875 3.75C2.90875 3.75 3.75 2.90875 3.75 1.875C3.75 0.84125 2.90875 0 1.875 0Z"
 		/>
 		<path
-			className={`${color} transition`}
+			className={`${color}`}
 			d="M14.375 0C13.3412 0 12.5 0.84125 12.5 1.875C12.5 2.90875 13.3412 3.75 14.375 3.75C15.4088 3.75 16.25 2.90875 16.25 1.875C16.25 0.84125 15.4088 0 14.375 0Z"
 		/>
 	</svg>
@@ -49,7 +47,7 @@ export const Glyph = ({ color = "fill-primary-text" }) => (
 export const HeartNoti = () => (
 	<svg width="22" height="19" viewBox="0 0 22 19" fill="none">
 		<path
-			className="fill-logo transition"
+			className="fill-logo"
 			d="M6.51266 15.9576C3.51769 13.6501 0 10.9399 0 6.24167C0 1.05509 5.86621 -2.62313 10.6655 2.36318L12.7986 4.49484C13.111 4.80717 13.6175 4.80708 13.9299 4.49463C14.2422 4.1822 14.2421 3.67572 13.9297 3.36339L11.8691 1.30355C16.3913 -2.00706 21.331 1.48223 21.331 6.24167C21.331 10.9399 17.8133 13.6501 14.8184 15.9576C14.5071 16.1975 14.2015 16.433 13.906 16.6659C12.7986 17.5389 11.7321 18.3608 10.6655 18.3608C9.59897 18.3608 8.53242 17.5389 7.42505 16.6659C7.12959 16.433 6.82395 16.1975 6.51266 15.9576Z"
 		/>
 	</svg>
@@ -58,15 +56,15 @@ export const HeartNoti = () => (
 export const CommentNoti = () => (
 	<svg width="21" height="21" viewBox="0 0 21 21" fill="none">
 		<path
-			className="fill-logo transition"
+			className="fill-logo"
 			d="M14.25 0H6.75C3 0 0 3 0 6.75V19.5C0 19.8 0.15 20.025 0.45 20.175C0.525 20.25 0.675 20.25 0.75 20.25C0.9 20.25 1.125 20.175 1.275 20.1C3.9 17.775 7.275 16.5 10.725 16.5H14.25C18 16.5 21 13.5 21 9.75V6.75C21 3 18 0 14.25 0ZM9 10.5H6C5.55 10.5 5.25 10.2 5.25 9.75C5.25 9.3 5.55 9 6 9H9C9.45 9 9.75 9.3 9.75 9.75C9.75 10.2 9.45 10.5 9 10.5ZM12.75 7.5H6C5.55 7.5 5.25 7.2 5.25 6.75C5.25 6.3 5.55 6 6 6H12.75C13.2 6 13.5 6.3 13.5 6.75C13.5 7.2 13.2 7.5 12.75 7.5Z"
 		/>
 		<path
-			className="fill-secondary-text transition"
+			className="fill-secondary-text"
 			d="M12.75 7.5H6C5.55 7.5 5.25 7.2 5.25 6.75C5.25 6.3 5.55 6 6 6H12.75C13.2 6 13.5 6.3 13.5 6.75C13.5 7.2 13.2 7.5 12.75 7.5Z"
 		/>
 		<path
-			className="fill-secondary-text transition"
+			className="fill-secondary-text"
 			d="M9 10.5H6C5.55 10.5 5.25 10.2 5.25 9.75C5.25 9.3 5.55 9 6 9H9C9.45 9 9.75 9.3 9.75 9.75C9.75 10.2 9.45 10.5 9 10.5Z"
 		/>
 	</svg>
@@ -115,12 +113,12 @@ export const SearchIcon = ({ color = "stroke-primary-text", compareVar, classNam
 export const Bell = ({ active = false }) => (
 	<svg className="md:size-[28px] size-6" viewBox="0 0 26 26" fill="none">
 		<path
-			className={`${active && "fill-primary-text"} stroke-primary-text transition`}
+			className={`${active && "fill-primary-text"} stroke-primary-text`}
 			d="M7.02161 9.83425C6.9321 6.35857 9.63221 3.25 13.1091 3.25C16.51 3.25 19.1273 6.22131 18.9953 9.61966C18.9721 10.2155 18.9583 10.8082 18.9583 11.375C18.9583 14.9296 22.75 19.5 22.75 19.5H3.25C3.25 19.5 7.04167 15.9454 7.04167 11.375C7.04167 10.8466 7.03442 10.3316 7.02161 9.83425Z"
 			strokeWidth="1.6"
 		/>
 		<path
-			className={`stroke-primary-text transition`}
+			className={`stroke-primary-text`}
 			d="M10.8335 22.75C11.3628 23.4143 12.1373 23.8333 13.0002 23.8333C13.863 23.8333 14.6375 23.4143 15.1668 22.75"
 			strokeWidth="1.6"
 		/>
@@ -281,7 +279,7 @@ export const UploadDecorIcon = () => (
 	</svg>
 );
 
-export const LoadingIcon = ({ color = "stroke-txtWhite" }) => (
+export const LoadingIcon = ({ stroke = "stroke-txtWhite" }) => (
 	<svg
 		className="size-6"
 		preserveAspectRatio="xMidYMid"
@@ -291,7 +289,7 @@ export const LoadingIcon = ({ color = "stroke-txtWhite" }) => (
 		viewBox="0 0 100 100"
 	>
 		<circle
-			className={color}
+			className={stroke}
 			cx={50}
 			cy={50}
 			r={32}

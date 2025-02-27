@@ -1,17 +1,16 @@
 import React, { useEffect, useRef, useState } from "react";
 import { LoadingIcon, UploadDecorIcon, XMarkIcon } from "./Icon";
 import Button from "./Button";
-import { popupCreatePostStore } from "../store/popupStore";
+import { usePopupStore } from "../store/popupStore";
 import { TextBox } from "./Field";
 import { ownerAccountStore } from "../store/ownerAccountStore";
 import { createPost } from "../api/postsApi";
 import { postsStore } from "../store/postsStore";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { themeStore } from "@/store/themeStore";
 import { toast } from "sonner";
 
 export default function CreatePost() {
-	const { isVisible, setIsVisible } = popupCreatePostStore();
+	const { isOpen, hidePopup } = usePopupStore();
 
 	const insertPost = postsStore((state) => state.insertPost);
 
@@ -26,7 +25,7 @@ export default function CreatePost() {
 	const textbox = useRef();
 
 	const closePopup = () => {
-		setIsVisible(false);
+		hidePopup(false);
 		textbox.current.innerHTML = "";
 		setFileUploads([]);
 		setFilePreviews([]);
@@ -99,126 +98,92 @@ export default function CreatePost() {
 				avatar: user.avatar,
 			};
 			insertPost(postCreated);
-			closePopup();
 			toast.success("Bài viết của bạn đã được đăng tải");
+			closePopup();
 		}
 		setSubmitClicked(false);
 	};
 
-	const [trigger, setTrigger] = useState(false);
-
-	useEffect(() => {
-		if (isVisible) {
-			setTrigger(!trigger);
-		} else {
-			textbox.current.innerHTML = "";
-		}
-	}, [isVisible]);
-
-	const theme = themeStore((state) => state.theme);
-
 	return (
-		<div
-			className={`z-20 fixed inset-0 sm:py-2 bg-black flex items-center justify-center ${
-				isVisible ? "bg-opacity-25 visible" : "bg-opacity-0 invisible"
-			} 
-			transition`}
-		>
-			<div
-				className={`
-				pb-3 flex flex-col space-y-3 bg-background rounded-lg overflow-hidden w-[550px] ${theme === "dark" && "sm:border"}
-				sm:h-fit sm:max-h-full
-				h-full
-				${isVisible ? "translate-y-0" : "translate-y-[100vh]"}	
-				transition-all`}
-			>
-				<div className="bg-background border-b sticky top-0 py-2">
-					<h4 className="text-center">Tạo bài viết</h4>
-					<button className="absolute right-0 top-0 h-full px-4" onClick={closePopup}>
-						<XMarkIcon />
-					</button>
-				</div>
+		<div className="relative flex-grow flex flex-col sm:w-[550px] w-screen sm:h-fit sm:max-h-[90dvh] h-[100dvh]">
+			<div className="overflow-y-auto flex-grow scrollable-div space-y-2">
+				<div className="flex space-x-2 px-3 pt-3">
+					<Avatar className={`md:size-11 size-9 grid`}>
+						<AvatarImage src={user.avatar} />
+						<AvatarFallback className="font-semibold">{user.firstName.charAt(0) ?? "?"}</AvatarFallback>
+					</Avatar>
 
-				<div className="px-3 overflow-y-auto flex-grow scrollable-div space-y-2">
-					<div className="flex space-x-2">
-						<Avatar className={`md:size-11 size-9 grid`}>
-							<AvatarImage src={user.avatar} />
-							<AvatarFallback className="font-semibold">{user.firstName.charAt(0) ?? "?"}</AvatarFallback>
-						</Avatar>
-
-						<div className="flex flex-col justify-center">
-							<span className="font-semibold">{user.firstName + " " + user.lastName}</span>
-						</div>
+					<div className="flex flex-col justify-center">
+						<span className="font-semibold">{user.firstName + " " + user.lastName}</span>
 					</div>
-
-					<TextBox texboxRef={textbox} autoFocus={true} trigger={trigger} placeholder="Nói gì đó về bài viết của bạn" />
-
-					<label
-						htmlFor="file-upload"
-						className={`rounded-md aspect-video cursor-pointer flex items-center justify-center border-[2px] border-gray-2light ${
-							fileUploads.length > 0 ? "hidden" : ""
-						}`}
-						onDragOver={(e) => {
-							e.preventDefault(); // Chặn hành động mặc định để không mở tệp
-							e.stopPropagation();
-							e.currentTarget.style = `background-color: black; opacity: 20%;`;
-						}}
-						onDragLeave={(e) => {
-							e.currentTarget.style = "";
-						}}
-						onDrop={(e) => {
-							e.preventDefault();
-							e.stopPropagation();
-							const files = e.dataTransfer.files;
-							if (files.length > 0) {
-								handleOnFileChange({ target: { files } }); // Gọi hàm xử lý tệp
-							}
-						}}
-					>
-						<div className="flex flex-col items-center pointer-events-none">
-							<UploadDecorIcon className="size-24" />
-							<span>Chọn hoặc kéo thả ảnh/video vào đây</span>
-						</div>
-						<input type="file" id="file-upload" onChange={handleOnFileChange} hidden multiple />
-					</label>
-
-					{filePreviews.map((preview, index) => (
-						<div key={index} className="relative">
-							<Button
-								className="btn-secondary z-10 absolute m-2 max-w-7 h-7 right-0 rounded-full"
-								onClick={() => deleteFile(index)}
-							>
-								<XMarkIcon className="size-[15px] pointer-events-none" />
-							</Button>
-							{fileTypes[index] === "image" ? (
-								<img src={preview} alt={`Preview ${index}`} className="w-full h-auto" />
-							) : fileTypes[index] === "video" ? (
-								<video controls className="w-full h-auto">
-									<source src={preview} type="video/mp4" />
-									Your browser does not support the video tag.
-								</video>
-							) : null}
-						</div>
-					))}
 				</div>
-				<div className="sticky bottom-0 mx-3 space-y-2">
-					{filePreviews.length > 0 && (
+
+				<TextBox texboxRef={textbox} autoFocus={true} placeholder="Nói gì đó về bài viết của bạn" className="px-3" />
+
+				<label
+					htmlFor="file-upload"
+					className={`mx-3 rounded-md aspect-video cursor-pointer flex items-center justify-center border-[2px] border-gray-2light ${
+						fileUploads.length > 0 ? "hidden" : ""
+					}`}
+					onDragOver={(e) => {
+						e.preventDefault(); // Chặn hành động mặc định để không mở tệp
+						e.stopPropagation();
+						e.currentTarget.style = `background-color: black; opacity: 20%;`;
+					}}
+					onDragLeave={(e) => {
+						e.currentTarget.style = "";
+					}}
+					onDrop={(e) => {
+						e.preventDefault();
+						e.stopPropagation();
+						const files = e.dataTransfer.files;
+						if (files.length > 0) {
+							handleOnFileChange({ target: { files } }); // Gọi hàm xử lý tệp
+						}
+					}}
+				>
+					<div className="flex flex-col items-center pointer-events-none">
+						<UploadDecorIcon className="size-24" />
+						<span>Chọn hoặc kéo thả ảnh/video vào đây</span>
+					</div>
+					<input type="file" id="file-upload" onChange={handleOnFileChange} hidden multiple />
+				</label>
+
+				{filePreviews.map((preview, index) => (
+					<div key={index} className="relative">
 						<Button
-							onClick={() => {
-								document.querySelector("#file-upload").click();
-							}}
-							className="btn-secondary py-2"
+							className="btn-secondary z-10 absolute m-2 max-w-7 h-7 right-0 rounded-full shadow-md"
+							onClick={() => deleteFile(index)}
 						>
-							Thêm ảnh/video
+							<XMarkIcon className="size-[15px] pointer-events-none" />
 						</Button>
-					)}
+						{fileTypes[index] === "image" ? (
+							<img src={preview} alt={`Preview ${index}`} className="w-full h-auto" />
+						) : fileTypes[index] === "video" ? (
+							<video controls className="w-full h-auto">
+								<source src={preview} type="video/mp4" />
+								Your browser does not support the video tag.
+							</video>
+						) : null}
+					</div>
+				))}
+			</div>
+
+			<div className="z-10 sticky bottom-0 space-y-3 p-3">
+				{filePreviews.length > 0 && (
 					<Button
-						className={`btn-primary py-2.5 w-full rounded-[4px] ${submitClicked && "disable-btn"}`}
-						onClick={handleSubmitPost}
+						onClick={() => {
+							document.querySelector("#file-upload").click();
+						}}
+						className="btn-secondary py-2.5"
 					>
-						{submitClicked ? <LoadingIcon /> : "Đăng bài"}
+						Thêm ảnh/video
 					</Button>
-				</div>
+				)}
+
+				<Button className={`btn-primary py-2.5 ${submitClicked && "disable-btn"}`} onClick={handleSubmitPost}>
+					{submitClicked ? <LoadingIcon /> : "Đăng bài"}
+				</Button>
 			</div>
 		</div>
 	);

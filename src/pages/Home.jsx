@@ -31,8 +31,6 @@ export default function Home() {
 					<RenderPosts className="sm:rounded shadow-y" />
 				</div>
 			</div>
-
-			<CommentModal />
 		</div>
 	);
 }

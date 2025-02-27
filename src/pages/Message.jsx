@@ -193,7 +193,7 @@ export default function Message() {
 		<div
 			style={{ height: realHeight }}
 			className={`${
-				selectedUser && "sm:relative fixed top-0 z-10"
+				selectedUser && "sm:relative fixed top-0 sm:z-0 z-10"
 			} flex-grow sm:flex bg-background overflow-hidden transition`}
 		>
 			{/* Danh sách hội thoại */}

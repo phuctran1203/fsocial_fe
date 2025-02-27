@@ -241,8 +241,8 @@ export default function Profile() {
 						>
 							<div ref={wrapperTabsRef} className="grid grid-cols-[repeat(5,100%)] h-full gap-[1px]">
 								{/* owner posts */}
-								<div className="snap-start mx-auto md:space-y-4 space-y-1.5 md:pb-0 overflow-y-auto w-full max-h-full scrollable-div">
-									<RenderPosts className="sm:rounded shadow-y" />
+								<div className="pt-0.5 snap-start mx-auto md:space-y-4 space-y-1.5 md:pb-0 overflow-y-auto w-full max-h-full scrollable-div">
+									<RenderPosts className="sm:rounded shadow-y border-x" />
 								</div>
 								{/* owner pictures */}
 								<div className="snap-start grid grid-cols-3 gap-[1px] h-fit overflow-y-auto w-full max-h-full scrollable-div">
@@ -289,15 +289,14 @@ export default function Profile() {
 									))}
 								</div>
 								{/* owner posts reacted */}
-								<div className="snap-start mx-auto md:space-y-4 space-y-1.5 md:pb-0 overflow-y-auto w-full max-h-full scrollable-div">
-									<RenderPosts className="sm:rounded shadow-y" />
+								<div className="pt-0.5 snap-start mx-auto md:space-y-4 space-y-1.5 md:pb-0 overflow-y-auto w-full max-h-full scrollable-div">
+									<RenderPosts className="sm:rounded border-x shadow-y" />
 								</div>
 							</div>
 						</div>
 					</div>
 				</div>
 			</div>
-			<CommentModal />
 		</div>
 	);
 }

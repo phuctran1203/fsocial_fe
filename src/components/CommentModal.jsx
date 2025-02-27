@@ -1,7 +1,6 @@
 import React, { useEffect, useRef, useState } from "react";
 import { LoadingIcon, SendIcon, XMarkIcon } from "./Icon";
 import Post from "./Post";
-import { popupCommentStore } from "../store/popupStore";
 import { getComments, sendComment, replyComment } from "../api/commentsApi";
 import { postsStore } from "../store/postsStore";
 import { ownerAccountStore } from "../store/ownerAccountStore";
@@ -10,7 +9,6 @@ import { dateTimeToNotiTime } from "../utils/convertDateTime";
 import { Link } from "react-router-dom";
 import { toast } from "sonner";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { themeStore } from "@/store/themeStore";
 
 function CommentReuse(props) {
 	const { comment, selectCommentToReply, handleShowReplyComment, replies, isReply } = props;
@@ -90,10 +88,8 @@ function CommentReuse(props) {
 	);
 }
 
-export default function CommentModal() {
+export default function CommentModal({ id }) {
 	const user = ownerAccountStore((state) => state.user);
-
-	const { isVisible, setIsVisible, id } = popupCommentStore();
 
 	const textbox = useRef(null);
 
@@ -196,41 +192,13 @@ export default function CommentModal() {
 	const [trigger, setTrigger] = useState(false);
 
 	useEffect(() => {
-		if (isVisible) {
-			setTrigger(!trigger);
-			getComment();
-		} else {
-			textbox.current.innerHTML = "";
-		}
-	}, [isVisible]);
-
-	const theme = themeStore((state) => state.theme);
+		getComment();
+	}, []);
 
 	return (
-		<div
-			className={`z-10 fixed inset-0 sm:py-2 bg-black flex items-center justify-center ${
-				isVisible ? "bg-opacity-30 visible" : "bg-opacity-0 invisible"
-			}
-			transition`}
-			onClick={() => setIsVisible(false)}
-		>
-			<div
-				className={`
-				flex flex-col bg-background rounded-lg w-[600px] overflow-y-auto h-full scrollable-div ${
-					theme === "dark" && "sm:border"
-				}
-				${isVisible ? "translate-y-0" : "translate-y-[100vh]"}
-				transition-all`}
-				onClick={(e) => e.stopPropagation()}
-			>
-				<div className="bg-background border-b sticky top-0 py-2">
-					<h4 className="text-center">Bài viết của {post?.displayName}</h4>
-					<button className="absolute right-0 top-0 h-full px-4" onClick={() => setIsVisible(false)}>
-						<XMarkIcon />
-					</button>
-				</div>
-
-				{post && <Post post={post} className="border-b " />}
+		<div className="relative flex-grow flex flex-col sm:w-[560px] sm:h-[90dvh] h-[100dvh]">
+			<div className="overflow-y-auto scrollable-div flex-grow flex flex-col">
+				<Post post={post} isChildren={true} className="border-b " />
 
 				<div className="space-y-3 py-3 px-5 flex-grow">
 					{comments.length > 0 ? (
@@ -248,45 +216,44 @@ export default function CommentModal() {
 						<p>Hãy là người đầu tiên bình luận bài viết này</p>
 					)}
 				</div>
+			</div>
+			{/* Ô nhập bình luận */}
+			<div className="sticky bottom-0">
+				<div
+					className={`absolute w-full -z-10 bg-background top-0 border-t py-2 px-4 flex items-center justify-between
+					${selectReply?.id ? "-translate-y-full" : "translate-y-0"}
+					transition`}
+				>
+					<p>
+						Đang phản hồi <span className="font-semibold">{selectReply?.displayName}</span>
+					</p>
+					<div onClick={handleStopReply} className="cursor-pointer">
+						<XMarkIcon />
+					</div>
+				</div>
 
-				{/* Ô nhập bình luận */}
-				<div className="sticky bottom-0">
-					<div
-						className={`absolute w-full -z-10 bg-background top-0 border-t py-2 px-4 flex items-center justify-between
-						${selectReply?.id ? "-translate-y-full" : "translate-y-0"}
-						transition`}
+				<div className=" bg-background flex items-end gap-4 px-4 pt-2 pb-3 border-t">
+					<Avatar className={`size-9`}>
+						<AvatarImage src={user.avatar} />
+						<AvatarFallback className="fs-xm">{user.firstName.charAt(0) ?? "?"}</AvatarFallback>
+					</Avatar>
+					<TextBox
+						texboxRef={textbox}
+						className="py-2 w-full max-h-[40vh]"
+						placeholder="Viết bình luận"
+						contentEditable={!submitCmtClicked}
+						onKeyDown={textBoxOnKeyDown}
+						autoFocus={true}
+						trigger={trigger}
+					/>
+
+					<button
+						className="py-2"
+						onClick={handleSendComment}
+						disabled={textbox.current?.innerText == "" || submitCmtClicked}
 					>
-						<p>
-							Đang phản hồi <span className="font-semibold">{selectReply?.displayName}</span>
-						</p>
-						<div onClick={handleStopReply} className="cursor-pointer">
-							<XMarkIcon />
-						</div>
-					</div>
-
-					<div className="bg-background flex items-end gap-4 px-4 pt-2 pb-3 border-t">
-						<Avatar className={`size-9`}>
-							<AvatarImage src={user.avatar} />
-							<AvatarFallback className="fs-xm">{user.firstName.charAt(0) ?? "?"}</AvatarFallback>
-						</Avatar>
-						<TextBox
-							texboxRef={textbox}
-							className="py-2 w-full max-h-[40vh]"
-							placeholder="Viết bình luận"
-							contentEditable={!submitCmtClicked}
-							onKeyDown={textBoxOnKeyDown}
-							autoFocus={true}
-							trigger={trigger}
-						/>
-
-						<button
-							className="py-2"
-							onClick={handleSendComment}
-							disabled={textbox.current?.innerText == "" || submitCmtClicked}
-						>
-							{submitCmtClicked ? <LoadingIcon color="stroke-gray-light" /> : <SendIcon />}
-						</button>
-					</div>
+						{submitCmtClicked ? <LoadingIcon stroke="stroke-gray-light" /> : <SendIcon />}
+					</button>
 				</div>
 			</div>
 		</div>

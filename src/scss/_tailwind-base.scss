@@ -245,4 +245,11 @@ $fs-5xl: clamp-font-size(6);
 	img {
 		-webkit-user-drag: none; /* Chặn drag trên Chrome, Safari */
 	}
+
+	svg {
+		@apply transition;
+		* {
+			@apply transition;
+		}
+	}
 }

@@ -30,8 +30,6 @@ export default function Follow() {
 					<RenderPosts className="sm:rounded shadow-y" />
 				</div>
 			</div>
-
-			<CommentModal />
 		</div>
 	);
 }

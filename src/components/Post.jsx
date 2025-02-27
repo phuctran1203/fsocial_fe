@@ -1,42 +1,39 @@
 import { Link } from "react-router-dom";
 import { ComplaintIcon, Glyph, TrashCanIcon, PencilIcon } from "./Icon";
-import { popupCommentStore, popupDeletePostStore, popupEditPostStore, popupReportPostStore } from "../store/popupStore";
+import { usePopupStore } from "../store/popupStore";
 import { postsStore } from "../store/postsStore";
 import { dateTimeToPostTime } from "../utils/convertDateTime";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import Button from "./Button";
 import { likePost } from "@/api/postsApi";
+import CommentModal from "./CommentModal";
+import ReportModal from "./ReportModal";
+import EditPostModal from "./EditPostModal";
+import DeletePostModal from "./DeletePostModal";
+import { useState } from "react";
 
-export default function Post({ post, className = "" }) {
-	const isVisiblePopupComment = popupCommentStore((state) => state.isVisible);
-	const setPopupCommentVisible = popupCommentStore((state) => state.setIsVisible);
-	const setIdPopupComment = popupCommentStore((state) => state.setId);
+export default function Post({ post, isChildren, className = "" }) {
+	const { showPopup } = usePopupStore();
+
+	const [popoverOpen, setPopoverOpen] = useState(false);
 
 	const showCommentPopup = () => {
-		if (isVisiblePopupComment) return;
-		setPopupCommentVisible(true);
-		setIdPopupComment(post.id);
+		showPopup(`Bài viết của ${post.displayName}`, <CommentModal id={post.id} />, "h-full");
 	};
 
-	const setPopupReportVisible = popupReportPostStore((state) => state.setIsVisible);
-	const setIdReport = popupReportPostStore((state) => state.setId);
 	const handlePopupReport = () => {
-		setPopupReportVisible(true);
-		setIdReport(post.id);
+		setPopoverOpen(false);
+		showPopup("Báo cáo vi phạm", <ReportModal id={post.id} />, " sm:max-h-[60dvh] max-h-full");
 	};
 
-	const setPopupEditVisible = popupEditPostStore((state) => state.setIsVisible);
-	const setIdEdit = popupEditPostStore((state) => state.setId);
 	const handlePopupEdit = () => {
-		setPopupEditVisible(true);
-		setIdEdit(post.id);
+		setPopoverOpen(false);
+		showPopup("Chỉnh sửa bài viết", <EditPostModal id={post.id} />);
 	};
 
-	const setPopupDeleteVisible = popupDeletePostStore((state) => state.setIsVisible);
-	const setIdDelete = popupDeletePostStore((state) => state.setId);
 	const handlePopupDelete = () => {
-		setPopupDeleteVisible(true);
-		setIdDelete(post.id);
+		setPopoverOpen(false);
+		showPopup("Xóa bài viết", <DeletePostModal id={post.id} />);
 	};
 
 	const likes = post.countLikes;
@@ -52,7 +49,7 @@ export default function Post({ post, className = "" }) {
 
 	return (
 		<div className={`${className} transition`}>
-			<div className="flex items-center justify-between p-4">
+			<div className="flex items-center justify-between px-4 pt-4 pb-3">
 				<div className="flex space-x-2">
 					<Link to="">
 						<img
@@ -69,8 +66,8 @@ export default function Post({ post, className = "" }) {
 						<span className="text-gray fs-xs">{dateTimeToPostTime(post.createdAt)}</span>
 					</div>
 				</div>
-				<Popover>
-					<PopoverTrigger className="btn-transparent !w-fit px-2 py-3">
+				<Popover open={popoverOpen} onOpenChange={setPopoverOpen}>
+					<PopoverTrigger className={`btn-transparent !w-fit px-2 py-3 ${isChildren && "!hidden"}`}>
 						<Glyph />
 					</PopoverTrigger>
 					<PopoverContent side="left" align="start" sideOffset={20} className="z-10 bg-background w-52 shadow-2xl p-2">
@@ -121,7 +118,7 @@ export default function Post({ post, className = "" }) {
 				</div>
 
 				{/* comment button */}
-				<div className="flex items-center sm:gap-2 gap-1 cursor-pointer" onClick={showCommentPopup}>
+				<div className="flex items-center sm:gap-2 gap-1 cursor-pointer" onClick={() => showCommentPopup()}>
 					<svg className="sm:h-6 h-5" width="22" height="22" viewBox="0 0 22 22" fill="none">
 						<path
 							className="fill-primary-text stroke-primary-text"

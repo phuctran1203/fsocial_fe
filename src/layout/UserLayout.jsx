@@ -3,13 +3,10 @@ import { Outlet } from "react-router-dom";
 import Nav from "../components/Nav";
 import Notification from "../components/Notification";
 import Header from "../components/Header";
-import CreatePost from "../components/CreatePost";
 import { Toaster } from "sonner";
 import { getOwnerProfile } from "@/api/profileApi";
 import { ownerAccountStore } from "@/store/ownerAccountStore";
-import ReportModal from "@/components/ReportModal";
-import EditPostModal from "@/components/EditPostModal";
-import DeletePostModal from "@/components/DeletePostModal";
+import Popup from "@/components/Popup";
 
 export default function UserLayout() {
 	const setUser = ownerAccountStore((state) => state.setUser);
@@ -33,11 +30,8 @@ export default function UserLayout() {
 				<Nav />
 				<Outlet />
 				<Notification />
-				<CreatePost />
-				<ReportModal />
-				<EditPostModal />
-				<DeletePostModal />
 			</main>
+			<Popup />
 			<Toaster position="top-center" />
 		</>
 	);

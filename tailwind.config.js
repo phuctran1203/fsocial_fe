@@ -89,10 +89,10 @@ export default {
 				DEFAULT: "all",
 			},
 			transitionDuration: {
-				DEFAULT: "120ms",
+				DEFAULT: "200ms",
 			},
 			transitionTimingFunction: {
-				DEFAULT: "ease-out",
+				DEFAULT: "cubic-bezier(0.16, 1, 0.3, 1)",
 			},
 			// borderRadius: {
 			// 	lg: "var(--radius)",
