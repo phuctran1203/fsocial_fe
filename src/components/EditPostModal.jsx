@@ -7,6 +7,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { dateTimeToPostTime } from "@/utils/convertDateTime";
 import Button from "./Button";
 import { toast } from "sonner";
+import { updatePost } from "@/api/postsApi";
 
 export default function EditPostModal({ id }) {
 	const hidePopup = usePopupStore((state) => state.hidePopup);
@@ -15,14 +16,27 @@ export default function EditPostModal({ id }) {
 
 	const post = postsStore.getState().findPost(id);
 
+	const replacePost = postsStore((state) => state.replacePost);
+
 	const [submitClicked, setSubmitClicked] = useState(false);
 
-	const handleUpdate = () => {
+	const handleUpdate = async () => {
 		setSubmitClicked(true);
-		setTimeout(() => {
+		const formData = new FormData();
+		formData.append("text", textbox.current.innerText);
+		formData.append("HTMLText", textbox.current.innerHTML);
+		formData.append("postId", id);
+
+		const respUpdate = await updatePost(formData);
+		if (respUpdate?.statusCode === 200) {
 			toast.success("Đã cập nhật bài viết");
+			const newPost = respUpdate.data;
+			replacePost(newPost);
 			hidePopup();
-		}, 1000);
+		} else {
+			toast.error("Cập nhật bài viết thất bại");
+			setSubmitClicked(false);
+		}
 	};
 
 	return (

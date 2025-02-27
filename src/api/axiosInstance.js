@@ -1,8 +1,18 @@
 import axios from "axios";
 import { refreshToken } from "./tokenManager";
-import { deleteCookie, getCookie } from "@/utils/cookie";
+import { getCookie } from "@/utils/cookie";
 
 const originalDomain = "http://localhost:8888/api/v1";
+
+const listBypassToken = [
+	"/account/refresh-token",
+	"/account/login",
+	"/account/check-duplication",
+	"/account/send-otp",
+	"/account/verify-otp",
+	"/account/register",
+	"/account/reset-password",
+];
 
 // Tạo instance Axios
 const API = axios.create({
@@ -15,14 +25,12 @@ API.interceptors.request.use(
 	async (config) => {
 		const token = getCookie("access-token");
 		const path = new URL(config.url, API.defaults.baseURL).pathname;
-
 		// api không cần token
-		if (["/account/refresh-token", "/account/login"].includes(path)) {
+		if (listBypassToken.includes(path)) {
 			return config;
 		}
-		config.headers.Authorization = `Bearer ${token}`;
-
 		// nếu có token
+		config.headers.Authorization = `Bearer ${token}`;
 		return config;
 	},
 	(error) => Promise.reject(error)

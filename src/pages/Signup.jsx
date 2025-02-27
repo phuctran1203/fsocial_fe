@@ -174,7 +174,7 @@ export default function Signup() {
 		if (responseCreateAccount.statusCode === 200) {
 			setTimeout(() => {
 				navigate("/login");
-			}, 4000);
+			}, 2500);
 		}
 	};
 
