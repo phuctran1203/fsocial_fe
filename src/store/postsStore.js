@@ -17,9 +17,7 @@ export const postsStore = create((set) => ({
 
 	// Hàm thêm nhiều post mới vào danh sách
 	setPosts: (newPosts) => {
-		set(() => ({
-			posts: newPosts,
-		}));
+		set({ posts: newPosts });
 	},
 
 	insertPost: (post) => {
