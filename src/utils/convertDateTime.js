@@ -69,7 +69,7 @@ export function dateTimeToPostTime(time) {
 
 	//hôm nay
 	if (diffSeconds < 60) {
-		text = `${diffSeconds} giây`;
+		text = `Vừa xong`;
 		flag = true;
 	}
 	const diffMinutes = !flag ? Math.floor(diffSeconds / 60) : null; // Chuyển thành phút
