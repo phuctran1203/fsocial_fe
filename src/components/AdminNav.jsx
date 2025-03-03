@@ -16,7 +16,7 @@ export default function AdminNav() {
 	};
 
 	return (
-		<nav className="rounded-lg w-[280px] flex flex-col flex-shrink-0 bg-background h-full p-5">
+		<nav className="rounded-lg w-[280px] flex flex-col flex-shrink-0 bg-background h-full p-5 border shadow">
 			<LogoFSAdmin />
 
 			<div className="mt-8 space-y-3 flex-grow">

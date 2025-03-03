@@ -79,6 +79,7 @@ export default {
 				hover: "var(--border-hover-clr)",
 			},
 			boxShadow: {
+				DEFAULT: "0px 0 8px 0 var(--shadow-clr)",
 				r: "1px 0 2px var(--shadow-clr)",
 				l: "-1px 0 2px var(--shadow-clr)",
 				t: "0 -1px 2px var(--shadow-clr)",
