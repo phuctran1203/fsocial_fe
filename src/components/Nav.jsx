@@ -40,13 +40,9 @@ export default function Nav() {
 	return (
 		<nav
 			className={`
-			z-10 bg-background
+			z-10 bg-background flex-shrink-0
 			border-0
-			${
-				!isInMessage
-					? "md:min-w-[260px] md:max-w-[260px] sm:min-w-[210px] sm:max-w-[210px]"
-					: "lg:min-w-[260px] lg:max-w-[260px] sm:w-[76px]"
-			} 
+			${!isInMessage ? "md:w-[260px] sm:w-[210px]" : "lg:w-[260px] sm:w-[76px]"} 
 			sm:border-r sm:border-t-0 sm:static sm:flex sm:flex-col sm:justify-between sm:h-screen sm:py-6
 			fixed bottom-0 w-full border-t
 			transition

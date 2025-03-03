@@ -140,9 +140,8 @@ export default function Notification() {
 	return (
 		<div
 			className={` 
-			z-0 bg-black h-screen overflow-hidden
-			lg:border-l-[1px]
-			lg:block ${
+			z-0 bg-black h-screen overflow-hidden flex-shrink-0
+			lg:border-l-[1px] lg:block ${
 				!isInMessage
 					? `
 				lg:relative lg:left-auto lg:min-w-fit lg:max-w-fit lg:visible
@@ -164,8 +163,8 @@ export default function Notification() {
 				h-full relative bg-background 
 				${!isInMessage ? "lg:translate-x-0 lg:drop-shadow-none" : ""}
 				lg:translate-y-0
-				md:min-w-[340px] md:max-w-[340px]
-				sm:min-w-[310px] sm:max-w-[310px] sm:pb-0
+				md:w-[340px]
+				sm:w-[310px] sm:pb-0
 				w-full pb-14
 				${isVisible ? "drop-shadow-[1px_0px_1px_var(--drop-shadow)]" : "sm:-translate-x-full sm:translate-y-0 translate-y-full"}
 				transition`}

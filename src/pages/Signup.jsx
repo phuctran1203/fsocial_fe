@@ -91,7 +91,6 @@ export default function Signup() {
 		autoFocusOTP.current = false;
 	};
 
-	const [errMessageUsername, setErrMessageUsernname] = useState("Tên đăng nhập không được để trống");
 	const [errMessageEmail, setErrMessageEmail] = useState("Điền đúng định dạng email");
 
 	const [requestOTPClicked, setRequestOTPClicked] = useState(false);
@@ -99,6 +98,7 @@ export default function Signup() {
 	const autoFocusOTP = useRef(false);
 
 	const goToStep3 = async () => {
+		// const duplicateInto = await ;
 		setRequestOTPClicked(true);
 		// check đã tồn tại username và email
 		const dataCheck = {
@@ -129,7 +129,8 @@ export default function Signup() {
 			updateField("username", { isValid: true });
 			updateField("email", { isValid: true });
 		} else {
-			console.log("Yêu cầu lấy OTP thất bại");
+			updateField("email", { isValid: false });
+			setErrMessageEmail(result);
 		}
 		setRequestOTPClicked(false);
 	};
@@ -152,6 +153,7 @@ export default function Signup() {
 				.toString()
 				.padStart(2, "0")}`,
 			gender: form.gender.value,
+			otp: OTPValue.join(""),
 		};
 
 		const sendingOTP = {
@@ -373,7 +375,7 @@ export default function Signup() {
 									initValue={hoten.current}
 									store={useSignupStore}
 									required={true}
-									errorMessage={errMessageUsername}
+									errorMessage="Tên đăng nhập không được để trống"
 									allowTab={currentStep === 2}
 								>
 									<UserIcon />
