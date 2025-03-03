@@ -15,8 +15,8 @@ import { useEffect } from "react";
 import Profile from "./pages/Profile";
 import { themeStore } from "./store/themeStore";
 import AdminLayout from "./layout/AdminLayout";
-import ManagerUser from "./pages/ManageUser";
-import Complaint from "./pages/Complaint";
+import AdminManagerUser from "./pages/AdminManageUser";
+import AdminComplaint from "./pages/AdminComplaint";
 
 function App() {
 	const theme = themeStore((state) => state.theme);
@@ -34,6 +34,7 @@ function App() {
 				<Route path="/login" element={<Login />} />
 				<Route path="/signup" element={<Signup />} />
 				<Route path="/forgot-password" element={<ForgotPassword />} />
+
 				<Route path="/" element={<UserLayout />}>
 					<Route index element={<Home />} />
 					<Route path="/home" element={<Home />} />
@@ -41,12 +42,14 @@ function App() {
 					<Route path="/search" element={<Search />} />
 					<Route path="/message" element={<Message />} />
 					<Route path="/profile" element={<Profile />} />
-					<Route path="*" element={<NotFound />} />
 				</Route>
+
 				<Route path="/admin" element={<AdminLayout />}>
-					<Route path="complaint" element={<Complaint />} />
-					<Route path="user-management" element={<ManagerUser />} />
+					<Route path="complaint" element={<AdminComplaint />} />
+					<Route path="user-management" element={<AdminManagerUser />} />
 				</Route>
+
+				<Route path="*" element={<NotFound />} />
 			</Routes>
 		</BrowserRouter>
 	);

@@ -5,7 +5,7 @@ import Table from "@/components/Table";
 import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 
-export default function Complaint() {
+export default function AdminComplaint() {
 	const [searchValue, setSearchValue] = useState("");
 
 	const buttonItems = ["Tất cả", "Bài viết", "Người dùng"];
@@ -235,7 +235,7 @@ export default function Complaint() {
 		);
 	};
 	return (
-		<div>
+		<div className="bg-background rounded-lg flex-grow border shadow">
 			<div className="flex flex-col h-[77px] pt-5 pl-6">
 				<span className="text-lg">Quản lý người dùng</span>
 				<span className="text-sm text-gray">Hành động đối với tài khoản người dùng</span>
