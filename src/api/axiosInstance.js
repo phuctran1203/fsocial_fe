@@ -19,7 +19,6 @@ const API = axios.create({
 	baseURL: originalDomain,
 	withCredentials: true,
 });
-
 // Thêm request interceptor (Thêm token vào header)
 API.interceptors.request.use(
 	async (config) => {
