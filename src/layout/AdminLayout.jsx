@@ -1,16 +1,14 @@
-import AdminNav from '@/components/AdminNav'
-import React from 'react'
-import { Outlet } from 'react-router-dom'
+import AdminNav from "@/components/AdminNav";
+import React from "react";
+import { Outlet } from "react-router-dom";
 
 export default function AdminLayout() {
-  return (
-    <div className='flex m-3 h-screen'>
-      <div className='p-5 mr-5 bg-[#ffff] rounded-md'>
-        <AdminNav />
-      </div>
-      <div className='bg-[#ffff] rounded-md w-full'>
-        <Outlet />
-      </div>
-    </div>
-  )
+	return (
+		<main className="p-3 flex gap-5 h-screen bg-background-lower">
+			<AdminNav />
+			<div className="bg-background rounded-lg flex-grow">
+				<Outlet />
+			</div>
+		</main>
+	);
 }
