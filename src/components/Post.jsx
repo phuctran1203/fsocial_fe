@@ -12,6 +12,7 @@ import EditPostModal from "./EditPostModal";
 import DeletePostModal from "./DeletePostModal";
 import { useState } from "react";
 import { ownerAccountStore } from "@/store/ownerAccountStore";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
 export default function Post({ post, isChildren, className = "" }) {
 	const { showPopup } = usePopupStore();
@@ -55,12 +56,10 @@ export default function Post({ post, isChildren, className = "" }) {
 			<div className="flex items-center justify-between px-4 pt-4 pb-3">
 				<div className="flex space-x-2">
 					<Link to="">
-						<img
-							src={post.avatar || "./temp/default_avatar.svg"}
-							alt="avatar"
-							className="md:size-11 size-9 rounded-full"
-							draggable={false}
-						/>
+						<Avatar className={`size-9`}>
+							<AvatarImage src={post.avatar} />
+							<AvatarFallback className="fs-xm">{post.displayName.charAt(0) ?? "?"}</AvatarFallback>
+						</Avatar>
 					</Link>
 					<div className="flex flex-col justify-center">
 						<Link to="" className="font-semibold">
