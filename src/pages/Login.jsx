@@ -176,7 +176,7 @@ export default function Login() {
 							<p className="text-center py-2.5 font-semibold">{user.name}</p>
 
 							<Button
-								className="absolute right-1 top-1 btn-secondary border !size-7 opacity-0 group-hover:opacity-100 !rounded-full transition"
+								className="absolute right-1 top-1 btn-secondary border !size-7 sm:opacity-0 group-hover:opacity-100 !rounded-full transition"
 								onClick={handleRemoveSavedAccount}
 							>
 								<XMarkIcon />
