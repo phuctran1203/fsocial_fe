@@ -10,7 +10,7 @@ export default function Table({ renderRow, data, headers, loading, bgHover }) {
             )
                 : (
                     <div className='overflow-x-auto'>
-                        <div className='max-h-[680px] overflow-y-auto'>
+                        <div className='max-h-[550px] overflow-y-auto'>
                             <table className="min-w-full text-sm text-left rtl:text-right text-gray-500 dark:text-gray-300 hidden md:table">
                                 <thead className="text-xs  text-[#808EA1] dark:text-[#A0A0B1] bg-[#F8F8F8] dark:bg-darkSecondary sticky top-0 z-10">
                                     <tr className=''>
