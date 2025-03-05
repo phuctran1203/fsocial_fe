@@ -30,7 +30,7 @@ const useWebSocket = (usernameSender) => {
 
 		// Hủy đăng ký cũ trước khi đăng ký mới
 		const subscription = stompClientRef.current.subscribe(
-			`/queue/messages/${usernameSender}/${receiver}`,
+			`/user/queue/private/${usernameSender}/${receiver}`,
 			(message) => {
 				const receivedMessage = JSON.parse(message.body);
 				setMessages((prev) => [...prev, receivedMessage]);
@@ -47,14 +47,14 @@ const useWebSocket = (usernameSender) => {
 		if (stompClientRef.current && stompClientRef.current.connected && receiver) {
 			const dataSending = {
 				sender: usernameSender,
-				receiver: receiver,
+				reciver: receiver,
 				content: content,
 				type: "CHAT",
 			};
 			console.log("dataSending: ", dataSending);
 
 			stompClientRef.current.publish({
-				destination: "/message/ws",
+				destination: "/app/chat.private",
 				body: JSON.stringify(dataSending),
 			});
 		}

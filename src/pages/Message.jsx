@@ -8,7 +8,7 @@ import { ownerAccountStore } from "@/store/ownerAccountStore";
 
 const listUsers = [
 	{
-		userId: "1",
+		userId: "4a3e83c8-9d36-4ec1-b4f9-d6e9f2961a60",
 		displayName: "Phúc Thịnh",
 		latestMessage: "Chào bạn!",
 		avatar: "./temp/user_2.png",
@@ -16,7 +16,7 @@ const listUsers = [
 		read: true,
 	},
 	{
-		userId: "2",
+		userId: "677d104e-e1df-4fdc-8ed3-2ddc34cdced4",
 		displayName: "Phương Nam",
 		latestMessage: "Lấy dùm tui cái laptop nha 🤧",
 		avatar: "./temp/user_3.png",
@@ -68,7 +68,9 @@ export default function Message() {
 	const handleChooseConversation = (userId) => {
 		setTrigger(!trigger);
 		setSelectedUser(userId);
-		setReceiver("4a3e83c8-9d36-4ec1-b4f9-d6e9f2961a60");
+		console.log("userId reciever: ", userId);
+
+		setReceiver(userId);
 		//call API lấy tin nhắn về
 	};
 
