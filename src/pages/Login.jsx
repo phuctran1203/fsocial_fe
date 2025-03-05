@@ -7,6 +7,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { login } from "../api/loginApi";
 import { getCookie, setCookie } from "@/utils/cookie";
 import { ownerAccountStore } from "@/store/ownerAccountStore";
+import { jwtDecode } from "jwt-decode";
 
 const list = [
 	{
@@ -21,6 +22,8 @@ const list = [
 
 export default function Login() {
 	const navigate = useNavigate();
+
+	const setUser = ownerAccountStore((state) => state.setUser);
 
 	const form = useLoginStore((state) => state.form);
 
@@ -55,7 +58,6 @@ export default function Login() {
 			// save token and refresh token
 			setCookie("access-token", result.data.accessToken, 360 * 10); // 10 năm
 			setCookie("refresh-token", result.data.refreshToken, 360 * 10); // 10 năm
-
 			navigate("/home");
 		} else {
 			setLoginErr(result.message);
@@ -176,7 +178,7 @@ export default function Login() {
 							<p className="text-center py-2.5 font-semibold">{user.name}</p>
 
 							<Button
-								className="absolute right-1 top-1 btn-secondary border !size-7 opacity-0 group-hover:opacity-100 !rounded-full transition"
+								className="absolute right-1 top-1 btn-secondary border !size-7 sm:opacity-0 group-hover:opacity-100 !rounded-full transition"
 								onClick={handleRemoveSavedAccount}
 							>
 								<XMarkIcon />

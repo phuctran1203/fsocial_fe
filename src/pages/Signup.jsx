@@ -400,8 +400,8 @@ export default function Signup() {
 									label="Mật khẩu"
 									store={useSignupStore}
 									required={true}
-									pattern="^(?=.*[A-Za-z])[A-Za-z\d]{7,20}$"
-									errorMessage="Mật khẩu từ 7-20 kí tự, bao gồm cả chữ và số"
+									pattern="^(?=.*[A-Za-z])[A-Za-z\d]{8,20}$"
+									errorMessage="Mật khẩu từ 8-20 kí tự, bao gồm cả chữ và số"
 									allowTab={currentStep === 2}
 								>
 									<div onClick={() => setIsShowPassword(!isShowPassword)}>

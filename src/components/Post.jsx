@@ -73,9 +73,14 @@ export default function Post({ post, isChildren, className = "" }) {
 						<Glyph />
 					</PopoverTrigger>
 					<PopoverContent side="left" align="start" sideOffset={20} className="z-10 bg-background w-52 shadow-2xl p-2">
-						<Button className="btn-transparent !justify-start py-2 ps-3 text-nowrap gap-3" onClick={handlePopupReport}>
-							<ComplaintIcon /> Báo cáo
-						</Button>
+						{post.userId !== user.userId && (
+							<Button
+								className="btn-transparent !justify-start py-2 ps-3 text-nowrap gap-3"
+								onClick={handlePopupReport}
+							>
+								<ComplaintIcon /> Báo cáo
+							</Button>
+						)}
 						{post.userId === user.userId && (
 							<Button className="btn-transparent !justify-start text-nowrap py-2 ps-3 gap-3" onClick={handlePopupEdit}>
 								<PencilIcon /> Chỉnh sửa
