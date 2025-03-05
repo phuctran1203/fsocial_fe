@@ -5,6 +5,8 @@ import Search from "@/components/Search";
 import Table from "@/components/Table";
 import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
+import { Switch } from "@/components/ui/switch";
+import { cn } from "@/lib/utils";
 
 export default function AdminManagerUser() {
 	const [searchValue, setSearchValue] = useState("");
@@ -222,7 +224,9 @@ export default function AdminManagerUser() {
 				{filteredData.map((item, index) => (
 					<tr
 						key={index}
-						className={`hover:bg-secondary border-t ${item.status && "hover:bg-primary-ghost bg-primary-ghost"}`}
+						className={cn(
+							`hover:bg-secondary border-t transition ${item.status && "hover:bg-primary-ghost bg-primary-ghost"}`
+						)}
 					>
 						<td align="center" className="ps-2 pe-4 py-5 fs-xs text-gray">
 							{index + 1}
@@ -245,15 +249,11 @@ export default function AdminManagerUser() {
 								<TrashCanIcon className="size-5" />
 							</button>
 
-							<button>
-								<input
-									type="checkbox"
-									name="status-user"
-									id="status-user"
-									checked={item.status === true}
-									onChange={() => handlechecked(item.id)}
-								/>
-							</button>
+							<Switch
+								className="bg-gray-2light scale-[85%]"
+								checked={item.status === true}
+								onCheckedChange={() => handlechecked(item.id)}
+							/>
 						</td>
 					</tr>
 				))}

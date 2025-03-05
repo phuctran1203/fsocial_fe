@@ -35,7 +35,7 @@ export default function AdminComplaint() {
 				userName: "cangngo",
 			},
 			{
-				status: false,
+				status: true,
 				id: "lạdlfkaư",
 				displayName: "Cang Ngô",
 				complaintType: "Người dùng",
@@ -45,7 +45,7 @@ export default function AdminComplaint() {
 				userName: "cangngo",
 			},
 			{
-				status: false,
+				status: true,
 				id: "lạdlfkea",
 				displayName: "Cang Ngô",
 				complaintType: "Người dùng",
