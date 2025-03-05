@@ -1,17 +1,19 @@
-import React from 'react'
-import { SearchIconAdmin } from './Icon'
+import React from "react";
+import { SearchIcon } from "./Icon";
 
-export default function Search({value, onChange, placeholder}) {
-    return (
-        <div className="relative w-full max-w-sm">
-            <input
-                type="text"
-                value={value}
-                onChange={onChange}
-                placeholder={placeholder}
-                className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:outline-none text-gray-700 placeholder-gray-400"
-            />
-            <SearchIconAdmin />
-        </div>
-    )
+export default function Search({ value, onChange, placeholder }) {
+	return (
+		<div className="relative size-full">
+			<input
+				type="text"
+				value={value}
+				onChange={onChange}
+				placeholder={placeholder}
+				className="size-full pl-8 pr-4 border rounded-lg"
+			/>
+			<div className="absolute left-2 top-1/2 -translate-y-1/2">
+				<SearchIcon className="size-[18px]" />
+			</div>
+		</div>
+	);
 }

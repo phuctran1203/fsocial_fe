@@ -279,9 +279,9 @@ export const UploadDecorIcon = () => (
 	</svg>
 );
 
-export const LoadingIcon = ({ stroke = "stroke-txtWhite" }) => (
+export const LoadingIcon = ({ stroke = "stroke-txtWhite", size = "size-6" }) => (
 	<svg
-		className="size-6"
+		className={`${size}`}
 		preserveAspectRatio="xMidYMid"
 		style={{
 			shapeRendering: "auto",
@@ -581,71 +581,14 @@ export const PencilIcon = () => (
 	</svg>
 );
 
-export const SearchIconAdmin = () => (
-	<svg
-		className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400"
-		xmlns="http://www.w3.org/2000/svg"
-		fill="none"
-		viewBox="0 0 24 24"
-		stroke="currentColor"
-	>
+export const CalendarIcon = () => (
+	<svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
 		<path
-			strokeLinecap="round"
-			strokeLinejoin="round"
-			strokeWidth="2"
-			d="M21 21l-4.35-4.35m1.85-5.15a7 7 0 11-14 0 7 7 0 0114 0z"
-		/>
-	</svg>
-);
-
-export const UnReadIcon = () => (
-	<svg width="40" height="40" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
-		<g clipPath="url(#clip0_858_8654)">
-			<path
-				d="M24.1667 12.4999C24.3855 12.2811 24.6454 12.1074 24.9313 11.989C25.2173 11.8705 25.5238 11.8096 25.8333 11.8096C26.1429 11.8096 26.4493 11.8705 26.7353 11.989C27.0213 12.1074 27.2811 12.2811 27.5 12.4999C27.7189 12.7188 27.8925 12.9786 28.0109 13.2646C28.1294 13.5506 28.1903 13.8571 28.1903 14.1666C28.1903 14.4761 28.1294 14.7826 28.0109 15.0686C27.8925 15.3546 27.7189 15.6144 27.5 15.8333L16.25 27.0833L11.6667 28.3333L12.9167 23.7499L24.1667 12.4999Z"
-				stroke="#737373"
-				strokeWidth="1.66667"
-				strokeLinejoin="round"
-				strokeLinecap="round"
-			/>
-		</g>
-		<circle cx="34" cy="11" r="4" fill="#E76E23" />
-		<defs>
-			<clipPath id="clip0_858_8654">
-				<rect width="20" height="20" fill="white" transform="translate(10 10)" />
-			</clipPath>
-		</defs>
-	</svg>
-);
-
-export const ReadIcon = () => (
-	<svg width="40" height="40" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
-		<g clipPath="url(#clip0_858_8751)">
-			<path
-				d="M24.1667 12.4999C24.3855 12.2811 24.6454 12.1074 24.9313 11.989C25.2173 11.8705 25.5238 11.8096 25.8333 11.8096C26.1429 11.8096 26.4493 11.8705 26.7353 11.989C27.0213 12.1074 27.2811 12.2811 27.5 12.4999C27.7189 12.7188 27.8925 12.9786 28.0109 13.2646C28.1294 13.5506 28.1903 13.8571 28.1903 14.1666C28.1903 14.4761 28.1294 14.7826 28.0109 15.0686C27.8925 15.3546 27.7189 15.6144 27.5 15.8333L16.25 27.0833L11.6667 28.3333L12.9167 23.7499L24.1667 12.4999Z"
-				stroke="#737373"
-				strokeWidth="1.66667"
-				strokeLinejoin="round"
-				strokeLinecap="round"
-			/>
-		</g>
-		<defs>
-			<clipPath id="clip0_858_8751">
-				<rect width="20" height="20" fill="white" transform="translate(10 10)" />
-			</clipPath>
-		</defs>
-	</svg>
-);
-
-export const SearchInApiIcon = () => (
-	<svg width="43" height="44" viewBox="0 0 43 44" fill="none" xmlns="http://www.w3.org/2000/svg">
-		<rect x="0.5" y="0.5" width="42" height="43" rx="7.5" stroke="#E6E6E6" />
-		<path
-			d="M13 19H31M27 23.0014L17 23M20.3333 27.0005L17 27M17 13V15M27 13V15M16.2 31H27.8C28.9201 31 29.4802 31 29.908 30.782C30.2843 30.5903 30.5903 30.2843 30.782 29.908C31 29.4802 31 28.9201 31 27.8V18.2C31 17.0799 31 16.5198 30.782 16.092C30.5903 15.7157 30.2843 15.4097 29.908 15.218C29.4802 15 28.9201 15 27.8 15H16.2C15.0799 15 14.5198 15 14.092 15.218C13.7157 15.4097 13.4097 15.7157 13.218 16.092C13 16.5198 13 17.0799 13 18.2V27.8C13 28.9201 13 29.4802 13.218 29.908C13.4097 30.2843 13.7157 30.5903 14.092 30.782C14.5198 31 15.0799 31 16.2 31Z"
+			d="M1 7H19M15 11.0014L5 11M8.3333 15.0005L5 15M5 1V3M15 1V3M4.2 19H15.8C16.9201 19 17.4802 19 17.908 18.782C18.2843 18.5903 18.5903 18.2843 18.782 17.908C19 17.4802 19 16.9201 19 15.8V6.2C19 5.07989 19 4.51984 18.782 4.09202C18.5903 3.71569 18.2843 3.40973 17.908 3.21799C17.4802 3 16.9201 3 15.8 3H4.2C3.0799 3 2.51984 3 2.09202 3.21799C1.71569 3.40973 1.40973 3.71569 1.21799 4.09202C1 4.51984 1 5.07989 1 6.2V15.8C1 16.9201 1 17.4802 1.21799 17.908C1.40973 18.2843 1.71569 18.5903 2.09202 18.782C2.51984 19 3.07989 19 4.2 19Z"
 			stroke="#737373"
-			strokeWidth="1.3"
-			strokeLinecap="round"
-			strokeLinejoin="round"
+			stroke-width="1.3"
+			stroke-linecap="round"
+			stroke-linejoin="round"
 		/>
 	</svg>
 );
