@@ -4,6 +4,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
 	FollowerProfileTabIcon,
 	Glyph,
+	PencilChangeImageIcon,
 	PictureProfileTabIcon,
 	PostProfileTabIcon,
 	ReactedProfileTabIcon,
@@ -12,7 +13,6 @@ import {
 import Button from "@/components/Button";
 import { useLocation } from "react-router-dom";
 import { postsStore } from "@/store/postsStore";
-import CommentModal from "@/components/CommentModal";
 import { getPosts } from "@/api/postsApi";
 import RenderPosts from "@/components/RenderPosts";
 
@@ -51,6 +51,7 @@ const listTabs = [
 ];
 export default function Profile() {
 	const location = useLocation();
+
 	const queryParams = new URLSearchParams(location.search);
 
 	const user = ownerAccountStore((state) => state.user);
@@ -160,21 +161,48 @@ export default function Profile() {
 		return () => observer.disconnect();
 	}, [currentTab]);
 
+	const isOwner = user.userId === queryParams.get("id");
+
+	const handleUpdateUserInfo = () => {};
+
 	return (
 		<div className="flex-grow bg-background transition overflow-auto scrollable-div">
 			<div className="lg:max-w-[630px] mx-auto">
 				{/* banner */}
-				<div className="sm:mt-5 mt-2 aspect-[3/1] overflow-hidden rounded-lg">
-					<img src="./temp/banner.png" alt="Ảnh bìa" className="object-cover size-full object-center" />
+				<div className="relative sm:mt-5 mt-2 aspect-[3/1] overflow-hidden rounded-lg border">
+					{user.banner ? (
+						<img src={user.banner} alt="Ảnh bìa" className="object-cover size-full object-center" />
+					) : (
+						<div className="size-full grid place-content-center">
+							<p>Cập nhật ảnh bìa của bạn</p>
+						</div>
+					)}
+					{isOwner && (
+						<Button
+							className="btn-secondary !w-fit absolute bottom-2 right-2 py-1 ps-2.5 pe-4 border"
+							onClick={handleUpdateUserInfo}
+						>
+							<PencilChangeImageIcon />
+							Đổi ảnh bìa
+						</Button>
+					)}
 				</div>
 				<div className="sm:-mt-6 -mt-4 mx-auto lg:max-w-[630px] ">
 					{/* profile detail */}
 					<div className="flex sm:flex-row sm:items-start flex-col items-center gap-4 sm:px-3 px-1">
-						<div className="bg-background border-4 rounded-full p-1 w-fit transition">
+						<div className="relative bg-background border-4 rounded-full p-1 w-fit transition">
 							<Avatar className={`size-[120px]`}>
 								<AvatarImage src={user.avatar} />
 								<AvatarFallback className="text-[40px] transition">{user.firstName.charAt(0) ?? "?"}</AvatarFallback>
 							</Avatar>
+							{isOwner && (
+								<Button
+									className="btn-secondary !w-fit absolute bottom-0 right-0 p-1 !rounded-full shadow border"
+									onClick={handleUpdateUserInfo}
+								>
+									<PencilChangeImageIcon />
+								</Button>
+							)}
 						</div>
 
 						<div className="sm:self-end sm:block flex flex-col items-center flex-grow sm:mb-2">
@@ -204,9 +232,7 @@ export default function Profile() {
 							<Button className="!hidden sm:!block btn-transparent px-3 h-10">
 								<Glyph />
 							</Button>
-							{queryParams.get("id") !== user.userId && (
-								<Button className="btn-primary px-8 text-nowrap h-10">Theo dõi</Button>
-							)}
+							{!isOwner && <Button className="btn-primary px-8 text-nowrap h-10">Theo dõi</Button>}
 						</div>
 					</div>
 

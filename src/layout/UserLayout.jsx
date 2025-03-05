@@ -7,6 +7,8 @@ import { Toaster } from "sonner";
 import { getOwnerProfile } from "@/api/profileApi";
 import { ownerAccountStore } from "@/store/ownerAccountStore";
 import Popup from "@/components/Popup";
+import { getCookie } from "@/utils/cookie";
+import { jwtDecode } from "jwt-decode";
 
 export default function UserLayout() {
 	const setUser = ownerAccountStore((state) => state.setUser);
@@ -14,7 +16,12 @@ export default function UserLayout() {
 	const getUserDetail = async () => {
 		const resp = await getOwnerProfile();
 		// if (resp.statusCode === 200) {
-		setUser(resp);
+		const accessToken = getCookie("access-token");
+		let userId = jwtDecode(accessToken).sub;
+		console.log("userId: ", userId);
+		setUser({ userId, ...resp.data });
+		console.log(ownerAccountStore.getState().user);
+
 		// }
 	};
 
