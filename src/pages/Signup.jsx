@@ -5,7 +5,9 @@ import { useSignupStore } from "../store/signupStore";
 import { useEffect, useRef, useState } from "react";
 import EnterOTPCode from "../components/EnterOTPCode";
 import { ArrowLeftIcon, AtIcon, EyeIcon, EyeSplashIcon, LoadingIcon, UserIcon } from "../components/Icon";
-import { signupAPI } from "../api/signupApi";
+import { checkDuplicate, requestOTP, validOTP, sendingCreateAccount } from "../api/signupApi";
+import { getCookie } from "@/utils/cookie";
+import { removeVietnameseAccents } from "@/utils/removeSpecialWord";
 
 export default function Signup() {
 	const navigate = useNavigate();
@@ -81,7 +83,10 @@ export default function Signup() {
 	};
 
 	const goToStep2 = () => {
-		hoten.current = form.ten.value + form.ho.value + (Math.floor(Math.random() * 9000) + 1000);
+		hoten.current =
+			removeVietnameseAccents(form.ten.value) +
+			removeVietnameseAccents(form.ho.value) +
+			(Math.floor(Math.random() * 9000) + 10000);
 		setCurrentStep(2);
 		autoFocusOTP.current = false;
 	};
@@ -101,19 +106,19 @@ export default function Signup() {
 			email: form.email.value,
 		};
 
-		const respCheckDuplicateInto = await signupAPI.checkDuplicate(dataCheck);
-
+		const respCheckDuplicateInto = await checkDuplicate(dataCheck);
 		console.log(respCheckDuplicateInto);
 
-		if (respCheckDuplicateInto.message != "Thông tin hợp lệ.") {
-			updateField("username", { isValid: false });
-			updateField("email", { isValid: false });
-			setErrMessageUsernname(respCheckDuplicateInto.data.username);
-			setErrMessageEmail(respCheckDuplicateInto.data.email);
+		if (respCheckDuplicateInto?.status === 500 || respCheckDuplicateInto.message != "Thông tin hợp lệ.") {
+			// updateField("username", { isValid: false });
+			// updateField("email", { isValid: false });
+			// setErrMessageUsernname(respCheckDuplicateInto.data.username);
+			// setErrMessageEmail(respCheckDuplicateInto.data.email);
 			setRequestOTPClicked(false);
 			return;
 		}
-		const result = await signupAPI.requestOTP({
+		// gửi yêu cầu lấy OTP
+		const result = await requestOTP({
 			email: form.email.value,
 			type: "REGISTER",
 		});
@@ -157,7 +162,7 @@ export default function Signup() {
 			type: "REGISTER",
 		};
 
-		const respValidOTP = await signupAPI.validOTP(sendingOTP);
+		const respValidOTP = await validOTP(sendingOTP);
 
 		if (respValidOTP.statusCode != 200) {
 			setOTPErr(respValidOTP.message);
@@ -166,12 +171,12 @@ export default function Signup() {
 		}
 
 		setCurrentStep(4);
-		const responseCreateAccount = await signupAPI.sendingCreateAccount(sending);
+		const responseCreateAccount = await sendingCreateAccount(sending);
 		console.log(responseCreateAccount);
 		if (responseCreateAccount.statusCode === 200) {
 			setTimeout(() => {
 				navigate("/login");
-			}, 4000);
+			}, 2500);
 		}
 	};
 
@@ -195,11 +200,15 @@ export default function Signup() {
 	// Handle nhập mã OTP xác minh email
 	const [OTPValue, setOTPValue] = useState(["", "", "", ""]);
 
+	useEffect(() => {
+		if (getCookie("refresh-token")) navigate("/home");
+	}, []);
+
 	return (
-		<div className="lg:w-[min(85%,1440px)] md:h-fit h-screen mx-auto relative bg-background xl:px-20 lg:px-12 lg:my-6 md:px-4  py-8 rounded-md">
+		<div className="lg:w-[min(85%,1440px)] md:h-fit h-[100dvh] mx-auto relative bg-background xl:px-20 lg:px-12 lg:my-4 md:px-4 py-6 rounded-md">
 			<img className="w-[max(72px,8%)] absolute bottom-0 left-0" src="./decor/form_decor.svg" alt="" />
-			<div className="md:w-10/12 md:mx-auto mx-4 md:mb-2 grid grid-cols-[repeat(15,minmax(0,1fr))] grid-rows-2 items-center">
-				<h3 className="z-0 col-start-2 justify-self-center bg-primary font-semibold md:w-12 w-10 aspect-square rounded-full grid place-content-center">
+			<div className="md:w-10/12 md:mx-auto mx-6 md:mb-2 grid grid-cols-[repeat(15,minmax(0,1fr))] grid-rows-2 items-center">
+				<h3 className="z-0 col-start-2 justify-self-center bg-primary text-txtWhite font-semibold md:w-12 w-10 aspect-square rounded-full grid place-content-center">
 					1
 				</h3>
 				<div
@@ -212,7 +221,7 @@ export default function Signup() {
 				/>
 				<h3
 					className={`z-0 justify-self-center font-semibold md:w-12 w-10 aspect-square rounded-full grid place-content-center ${
-						currentStep >= 2 ? "bg-primary" : "bg-secondary"
+						currentStep >= 2 ? "bg-primary text-txtWhite" : "bg-secondary"
 					} transition-all duration-300 ease-in`}
 				>
 					2
@@ -227,7 +236,7 @@ export default function Signup() {
 				/>
 				<h3
 					className={`z-0 justify-self-center font-semibold md:w-12 w-10 aspect-square rounded-full grid place-content-center ${
-						currentStep >= 3 ? "bg-primary" : "bg-secondary"
+						currentStep >= 3 ? "bg-primary text-txtWhite" : "bg-secondary"
 					} transition-all duration-300 ease-in`}
 				>
 					3
@@ -242,7 +251,7 @@ export default function Signup() {
 				/>
 				<h3
 					className={`z-0 justify-self-center font-semibold md:w-12 w-10 aspect-square rounded-full grid place-content-center ${
-						currentStep >= 4 ? "bg-primary" : "bg-secondary"
+						currentStep >= 4 ? "bg-primary text-txtWhite" : "bg-secondary"
 					} transition-all duration-300 ease-in`}
 				>
 					4
@@ -256,16 +265,17 @@ export default function Signup() {
 				<div />
 				<span className="col-span-3 fs-sm font-light text-center">Hoàn tất tạo tài khoản</span>
 			</div>
+
 			<div className="flex md:gap-x-[5%] w-full justify-center">
 				<div
 					ref={formContainer}
-					className={`md:py-8 py-4 overflow-hidden xl:basis-5/12 lg:basis-6/12 md:basis-7/12 basis-full md:ring-1 ring-inset ring-gray-2light rounded w-14
+					className={`md:py-8 py-4 overflow-hidden xl:basis-5/12 lg:basis-6/12 md:basis-7/12 basis-full md:border rounded-lg w-14
 						${currentStep !== 4 ? "" : "hidden"}
 						`}
 				>
 					<div ref={stepsWrapper} className="grid" style={{ transition: "transform 0.3s, height 0.2s" }}>
 						{/* step 1 */}
-						<div ref={setStepsRef(1)} className={`md:px-8 px-4 h-fit ${currentStep === 1 ? "" : "invisible"}`}>
+						<div ref={setStepsRef(1)} className={`md:px-8 px-6 h-fit ${currentStep === 1 ? "" : "invisible"}`}>
 							<div className="mb-4">
 								<h2>Thông tin cơ bản</h2>
 								<p className="text-gray">Hãy điền vào form bên dưới để hoàn tất quá trình đăng ký nhé</p>
@@ -351,7 +361,7 @@ export default function Signup() {
 						</div>
 
 						{/* step 2 */}
-						<div ref={setStepsRef(2)} className={`md:px-8 px-4 h-fit ${currentStep === 2 ? "" : "invisible"}`}>
+						<div ref={setStepsRef(2)} className={`md:px-8 px-6 h-fit ${currentStep === 2 ? "" : "invisible"}`}>
 							<div className="mb-4">
 								<h2>Thông tin đăng nhập</h2>
 								<p className="text-gray">Đây là thông tin quan trọng. Hãy luôn giữ bảo mật nhé!</p>
@@ -390,8 +400,8 @@ export default function Signup() {
 									label="Mật khẩu"
 									store={useSignupStore}
 									required={true}
-									pattern="^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{6,20}$"
-									errorMessage="Mật khẩu từ 6-20 kí tự, bao gồm cả chữ và số"
+									pattern="^(?=.*[A-Za-z])[A-Za-z\d]{8,20}$"
+									errorMessage="Mật khẩu từ 8-20 kí tự, bao gồm cả chữ và số"
 									allowTab={currentStep === 2}
 								>
 									<div onClick={() => setIsShowPassword(!isShowPassword)}>
@@ -433,7 +443,7 @@ export default function Signup() {
 						{/* step 3 */}
 						<div
 							ref={setStepsRef(3)}
-							className={`space-y-5 md:px-8 px-4 h-fit ${currentStep === 3 ? "" : "invisible"}`}
+							className={`space-y-5 md:px-8 px-6 h-fit ${currentStep === 3 ? "" : "invisible"}`}
 						>
 							<div className="mb-4">
 								<h2>Xác minh tài khoản</h2>
@@ -463,10 +473,10 @@ export default function Signup() {
 						</div>
 					</div>
 
-					<div className="relative md:px-8 px-4 bg-background pt-3 border-x">
+					<div className="relative md:px-8 px-6 bg-background pt-3 border-x">
 						<div
 							className="mt-6 mb-10
-								relative w-10/12 mx-auto border-b-[1px] border-[--gray-light-clr] overflow-visible text-[--gray-light-clr]
+								relative w-10/12 mx-auto border-b-[1px] border overflow-visible text-gray-light
 								before:absolute before:left-1/2 before:-translate-x-1/2 before:-translate-y-1/2 before:content-['Hoặc'] before:size-fit before:bg-background before:px-2"
 						/>
 						<div>

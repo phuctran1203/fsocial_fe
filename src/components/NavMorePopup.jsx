@@ -3,24 +3,22 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover
 import { LogoutIcon, KeyIcon, SunIcon, SwitchIcon, MoonIcon, CheckIcon } from "./Icon";
 import styles from "./Nav.module.scss";
 import { useNavigate } from "react-router-dom";
+import { deleteCookie } from "@/utils/cookie";
+import { themeStore } from "@/store/themeStore";
 
 export default function NavMorePopup({ inMobile }) {
-	const [mode, setMode] = useState(localStorage.getItem("theme") || "light");
+	const { theme, setTheme } = themeStore();
 
 	const handleSetMode = (modePicked) => {
-		setMode(modePicked);
-		if (modePicked === "light") {
-			document.body.classList.remove("dark");
-		} else if (modePicked === "dark") {
-			document.body.classList.add("dark");
-		}
-		localStorage.setItem("theme", modePicked);
+		setTheme(modePicked);
 	};
 
 	const [switchThemeOpen, setSwitchThemeOpen] = useState(false);
 
 	const navigate = useNavigate();
 	const handleLogout = () => {
+		deleteCookie("refresh-token");
+		deleteCookie("access-token");
 		navigate("/login");
 	};
 
@@ -48,24 +46,24 @@ export default function NavMorePopup({ inMobile }) {
 					side={!inMobile ? "right" : "top"}
 					align="start"
 					sideOffset={!inMobile ? 20 : 0}
-					className="bg-background p-2 sm:w-44 space-y-2"
+					className="bg-background p-2 sm:w-44 space-y-2 transition"
 				>
 					<button
-						className={`${styles.navMore} !gap-2 border ${mode == "light" && "shadow-md"}`}
+						className={`${styles.navMore} !gap-2 border ${theme == "light" && "shadow-md"}`}
 						onClick={() => handleSetMode("light")}
 					>
 						<SunIcon />
 						<span>Sáng</span>
-						<CheckIcon className={`ms-auto ${mode != "light" && "hidden"}`} />
+						<CheckIcon className={`ms-auto ${theme != "light" && "hidden"}`} />
 					</button>
 
 					<button
-						className={`${styles.navMore} !gap-2 border ${mode == "dark" && "bg-gray-2light"}`}
+						className={`${styles.navMore} !gap-2 border ${theme == "dark" && "bg-gray-2light"}`}
 						onClick={() => handleSetMode("dark")}
 					>
 						<MoonIcon />
 						<span>Tối</span>
-						<CheckIcon className={`ms-auto ${mode != "dark" && "hidden"}`} />
+						<CheckIcon className={`ms-auto ${theme != "dark" && "hidden"}`} />
 					</button>
 				</PopoverContent>
 			</Popover>
@@ -75,7 +73,7 @@ export default function NavMorePopup({ inMobile }) {
 				<span>Đổi mật khẩu</span>
 			</button>
 
-			<hr className="my-1" />
+			<hr className="my-1 transition" />
 
 			<button className={styles.navMore}>
 				<SwitchIcon />

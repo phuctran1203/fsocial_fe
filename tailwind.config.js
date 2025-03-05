@@ -7,23 +7,22 @@ export default {
 			container: {
 				center: true,
 			},
-
 			colors: {
 				logo: "var(--logo-clr)",
-
 				primary: {
 					DEFAULT: "var(--primary-clr)",
 					hover: "var(--primary-hover-clr)",
 					active: "var(--primary-active-clr)",
 					ghost: "var(--primary-ghost-clr)",
 					text: "var(--text-primary-clr)",
+					// foreground: "hsl(var(--primary-foreground))",
 				},
-
 				secondary: {
 					DEFAULT: "var(--secondary-clr)",
 					hover: "var(--secondary-hover-clr)",
 					active: "var(--secondary-active-clr)",
 					text: "var(--text-secondary-clr)",
+					// foreground: "hsl(var(--secondary-foreground))",
 				},
 
 				background: {
@@ -39,6 +38,30 @@ export default {
 				},
 				txtWhite: "var(--text-white)",
 
+				// foreground: "hsl(var(--foreground))",
+				// card: {
+				// 	DEFAULT: "hsl(var(--card))",
+				// 	foreground: "hsl(var(--card-foreground))",
+				// },
+				// popover: {
+				// 	DEFAULT: "hsl(var(--popover))",
+				// 	foreground: "hsl(var(--popover-foreground))",
+				// },
+				muted: {
+					DEFAULT: "var(--gray-3light-clr)",
+					foreground: "hsl(var(--muted-foreground))",
+				},
+				// accent: {
+				// 	DEFAULT: "hsl(var(--accent))",
+				// 	foreground: "hsl(var(--accent-foreground))",
+				// },
+				// destructive: {
+				// 	DEFAULT: "hsl(var(--destructive))",
+				// 	foreground: "hsl(var(--destructive-foreground))",
+				// },
+				// border: "hsl(var(--border))",
+				// input: "hsl(var(--input))",
+				// ring: "hsl(var(--ring))",
 				// chart: {
 				// 	1: "hsl(var(--chart-1))",
 				// 	2: "hsl(var(--chart-2))",
@@ -51,29 +74,32 @@ export default {
 				DEFAULT: "var(--border-clr)",
 				hover: "var(--border-hover-clr)",
 			},
-
 			ringColor: {
 				DEFAULT: "var(--border-clr)",
 				hover: "var(--border-hover-clr)",
 			},
-
 			boxShadow: {
-				r: "1px 0 2px var(--shadow-clr)", // Đổ bóng về bên phải
-				l: "-1px 0 2px var(--shadow-clr)", // Đổ bóng về bên trái
-				t: "0 -1px 2px var(--shadow-clr)", // Đổ bóng lên trên
-				b: "0 1px 2px var(--shadow-clr)", // Đổ bóng xuống dưới
+				DEFAULT: "0px 0 8px 0 var(--shadow-clr)",
+				r: "1px 0 2px var(--shadow-clr)",
+				l: "-1px 0 2px var(--shadow-clr)",
+				t: "0 -1px 2px var(--shadow-clr)",
+				b: "0 1px 2px var(--shadow-clr)",
 				y: "0px -1px 2px var(--shadow-clr), 0 1px 2px var(--shadow-clr)",
 			},
-
 			transitionProperty: {
-				DEFAULT: "all", // Mặc định tất cả thuộc tính đều có hiệu ứng transition
+				DEFAULT: "all",
 			},
 			transitionDuration: {
-				DEFAULT: "120ms", // Mặc định 0.12s
+				DEFAULT: "150ms",
 			},
 			transitionTimingFunction: {
-				DEFAULT: "ease-out", // Mặc định ease-out
+				DEFAULT: "cubic-bezier(0.22, 0.16, 0.06, 0.93)",
 			},
+			// borderRadius: {
+			// 	lg: "var(--radius)",
+			// 	md: "calc(var(--radius) - 2px)",
+			// 	sm: "calc(var(--radius) - 4px)",
+			// },
 		},
 	},
 	plugins: [require("tailwindcss-animate")],

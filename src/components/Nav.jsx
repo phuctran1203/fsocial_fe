@@ -3,11 +3,13 @@ import { NavLink, useLocation } from "react-router-dom";
 import styles from "./Nav.module.scss";
 // import "./Nav.scss";
 import { Bell, FriendsIcon, HamburgerIcon, HomeIcon, LogoNoBG, SearchIcon } from "./Icon";
-import { popupCreatePostStore, popupNotificationtStore } from "../store/popupStore";
+import { popupNotificationtStore, usePopupStore } from "../store/popupStore";
 import { ownerAccountStore } from "../store/ownerAccountStore";
 import { toast } from "sonner";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import NavMorePopup from "./NavMorePopup";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import CreatePost from "./CreatePost";
 
 export default function Nav() {
 	const user = ownerAccountStore((state) => state.user);
@@ -18,40 +20,37 @@ export default function Nav() {
 
 	const isInHome = ["/", "/home"].includes(location.pathname);
 
-	const { isVisible, setIsVisible } = popupNotificationtStore();
-
-	const isVisibleCreatePost = popupCreatePostStore((state) => state.isVisible);
-	const setIsVisibleCreatePost = popupCreatePostStore((state) => state.setIsVisible);
+	const isVisibleNoti = popupNotificationtStore((state) => state.isVisible);
+	const setIsVisibleNoti = popupNotificationtStore((state) => state.setIsVisible);
 
 	const toggleShowNotification = () => {
-		setIsVisible(!isVisible);
+		setIsVisibleNoti(!isVisibleNoti);
 	};
 
-	const closeNotification = () => setIsVisible(false);
+	const closeNotification = () => {
+		setIsVisibleNoti(false);
+	};
+
+	const { showPopup } = usePopupStore();
 
 	const handlePopupCreatePost = () => {
-		isVisible ? closeNotification() : "";
-		setIsVisibleCreatePost(!isVisibleCreatePost);
+		showPopup("Tạo bài viết", <CreatePost />);
 	};
 
 	return (
 		<nav
 			className={`
-			z-10 bg-background
-			sm:border-r border-0
-			${
-				!isInMessage
-					? "md:min-w-[260px] md:max-w-[260px] sm:min-w-[210px] sm:max-w-[210px]"
-					: "lg:min-w-[260px] lg:max-w-[260px] sm:w-[76px]"
-			} 
-			sm:static sm:flex sm:flex-col sm:justify-between sm:h-screen sm:py-6
-			absolute bottom-0 w-full border-t
+			z-10 bg-background flex-shrink-0
+			border-0
+			${!isInMessage ? "md:w-[260px] sm:w-[210px]" : "lg:w-[260px] sm:w-[76px]"} 
+			sm:border-r sm:border-t-0 sm:static sm:flex sm:flex-col sm:justify-between sm:h-screen sm:py-6
+			fixed bottom-0 w-full border-t
 			transition
 			${styles.transitionNav}`}
 		>
 			<div className="sm:space-y-8 sm:block w-full">
 				{/* logo */}
-				<NavLink to="/" className="sm:block hidden" onClick={() => toast.message("Clicked logo")}>
+				<NavLink to="/" className="sm:block hidden" onClick={() => toast.error("Clicked logo")}>
 					<LogoNoBG className={!isInMessage ? "ms-6" : "lg:ms-6 mx-auto"} />
 				</NavLink>
 
@@ -113,7 +112,7 @@ export default function Nav() {
 						onClick={toggleShowNotification}
 					>
 						<div className="relative">
-							<Bell active={isVisible} />
+							<Bell active={isVisibleNoti} />
 							<div className="absolute size-2.5 -top-[1px] right-[1px]  bg-primary rounded-full " />
 						</div>
 						<span className={`${!isInMessage ? "sm:inline" : "lg:inline"} hidden`}>Thông báo</span>
@@ -129,12 +128,16 @@ export default function Nav() {
 						<span className={`${!isInMessage ? "sm:inline" : "lg:inline"} hidden`}>Tạo bài viết</span>
 					</button>
 
-					<NavLink to={`/profile?id=${user.id}`} className={styles.navBaseStyle} onClick={closeNotification}>
+					<NavLink to={`/profile?id=${user.userId}`} className={styles.navBaseStyle} onClick={closeNotification}>
 						{({ isActive }) => (
 							<>
-								<div className="size-[26px] rounded-full overflow-hidden">
-									<img className="size-full object-cover object-center" src={user.avatar} alt="navbar avatar account" />
-								</div>
+								<Avatar className={`size-[26px]`}>
+									<AvatarImage src={user.avatar} />
+									<AvatarFallback className="text-[12px] font-semibold">
+										{user.firstName.charAt(0) ?? "?"}
+									</AvatarFallback>
+								</Avatar>
+
 								<span className={`${!isInMessage ? "sm:inline" : "lg:inline"} hidden ${isActive && "font-semibold"}`}>
 									Hồ sơ
 								</span>
@@ -150,7 +153,7 @@ export default function Nav() {
 						<HamburgerIcon />
 						<span className={!isInMessage ? "" : "lg:inline hidden"}>Thêm</span>
 					</PopoverTrigger>
-					<PopoverContent sideOffset={10} className="ms-4 bg-background w-72 border shadow-xl p-2">
+					<PopoverContent sideOffset={10} className="ms-4 bg-background w-72 border shadow-xl p-2 transition">
 						<NavMorePopup />
 					</PopoverContent>
 				</Popover>

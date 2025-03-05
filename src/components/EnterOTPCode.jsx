@@ -77,7 +77,7 @@ export default function EnterOTPCode({ OTPValue, setOTPValue, allowTab = true, a
 				ref={setInputsOTPRef(0)}
 				type="text"
 				tabIndex={allowTab ? 0 : -1}
-				className="bg-transparent text-xl border-2 border-[--gray-light-clr] md:size-14 size-12 text-center rounded-md focus:border-[--gray-clr] outline-none"
+				className="bg-transparent text-xl border-2 border-gray-light md:size-14 size-12 text-center rounded-md focus:border-[--gray-clr] outline-none"
 				inputMode="numeric"
 				autoComplete="off"
 				onChange={(e) => handleInputOTPChange(e, 0)}
@@ -88,7 +88,7 @@ export default function EnterOTPCode({ OTPValue, setOTPValue, allowTab = true, a
 				ref={setInputsOTPRef(1)}
 				type="text"
 				tabIndex={allowTab ? 0 : -1}
-				className="bg-transparent text-xl border-2 border-[--gray-light-clr] md:size-14 size-12 text-center rounded-md focus:border-[--gray-clr] outline-none"
+				className="bg-transparent text-xl border-2 border-gray-light md:size-14 size-12 text-center rounded-md focus:border-[--gray-clr] outline-none"
 				inputMode="numeric"
 				autoComplete="off"
 				onChange={(e) => handleInputOTPChange(e, 1)}
@@ -99,7 +99,7 @@ export default function EnterOTPCode({ OTPValue, setOTPValue, allowTab = true, a
 				ref={setInputsOTPRef(2)}
 				type="text"
 				tabIndex={allowTab ? 0 : -1}
-				className="bg-transparent text-xl border-2 border-[--gray-light-clr] md:size-14 size-12 text-center rounded-md focus:border-[--gray-clr] outline-none"
+				className="bg-transparent text-xl border-2 border-gray-light md:size-14 size-12 text-center rounded-md focus:border-[--gray-clr] outline-none"
 				inputMode="numeric"
 				autoComplete="off"
 				onChange={(e) => handleInputOTPChange(e, 2)}
@@ -110,7 +110,7 @@ export default function EnterOTPCode({ OTPValue, setOTPValue, allowTab = true, a
 				ref={setInputsOTPRef(3)}
 				type="text"
 				tabIndex={allowTab ? 0 : -1}
-				className="bg-transparent text-xl border-2 border-[--gray-light-clr] md:size-14 size-12 text-center rounded-md focus:border-[--gray-clr] outline-none"
+				className="bg-transparent text-xl border-2 border-gray-light md:size-14 size-12 text-center rounded-md focus:border-[--gray-clr] outline-none"
 				inputMode="numeric"
 				autoComplete="off"
 				onChange={(e) => handleInputOTPChange(e, 3)}

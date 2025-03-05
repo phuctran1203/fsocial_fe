@@ -2,6 +2,9 @@ import React, { useState, useEffect, useRef } from "react";
 import { ArrowLeftIcon, Glyph, SearchIcon, SendIcon, SmileIcon } from "../components/Icon";
 import { dateTimeToNotiTime } from "../utils/convertDateTime";
 import { TextBox } from "../components/Field";
+import { Client } from "@stomp/stompjs";
+import useWebSocket from "@/hooks/useWebSocket";
+import { ownerAccountStore } from "@/store/ownerAccountStore";
 
 const listUsers = [
 	{
@@ -58,45 +61,72 @@ const message = [
 ];
 
 export default function Message() {
-	const textbox = useRef(null);
+	const user = ownerAccountStore((state) => state.user);
 
 	const [selectedUser, setSelectedUser] = useState(null);
 
-	const [messages, setMessages] = useState(null);
-
-	const messagesEndRef = useRef(null);
-
-	const sendMessage = () => {};
-
-	const handleKeyPress = (e) => {
-		if (e.key === "Enter") {
-			sendMessage();
-		}
-	};
-
-	const handleUserClick = (userId) => {
+	const handleChooseConversation = (userId) => {
+		setTrigger(!trigger);
 		setSelectedUser(userId);
+		setReceiver("4a3e83c8-9d36-4ec1-b4f9-d6e9f2961a60");
 		//call API lấy tin nhắn về
 	};
 
 	const handleGoBack = () => {
+		setRealHeight(window.innerHeight);
 		setSelectedUser(null);
 	};
 
+	const [submitMsgClicked, setSubmitMsgClicked] = useState(false);
+
+	const textBoxOnKeyDown = (e) => {
+		if (window.innerWidth <= 640) return;
+		if (e.key === "Enter" && !e.shiftKey) {
+			sendMessage(textbox.current.innerText);
+		}
+	};
+
+	const { messages, sendMessage, setReceiver } = useWebSocket(user.userId);
+
+	const [trigger, setTrigger] = useState(true); // trigger auto focus lại textbox
+	const textbox = useRef(null); // messsage chuẩn bị gửi lưu ở đây
+
+	const handleSendMsg = () => {
+		sendMessage(textbox.current.innerText);
+	};
+
+	// handle căn chỉnh chiều cao khi bàn phím ảo mở lên trên mobile
+	const [realHeight, setRealHeight] = useState(window.visualViewport.height);
+	useEffect(() => {
+		const handleRezise = () => {
+			const height = window.visualViewport.height;
+
+			if (textbox.current) textbox.current.innerText = height;
+			setRealHeight(height);
+		};
+		window.addEventListener("resize", handleRezise);
+		return () => window.removeEventListener("resize", handleRezise);
+	}, []);
+
 	return (
-		<div className={`${selectedUser && "z-10"} flex-grow sm:flex h-full bg-background overflow-hidden`}>
+		<div
+			style={{ height: realHeight }}
+			className={`${
+				selectedUser && "sm:relative fixed top-0 sm:z-0 z-10"
+			} flex-grow sm:flex bg-background overflow-hidden transition`}
+		>
 			{/* Danh sách hội thoại */}
 			<div
 				className="
 				flex flex-col pt-4 h-full
 				sm:w-2/5 sm:min-w-[300px] sm:max-w-[350px] sm:gap-4 sm:border-r
-				w-screen gap-2"
+				w-screen gap-2 transition"
 			>
 				<h2 className="px-4">Tin nhắn</h2>
 				{/* search bar */}
 				<label
 					htmlFor="search-message"
-					className="flex gap-2 p-2 mx-4 border rounded-full hover:border-[--gray-light-clr]"
+					className="flex gap-2 p-2 mx-4 border rounded-full hover:border-gray-light transition"
 				>
 					<SearchIcon className="size-5 ms-1" color="stroke-[--gray-clr]" />
 					<input
@@ -107,12 +137,12 @@ export default function Message() {
 					/>
 				</label>
 				{/* list user's messages */}
-				<div className="px-2 flex-grow overflow-auto">
+				<div className="h-full px-2 flex-grow overflow-auto">
 					{listUsers.map((user) => (
 						<div
 							key={user.userId}
 							className="px-3 py-2.5 rounded-md flex items-center gap-3 hover:bg-gray-3light ct-transition cursor-pointer"
-							onClick={() => handleUserClick(user.userId)}
+							onClick={() => handleChooseConversation(user.userId)}
 						>
 							<div className="max-w-12 aspect-square rounded-full overflow-hidden">
 								<img src={user.avatar} className="size-full object-cover" alt="" />
@@ -136,10 +166,12 @@ export default function Message() {
 
 			{/* Cửa sổ tin nhắn */}
 			<div
-				className={`w-screen flex flex-col bg-background h-full ${
+				style={{ height: realHeight }}
+				className={` sm:flex-grow flex flex-col bg-background ${
 					selectedUser && "sm:translate-y-0 -translate-y-full"
 				} transition`}
 			>
+				{/* header info */}
 				<div className={`py-3 px-4 border-b flex items-center justify-between ${!selectedUser && "hidden"} `}>
 					<div className="flex items-center">
 						<button onClick={handleGoBack}>
@@ -151,15 +183,19 @@ export default function Message() {
 					<Glyph />
 				</div>
 
-				{!selectedUser && (
+				{!selectedUser ? (
 					<div className="size-full grid place-content-center">Cùng bắt đầu trò chuyện với người theo dõi của bạn</div>
+				) : (
+					<div className="overflow-auto px-5 flex-grow" id="allow-scroll">
+						{messages.map((message) => (
+							<p>{message}</p>
+						))}
+					</div>
 				)}
-
-				<div className="flex-grow overflow-auto"></div>
 
 				{/* Thanh nhập tin nhắn */}
 				{selectedUser && (
-					<div className="border-t sm:px-6 px-4 sm:py-4 py-3 flex items-end gap-3">
+					<div className="bg-background border-t sm:px-6 px-4 sm:py-4 py-3 flex items-end gap-3">
 						<div className="md:py-2 py-1.5">
 							<SmileIcon className="size-6" />
 						</div>
@@ -167,8 +203,12 @@ export default function Message() {
 							texboxRef={textbox}
 							placeholder="Soạn tin nhắn"
 							className="sm:py-2 py-1.5 max-h-[120px] bg-gray-3light border rounded-3xl px-5 flex-grow scrollable-div"
+							contentEditable={!submitMsgClicked}
+							onKeyDown={textBoxOnKeyDown}
+							autoFocus={true}
+							trigger={trigger}
 						/>
-						<button onClick={sendMessage} className="bg-primary sm:py-2 py-1.5 px-5 rounded-full">
+						<button onClick={handleSendMsg} className="bg-primary sm:py-2 py-1.5 px-5 rounded-full">
 							<SendIcon color="stroke-txtWhite" />
 						</button>
 					</div>
