@@ -50,7 +50,7 @@ export default function EditPostModal({ id }) {
 
 					<div className="flex flex-col justify-center">
 						<span className="font-semibold">{post.displayName}</span>
-						<span className="text-gray fs-xs">{dateTimeToPostTime(post.createdAt)}</span>
+						<span className="text-gray fs-xs">{dateTimeToPostTime(post.createDatetime)}</span>
 					</div>
 				</div>
 

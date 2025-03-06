@@ -13,3 +13,15 @@ export async function getOwnerProfile() {
 		return error.response?.data || {};
 	}
 }
+
+export async function getProfile(userId) {
+	try {
+		const resp = await API.get(`/profile/${userId}`);
+		const data = resp.data;
+		console.log("Resp getProfile: ", data);
+		return data;
+	} catch (error) {
+		console.error("Error at getProfile: ", error);
+		return error.response?.data || {};
+	}
+}

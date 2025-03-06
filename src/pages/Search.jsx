@@ -2,7 +2,6 @@ import React, { useState, useEffect, useRef } from "react";
 import Button from "../components/Button";
 import { LoadingIcon, SearchIcon } from "../components/Icon";
 import { searchUsers, searchPosts } from "../api/searchApi";
-import CommentModal from "../components/CommentModal";
 import { postsStore } from "../store/postsStore";
 import RenderPosts from "@/components/RenderPosts";
 

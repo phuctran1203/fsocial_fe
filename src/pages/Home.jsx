@@ -1,21 +1,29 @@
-import React, { useEffect } from "react";
-import CommentModal from "../components/CommentModal";
+import React, { useEffect, useRef } from "react";
 import { getPosts } from "../api/postsApi";
 import { postsStore } from "../store/postsStore";
 import "../index.scss";
 import RenderPosts from "@/components/RenderPosts";
+import { ownerAccountStore } from "@/store/ownerAccountStore";
 
 export default function Home() {
 	const setPosts = postsStore((state) => state.setPosts);
+	const user = ownerAccountStore((state) => state.user);
+	const abortControllerRef = useRef(null);
 
 	const fetchPosts = async () => {
-		const resp = await getPosts();
+		const resp = await getPosts(user.userId, abortControllerRef.current);
 		setPosts(resp?.statusCode === 200 ? resp.data : null);
 	};
 
 	useEffect(() => {
+		if (!user?.userId) return;
+		if (abortControllerRef.current) {
+			abortControllerRef.current.abort();
+		}
+		const controller = new AbortController();
+		abortControllerRef.current = controller;
 		fetchPosts();
-	}, []);
+	}, [user?.userId]);
 
 	return (
 		<div className="bg-background flex flex-grow transition">

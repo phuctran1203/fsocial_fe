@@ -91,7 +91,7 @@ export default function CreatePost() {
 
 		const respCreatePost = await createPost(formData);
 
-		if (respCreatePost.statusCode === 200) {
+		if (respCreatePost.statusCode === 100) {
 			const postCreated = {
 				...respCreatePost.data,
 				displayName: user.firstName + " " + user.lastName,
