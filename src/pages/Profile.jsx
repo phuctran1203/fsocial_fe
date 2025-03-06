@@ -15,6 +15,7 @@ import { useLocation } from "react-router-dom";
 import { postsStore } from "@/store/postsStore";
 import { getPosts } from "@/api/postsApi";
 import RenderPosts from "@/components/RenderPosts";
+import { getOwnerProfile, getProfile } from "@/api/profileApi";
 
 const listFriends = [
 	{ firstName: "Thịnh", displayName: "Phúc Thịnh", avatar: "./temp/user_2.png" },
@@ -56,18 +57,20 @@ export default function Profile() {
 
 	const user = ownerAccountStore((state) => state.user);
 
+	const [accountInfo, setAccountInfo] = useState({});
+
 	const maxPreviewFriendsAvatar = useRef(7);
 
 	const containerTabsRef = useRef(null);
 
 	const wrapperTabsRef = useRef(null);
 
-	const [currentTab, setCurrentTab] = useState(0);
+	const [currentTab, setCurrentTab] = useState(null);
 
 	const setPosts = postsStore((state) => state.setPosts);
 
 	const showPosts = async () => {
-		const resp = await getPosts();
+		const resp = await getPosts(user.userId);
 		setPosts(resp?.statusCode === 200 ? resp.data : null);
 	};
 
@@ -142,6 +145,24 @@ export default function Profile() {
 		setTouched(false);
 	};
 
+	const handleGetProfile = async () => {
+		const resp = await getProfile(queryParams.get("id"));
+		const data = resp.data;
+	};
+
+	useEffect(() => {
+		if (!user?.userId) return;
+		setCurrentTab(0);
+		if (queryParams.get("id") === user.userId) {
+			setAccountInfo(user);
+		} else {
+			setAccountInfo({
+				firstName: "Fake",
+				lastName: "Người khác",
+			});
+		}
+	}, [user?.userId, queryParams.get("id")]);
+
 	useEffect(() => {
 		const interCallback = (entries) => {
 			entries.forEach((entry) => {
@@ -170,8 +191,8 @@ export default function Profile() {
 			<div className="lg:max-w-[630px] mx-auto">
 				{/* banner */}
 				<div className="relative sm:mt-5 mt-2 aspect-[3/1] overflow-hidden rounded-lg border">
-					{user.banner ? (
-						<img src={user.banner} alt="Ảnh bìa" className="object-cover size-full object-center" />
+					{accountInfo.banner ? (
+						<img src={accountInfo.banner} alt="Ảnh bìa" className="object-cover size-full object-center" />
 					) : (
 						<div className="size-full grid place-content-center">
 							<p>Cập nhật ảnh bìa của bạn</p>
@@ -192,8 +213,10 @@ export default function Profile() {
 					<div className="flex sm:flex-row sm:items-start flex-col items-center gap-4 sm:px-3 px-1">
 						<div className="relative bg-background border-4 rounded-full p-1 w-fit transition">
 							<Avatar className={`size-[120px]`}>
-								<AvatarImage src={user.avatar} />
-								<AvatarFallback className="text-[40px] transition">{user.firstName.charAt(0) ?? "?"}</AvatarFallback>
+								<AvatarImage src={accountInfo.avatar} />
+								<AvatarFallback className="text-[40px] transition">
+									{accountInfo.firstName?.charAt(0) ?? "?"}
+								</AvatarFallback>
 							</Avatar>
 							{isOwner && (
 								<Button
@@ -206,7 +229,7 @@ export default function Profile() {
 						</div>
 
 						<div className="sm:self-end sm:block flex flex-col items-center flex-grow sm:mb-2">
-							<h3>{user.firstName + " " + user.lastName}</h3>
+							<h3>{(accountInfo.firstName ?? "") + " " + (accountInfo.lastName ?? "")}</h3>
 							<p>12 người theo dõi</p>
 							<div className="mt-1 flex -space-x-2">
 								{listFriends.slice(0, maxPreviewFriendsAvatar.current).map((friend, index) => (
@@ -242,7 +265,7 @@ export default function Profile() {
 					<div className="mt-8 flex flex-col gap-2 h-[100dvh]">
 						{/* button head */}
 						<div className="border-t flex bg-background transition">
-							{listTabs.map((tab, index) => (
+							{(isOwner ? listTabs : listTabs.slice(0, 4)).map((tab, index) => (
 								<button
 									key={index}
 									className={`flex-grow flex items-center justify-center gap-1 border-t px-1 sm:py-1 py-3 ${
@@ -265,7 +288,12 @@ export default function Profile() {
 							onMouseMove={onDrag}
 							onMouseUp={onEnd}
 						>
-							<div ref={wrapperTabsRef} className="grid grid-cols-[repeat(5,100%)] h-full gap-[1px]">
+							<div
+								ref={wrapperTabsRef}
+								className={`grid h-full gap-[1px] ${
+									isOwner ? "grid-cols-[repeat(5,100%)]" : "grid-cols-[repeat(4,100%)]"
+								}`}
+							>
 								{/* owner posts */}
 								<div className="pt-0.5 snap-start mx-auto md:space-y-4 space-y-1.5 md:pb-0 overflow-y-auto w-full max-h-full scrollable-div">
 									<RenderPosts className="sm:rounded shadow-y border-x" />
@@ -315,9 +343,11 @@ export default function Profile() {
 									))}
 								</div>
 								{/* owner posts reacted */}
-								<div className="pt-0.5 snap-start mx-auto md:space-y-4 space-y-1.5 md:pb-0 overflow-y-auto w-full max-h-full scrollable-div">
-									<RenderPosts className="sm:rounded border-x shadow-y" />
-								</div>
+								{isOwner && (
+									<div className="pt-0.5 snap-start mx-auto md:space-y-4 space-y-1.5 md:pb-0 overflow-y-auto w-full max-h-full scrollable-div">
+										<RenderPosts className="sm:rounded border-x shadow-y" />
+									</div>
+								)}
 							</div>
 						</div>
 					</div>

@@ -12,7 +12,7 @@ export const postsStore = create((set) => ({
 
 	replacePost: (post) =>
 		set((state) => ({
-			posts: state.posts.map((oldPost) => (oldPost.id === post.id ? post : oldPost)),
+			posts: state.posts.map((oldPost) => (oldPost.id === post.id ? { ...oldPost, ...post } : oldPost)),
 		})),
 
 	// Hàm thêm nhiều post mới vào danh sách

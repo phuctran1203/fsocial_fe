@@ -65,7 +65,7 @@ export default function Post({ post, isChildren, className = "" }) {
 						<Link to="" className="font-semibold">
 							{post.displayName}
 						</Link>
-						<span className="text-gray fs-xs">{dateTimeToPostTime(post.createdAt)}</span>
+						<span className="text-gray fs-xs">{dateTimeToPostTime(post.createDatetime)}</span>
 					</div>
 				</div>
 				<Popover open={popoverOpen} onOpenChange={setPopoverOpen}>

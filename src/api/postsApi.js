@@ -1,14 +1,14 @@
 import { ownerAccountStore } from "@/store/ownerAccountStore";
 import API from "./axiosInstance";
 
-export const getPosts = async () => {
-	const user = ownerAccountStore.getState().user;
+export const getPosts = async (userId, controller) => {
 	try {
-		const resp = await API.get(`/timeline/post?userId=${user.userId}`);
+		const resp = await API.get(`/timeline/post?userId=${userId}`, controller && { signal: controller.signal });
 		const data = resp.data;
 		console.log("Resp getPosts: ", data);
 		return data;
 	} catch (error) {
+		if (error.name === "CanceledError") return null;
 		console.error("Error at getPosts:", error);
 		return error.response?.data || null;
 	}

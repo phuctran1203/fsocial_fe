@@ -1,3 +1,4 @@
+import { getComplaint } from "@/api/complaintApi";
 import Button from "@/components/Button";
 import ButtonGroup from "@/components/ButtonGroup";
 import { TrashCanIcon, CalendarIcon, PencilIcon } from "@/components/Icon";
@@ -22,146 +23,20 @@ export default function AdminComplaint() {
 		"Ngày báo cáo",
 		"Hành động",
 	];
-	const fetchComplant = () => {
-		const currenData = [
-			{
-				status: false,
-				id: "lạdlfka",
-				displayName: "Cang Ngô 123",
-				complaintType: "Bài viết",
-				complaint: "http://localhost:3000/postId?=bai-viet-hoi-nhay-cam-hihi",
-				content: "Bài viết hơi kì",
-				dataTime: "11/02/2025",
-				userName: "cangngo",
-			},
-			{
-				status: true,
-				id: "lạdlfkaư",
-				displayName: "Cang Ngô",
-				complaintType: "Người dùng",
-				complaint: "http://localhost:3000/postId?=bai-viet-hoi-nhay-cam-hihi",
-				content: "Nội dung nhạy cảm",
-				dataTime: "11/02/2025",
-				userName: "cangngo",
-			},
-			{
-				status: true,
-				id: "lạdlfkea",
-				displayName: "Cang Ngô",
-				complaintType: "Người dùng",
-				complaint: "http://localhost:3000/postId?=bai-viet-hoi-nhay-cam-hihi",
-				content: "Nội dung nhạy cảm",
-				dataTime: "11/02/2025",
-				userName: "cangngo",
-			},
-			{
-				status: false,
-				id: "lạdlưfka",
-				displayName: "Cang Ngô",
-				complaintType: "Người dùng",
-				complaint: "http://localhost:3000/postId?=bai-viet-hoi-nhay-cam-hihi",
-				content: "Nội dung nhạy cảm",
-				dataTime: "11/02/2025",
-				userName: "cangngo",
-			},
-			{
-				status: false,
-				id: "lạdlfqka",
-				displayName: "Cang Ngô",
-				complaintType: "Bài viết",
-				complaint: "http://localhost:3000/postId?=bai-viet-hoi-nhay-cam-hihi",
-				content: "Nội dung nhạy cảm",
-				dataTime: "11/02/2025",
-				userName: "cangngo",
-			},
-			{
-				status: false,
-				id: "lạdlfska",
-				displayName: "Cang Ngô",
-				complaintType: "Bài viết",
-				complaint: "http://localhost:3000/postId?=bai-viet-hoi-nhay-cam-hihi",
-				content: "Nội dung nhạy cảm",
-				dataTime: "11/02/2025",
-				userName: "cangngo",
-			},
-			{
-				status: false,
-				id: "lạdlfkfa",
-				displayName: "Cang Ngô",
-				complaintType: "Bài viết",
-				complaint: "http://localhost:3000/postId?=bai-viet-hoi-nhay-cam-hihi",
-				content: "Nội dung nhạy cảm",
-				dataTime: "11/02/2025",
-				userName: "cangngo",
-			},
-			{
-				status: false,
-				id: "lạdlfkca",
-				displayName: "Cang Ngô",
-				complaintType: "Bài viết",
-				complaint: "http://localhost:3000/postId?=bai-viet-hoi-nhay-cam-hihi",
-				content: "Nội dung nhạy cảm",
-				dataTime: "11/02/2025",
-				userName: "cangngo",
-			},
+	const fetchComplant = async () => {
+		const res = await getComplaint();
+		console.log("complaint :", res);
 
-			{
-				status: false,
-				id: "lạdlfxka",
-				displayName: "Cang Ngô",
-				complaintType: "Bài viết",
-				complaint: "http://localhost:3000/postId?=bai-viet-hoi-nhay-cam-hihi",
-				content: "Nội dung nhạy cảm",
-				dataTime: "11/02/2025",
-				userName: "cangngo",
-			},
-			{
-				status: false,
-				id: "lạdlzfka",
-				displayName: "Cang Ngô",
-				complaintType: "Bài viết",
-				complaint: "http://localhost:3000/postId?=bai-viet-hoi-nhay-cam-hihi",
-				content: "Nội dung nhạy cảm",
-				dataTime: "11/02/2025",
-				userName: "cangngo",
-			},
-			{
-				status: false,
-				id: "lạdvlfka",
-				displayName: "Cang Ngô",
-				complaintType: "Bài viết",
-				complaint: "http://localhost:3000/postId?=bai-viet-hoi-nhay-cam-hihi",
-				content: "Nội dung nhạy cảm",
-				dataTime: "11/02/2025",
-				userName: "cangngo",
-			},
-			{
-				status: false,
-				id: "lạdlfkba",
-				displayName: "Cang Ngô",
-				complaintType: "Bài viết",
-				complaint: "http://localhost:3000/postId?=bai-viet-hoi-nhay-cam-hihi",
-				content: "Nội dung nhạy cảm",
-				dataTime: "11/02/2025",
-				userName: "cangngo",
-			},
-			{
-				status: false,
-				id: "lạdlfka",
-				displayName: "Cang Ngô",
-				complaintType: "Bài viết",
-				complaint: "http://localhost:3000/postId?=bai-viet-hoi-nhay-cam-hihi",
-				content: "Nội dung nhạy cảm",
-				dataTime: "11/02/2025",
-				userName: "cangngo",
-			},
-		];
-		return currenData;
+		return res.data;
 	};
 	useEffect(() => {
-		const fetch = fetchComplant();
-		setData(fetch);
-		setFilteredData(fetch);
+		const fetchData = async () => {
+			const fetch = await fetchComplant();
+			setData(fetch);
+			setFilteredData(fetch);
+		};
+
+		fetchData();
 	}, []);
 
 	useEffect(() => {
@@ -231,25 +106,32 @@ export default function AdminComplaint() {
 			</div>
 
 			<Table loading={loading} headers={headers}>
+				{filteredData.length === 0 && (
+					<tr>
+						<td colSpan={7} align="center" className="py-5">
+							Không có khiếu nại nào
+						</td>
+					</tr>
+				)}
 				{filteredData.map((item, index) => (
 					<tr key={index} className={`hover:bg-secondary border-t ${item.status && "bg-secondary"}`}>
 						<td align="center" className="ps-2 pe-4 py-5 fs-xs text-gray">
 							{index + 1}
 						</td>
 						<td className="px-2">
-							<p className="pt-1 leading-5 fs-xs font-medium">{item.displayName}</p>
+							<p className="pt-1 leading-5 fs-xs font-medium">{item.firstName + " " + item.lastName}</p>
 							<Link to="" className="fs-xs text-gray hover:underline">
 								{item.userName}
 							</Link>
 						</td>
 						<td className="px-2 fs-xs">{item.complaintType}</td>
 						<td className="px-2 text-primary">
-							<Link to={item.complaint} className="fs-xs font-medium hover:underline">
-								{item.complaint}
+							<Link to={item.profileId} className="fs-xs font-medium hover:underline">
+								{item.profileId}
 							</Link>
 						</td>
-						<td className="px-2 fs-xs">{item.content}</td>
-						<td className="px-2 fs-xs text-gray">{item.dataTime}</td>
+						<td className="px-2 fs-xs">{item.termOfService}</td>
+						<td className="px-2 fs-xs text-gray">{item.dateTime}</td>
 						<td align="center" className="px-2">
 							<button className="me-3" onClick={() => handleRemoveComplaint(item.id)}>
 								<TrashCanIcon className="size-5" />
