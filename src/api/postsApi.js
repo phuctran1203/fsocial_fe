@@ -5,6 +5,8 @@ export const getPosts = async () => {
 	const user = ownerAccountStore.getState().user;
 	try {
 		const resp = await API.get(`/timeline/post?userId=${user.userId}`);
+		console.log("userId get Posts: ", user.userId);
+		
 		const data = resp.data;
 		console.log("Resp getPosts: ", data);
 		return data;

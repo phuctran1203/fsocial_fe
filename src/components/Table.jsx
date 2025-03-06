@@ -17,7 +17,6 @@ export default function Table({ headers, loading, children }) {
 						))}
 					</tr>
 				</thead>
-
 				<tbody className="cursor-pointer">
 					{loading && (
 						<tr className="h-52">
