@@ -96,6 +96,7 @@ export default function CreatePost() {
 				...respCreatePost.data,
 				displayName: user.firstName + " " + user.lastName,
 				avatar: user.avatar,
+				createDatetime: respCreatePost.dateTime,
 			};
 			insertPost(postCreated);
 			toast.success("Bài viết của bạn đã được đăng tải");

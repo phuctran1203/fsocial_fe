@@ -215,7 +215,7 @@ export default function Profile() {
 							<Avatar className={`size-[120px]`}>
 								<AvatarImage src={accountInfo.avatar} />
 								<AvatarFallback className="text-[40px] transition">
-									{accountInfo.firstName?.charAt(0) ?? "?"}
+									{accountInfo.firstName?.charAt(0) ?? ""}
 								</AvatarFallback>
 							</Avatar>
 							{isOwner && (

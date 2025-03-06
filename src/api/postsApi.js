@@ -10,7 +10,7 @@ export const getPosts = async (userId, controller) => {
 	} catch (error) {
 		if (error.name === "CanceledError") return null;
 		console.error("Error at getPosts:", error);
-		return error.response?.data || null;
+		return null;
 	}
 };
 

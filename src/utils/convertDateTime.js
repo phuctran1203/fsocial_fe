@@ -1,131 +1,88 @@
 export function dateTimeToNotiTime(time) {
 	const previousTime = new Date(time);
 	const currentTime = new Date();
-	const hoursTodayPassed = new Date().getHours();
-
 	const diffMs = currentTime - previousTime;
-	const diffSeconds = Math.floor(diffMs / 1000); // Chuyển thành giây
+	const diffSeconds = Math.floor(diffMs / 1000);
 
-	let text = "";
-	let flag = false;
-	let labelType = 0;
+	if (diffSeconds < 60) return { textTime: `${diffSeconds} giây`, labelType: 0 };
 
-	//hôm nay
-	if (diffSeconds < 60) {
-		text = `${diffSeconds} giây`;
-		labelType = 0;
-		flag = true;
-	}
-	const diffMinutes = !flag ? Math.floor(diffSeconds / 60) : null; // Chuyển thành phút
-	if (diffMinutes && diffMinutes < 60) {
-		text = `${diffMinutes} phút`;
-		labelType = 0;
-		flag = true;
-	}
-	const diffHours = !flag ? Math.floor(diffMinutes / 60) : null; // Chuyển thành giờ
-	if (diffHours && diffHours < hoursTodayPassed) {
-		text = `${diffHours} giờ`;
-		labelType = 0;
-		flag = true;
-	}
+	const diffMinutes = Math.floor(diffSeconds / 60);
+	if (diffMinutes < 60) return { textTime: `${diffMinutes} phút`, labelType: 0 };
 
-	//7 ngày trước
-	const diffDays = !flag ? Math.ceil(diffHours / 24) : null; // Chuyển thành ngày
+	const diffHours = Math.floor(diffMinutes / 60);
+	if (diffHours < currentTime.getHours()) return { textTime: `${diffHours} giờ`, labelType: 0 };
 
-	if (diffDays && diffDays < 30) {
-		text = `${diffDays} ngày`;
-		labelType = diffDays <= 7 ? 1 : 2; //7 ngày trước hoặc trước đó
-		flag = true;
-	}
+	const diffDays = Math.floor(diffHours / 24);
+	if (diffDays < 7) return { textTime: `${diffDays} ngày`, labelType: 1 };
+	if (diffDays < 30) return { textTime: `${diffDays} ngày`, labelType: 2 };
 
-	const diffMonths = !flag ? Math.floor(diffDays / 30) : null; // Chuyển thành tháng
-	if (diffMonths && diffMonths < 12) {
-		text = `${diffMonths} tháng`;
-		labelType = 2;
-		flag = true;
-	}
-	if (!flag) {
-		const diffYears = Math.round(diffMonths / 12); // Chuyển thành năm
-		labelType = 2;
-		text = `${diffYears} năm`;
-	}
+	const diffMonths = Math.floor(diffDays / 30);
+	if (diffMonths < 12) return { textTime: `${diffMonths} tháng`, labelType: 2 };
 
-	return {
-		textTime: text,
-		labelType: labelType,
-	};
+	const diffYears = Math.floor(diffMonths / 12);
+	return { textTime: `${diffYears} năm`, labelType: 2 };
 }
 
 export function dateTimeToPostTime(time) {
 	const previousTime = new Date(time);
 	const currentTime = new Date();
-	const hoursTodayPassed = new Date().getHours();
+	const hoursTodayPassed = currentTime.getHours();
 
 	const diffMs = currentTime - previousTime;
-	const diffSeconds = Math.floor(diffMs / 1000); // Chuyển thành giây
+	const diffSeconds = Math.floor(diffMs / 1000);
+	const diffMinutes = Math.floor(diffSeconds / 60);
+	const diffHours = Math.floor(diffMinutes / 60);
 
-	let text = "";
-	let flag = false;
-
-	//hôm nay
-	if (diffSeconds < 60) {
-		text = `Vừa xong`;
-		flag = true;
+	// Nếu dưới 1 phút
+	if (diffSeconds < 60) return "Vừa xong";
+	// Nếu dưới 1 giờ
+	if (diffMinutes < 60) return `${diffMinutes} phút`;
+	// Nếu trong hôm nay
+	if (diffHours < hoursTodayPassed) return `${diffHours} giờ`;
+	// Nếu là hôm qua
+	const yesterday = new Date();
+	yesterday.setDate(yesterday.getDate() - 1);
+	if (previousTime.toDateString() === yesterday.toDateString()) {
+		return `${previousTime.getHours()}:${previousTime.getMinutes().toString().padStart(2, "0")} hôm qua`;
 	}
-	const diffMinutes = !flag ? Math.floor(diffSeconds / 60) : null; // Chuyển thành phút
-	if (diffMinutes && diffMinutes < 60) {
-		text = `${diffMinutes} phút`;
-		flag = true;
-	}
-	// bài lên hôm nay: chêch lệch giờ nhỏ hơn số giờ đã qua của hôm nay
-	const diffHours = !flag ? Math.floor(diffMinutes / 60) : null; // Chuyển thành giờ
-	if (diffHours && diffHours < hoursTodayPassed) {
-		text = `${diffHours} giờ`;
-		flag = true;
-	}
-
-	// bài lên hôm qua: chêch lệch giờ lớn hơn số giờ đã qua của hôm nay và nhỏ hơn 24h + số giờ đã qua của hôm nay
-	if (!flag && diffHours < 24 + hoursTodayPassed) {
-		text = `${previousTime.getMinutes()}:${previousTime.getHours()} hôm qua`;
-		flag = true;
-	}
-
-	//bài lên lớn hơn hôm qua -> format về mm:hh DD/MM/YYYY
-	if (!flag) {
-		text = `${previousTime.getMinutes().toString().padStart(2, "0")}:${previousTime
-			.getHours()
-			.toString()
-			.padStart(2, "0")} ${previousTime.getDate().toString().padStart(2, "0")}/${previousTime
-			.getMonth()
-			.toString()
-			.padStart(2, "0")}/${previousTime.getFullYear()}`;
-	}
-
-	return text;
+	// Nếu trước hôm qua
+	return `${previousTime.getHours().toString().padStart(2, "0")}:${previousTime
+		.getMinutes()
+		.toString()
+		.padStart(2, "0")} ${previousTime.getDate().toString().padStart(2, "0")}/${(previousTime.getMonth() + 1)
+		.toString()
+		.padStart(2, "0")}/${previousTime.getFullYear()}`;
 }
+
+const capitalize = (str) => str.charAt(0).toUpperCase() + str.slice(1);
 
 export function dateTimeToMessageTime(time) {
 	const previousTime = new Date(time);
 	const currentTime = new Date();
-	const hoursTodayPassed = new Date().getHours();
+
+	// Tính ngày bắt đầu của tuần (Thứ Hai tuần này)
+	const thisWeekStart = new Date();
+	thisWeekStart.setDate(currentTime.getDate() - currentTime.getDay() + 1); // Chuyển về thứ Hai tuần này
+	thisWeekStart.setHours(0, 0, 0, 0); // Đặt giờ về 00:00:00
 
 	let text = "";
-	let flag = false;
 
-	const diffMs = currentTime - previousTime;
-
-	const diffHours = Math.floor(diffMs / 1000 / 60 / 60); // Chuyển thành giờ
-
-	// trong hôm nay -> hh:mm
-	if (diffHours < hoursTodayPassed) {
-		text = `${previousTime.getHours()}:${previousTime.getMinutes()}`;
-		flag = true;
+	// Hôm nay -> hh:mm
+	if (previousTime.toDateString() === currentTime.toDateString()) {
+		text = `${previousTime.getHours()}:${previousTime.getMinutes().toString().padStart(2, "0")}`;
 	}
-	// từ hôm qua lùi đến thứ 2 -> thứ n hh:mm
-	// if (!flag){
-	// 	text = `${previousTime.}`;
-	// 	flag = true
-	// }
+	// Từ hôm qua đến thứ Hai tuần này -> Thứ n hh:mm
+	else if (previousTime >= thisWeekStart) {
+		const dayName = previousTime.toLocaleDateString("vi-VN", { weekday: "long" });
+		text = `${capitalize(dayName)} ${previousTime.getHours()}:${previousTime.getMinutes().toString().padStart(2, "0")}`;
+	}
+	// Chủ nhật tuần trước về trước đó -> hh:mm dd/MM/yyyy
+	else {
+		text = `${previousTime.getHours()}:${previousTime.getMinutes().toString().padStart(2, "0")} ${previousTime
+			.getDate()
+			.toString()
+			.padStart(2, "0")}/${(previousTime.getMonth() + 1).toString().padStart(2, "0")}/${previousTime.getFullYear()}`;
+	}
 
-	// từ CN tuần trước lùi lại: hh:mm dd:MM:yyyy
+	return text;
 }

@@ -12,7 +12,7 @@ export default function Home() {
 
 	const fetchPosts = async () => {
 		const resp = await getPosts(user.userId, abortControllerRef.current);
-		setPosts(resp?.statusCode === 200 ? resp.data : null);
+		setPosts(resp?.data || []);
 	};
 
 	useEffect(() => {
