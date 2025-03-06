@@ -17,6 +17,7 @@ import { themeStore } from "./store/themeStore";
 import AdminLayout from "./layout/AdminLayout";
 import AdminManagerUser from "./pages/AdminManageUser";
 import AdminComplaint from "./pages/AdminComplaint";
+import AdminPolicySettings from './pages/AdminPolicySettings';
 
 function App() {
 	const theme = themeStore((state) => state.theme);
@@ -47,6 +48,7 @@ function App() {
 				<Route path="/admin" element={<AdminLayout />}>
 					<Route path="complaint" element={<AdminComplaint />} />
 					<Route path="user-management" element={<AdminManagerUser />} />
+					<Route path="policy-setting" element={<AdminPolicySettings />} />
 				</Route>
 
 				<Route path="*" element={<NotFound />} />

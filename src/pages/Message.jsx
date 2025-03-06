@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from "react";
 import { ArrowLeftIcon, Glyph, SearchIcon, SendIcon, SmileIcon } from "../components/Icon";
-import { dateTimeToNotiTime, dateTimeToPostTime } from "../utils/convertDateTime";
+import { dateTimeToMessageTime, dateTimeToNotiTime, dateTimeToPostTime } from "../utils/convertDateTime";
 import { TextBox } from "../components/Field";
 import useWebSocket from "@/hooks/useWebSocket";
 import { ownerAccountStore } from "@/store/ownerAccountStore";
@@ -188,7 +188,7 @@ export default function Message() {
 								{user.latestMessage !== "" && (
 									<div className="flex gap-1">
 										<p className={`line-clamp-1 ${!user.read && "font-semibold"}`}>{user.latestMessage}</p>
-										<span className="text-[--gray-clr] text-nowrap">{dateTimeToNotiTime(user.time).textTime}</span>
+										<span className="text-[--gray-clr] text-nowrap">{dateTimeToMessageTime(user.time).textTime}</span>
 									</div>
 								)}
 							</div>

@@ -4,6 +4,7 @@ import { adminNavRout } from "@/config/adminNavRout";
 import Button from "./Button";
 import { ownerAccountStore } from "@/store/ownerAccountStore";
 import { useLocation } from "react-router-dom";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
 export default function AdminNav() {
 	const location = useLocation();
@@ -38,10 +39,10 @@ export default function AdminNav() {
                         ${path === "/profile" ? "bg-gray-3light font-medium" : ""}
                         hover:bg-gray-3light`}
 				>
-					<div className="mr-3 w-7 h-7">
-						<img className="w-full h-full object-cover rounded-full" src={user.avatar} />
-					</div>
-					{user.firstName + " " + user.lastName}
+					<Avatar className={`size-[26px]`}>
+						<AvatarImage src={"../temp/default_avatar.svg"} />
+						<AvatarFallback className="text-[12px] font-semibold">{user.firstName.charAt(0) || "?"}</AvatarFallback>
+					</Avatar>
 				</Button>
 			</div>
 
