@@ -103,3 +103,29 @@ export function dateTimeToPostTime(time) {
 
 	return text;
 }
+
+export function dateTimeToMessageTime(time) {
+	const previousTime = new Date(time);
+	const currentTime = new Date();
+	const hoursTodayPassed = new Date().getHours();
+
+	let text = "";
+	let flag = false;
+
+	const diffMs = currentTime - previousTime;
+
+	const diffHours = Math.floor(diffMs / 1000 / 60 / 60); // Chuyển thành giờ
+
+	// trong hôm nay -> hh:mm
+	if (diffHours < hoursTodayPassed) {
+		text = `${previousTime.getHours()}:${previousTime.getMinutes()}`;
+		flag = true;
+	}
+	// từ hôm qua lùi đến thứ 2 -> thứ n hh:mm
+	// if (!flag){
+	// 	text = `${previousTime.}`;
+	// 	flag = true
+	// }
+
+	// từ CN tuần trước lùi lại: hh:mm dd:MM:yyyy
+}

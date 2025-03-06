@@ -9,6 +9,7 @@ import { dateTimeToNotiTime } from "../utils/convertDateTime";
 import { Link } from "react-router-dom";
 import { toast } from "sonner";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { getTextboxData } from "@/utils/processTextboxData";
 
 function CommentReuse(props) {
 	const { comment, selectCommentToReply, handleShowReplyComment, replies, isReply } = props;
@@ -135,41 +136,14 @@ export default function CommentModal({ id }) {
 	const handleStopReply = () => setSelectReply(null);
 
 	const handleSendComment = async () => {
-		const childNodes = Array.from(textbox.current.childNodes);
-		let start = null;
-		let end = null;
-		let index = 0;
-		while (true) {
-			if (index > childNodes.length - 1) {
-				setTimeout(() => {
-					textbox.current.innerHTML = "";
-					setTrigger(!trigger);
-				}, 1);
-				console.log("Không có gì để gửi");
-				return;
-			}
-
-			if (childNodes[index].textContent.trim() != "") {
-				if (start === null) {
-					start = index;
-					index = childNodes.length - 1;
-					continue;
-				} else {
-					end = index;
-					break;
-				}
-			}
-			if (start !== null) {
-				index -= 1;
-			} else {
-				index += 1;
-			}
+		const { innerText, innerHTML } = getTextboxData(textbox);
+		if (!innerText || !innerHTML) {
+			setTimeout(() => {
+				textbox.current.innerHTML = "";
+				setTrigger(!trigger);
+			}, 1);
+			return;
 		}
-		// xử lý cắt đầu và đuôi nếu toàn khoảng trắng hoặc enter
-		const processedComment = childNodes.slice(start, end + 1);
-		console.log("after process: ", processedComment);
-		const innerText = processedComment.map((el) => el.textContent).join("");
-		const innerHTML = processedComment.map((el) => (el.nodeType === 3 ? el.textContent : el.outerHTML)).join("");
 		// chuẩn bị data gửi đi
 		setSubmitCmtClicked(true);
 		const formData = new FormData();

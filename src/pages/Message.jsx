@@ -1,10 +1,12 @@
 import React, { useState, useEffect, useRef } from "react";
 import { ArrowLeftIcon, Glyph, SearchIcon, SendIcon, SmileIcon } from "../components/Icon";
-import { dateTimeToNotiTime } from "../utils/convertDateTime";
+import { dateTimeToNotiTime, dateTimeToPostTime } from "../utils/convertDateTime";
 import { TextBox } from "../components/Field";
-import { Client } from "@stomp/stompjs";
 import useWebSocket from "@/hooks/useWebSocket";
 import { ownerAccountStore } from "@/store/ownerAccountStore";
+import { getMessages } from "@/api/messageApi";
+import { getTextboxData } from "@/utils/processTextboxData";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
 const listUsers = [
 	{
@@ -49,34 +51,22 @@ const listUsers = [
 	},
 ];
 
-const message = [
-	{
-		idMessage: "4h7ad2",
-		data: {
-			userId: 1,
-			sendToId: 0,
-			message: "",
-		},
-	},
-];
-
 export default function Message() {
 	const user = ownerAccountStore((state) => state.user);
 
-	const [selectedUser, setSelectedUser] = useState(null);
+	const { messages, setMessages, sendMessage, receiver, setReceiver } = useWebSocket(user.userId);
 
-	const handleChooseConversation = (userId) => {
+	const handleChooseConversation = async (user) => {
 		setTrigger(!trigger);
-		setSelectedUser(userId);
-		console.log("userId reciever: ", userId);
-
-		setReceiver(userId);
-		//call API lấy tin nhắn về
+		setReceiver(user);
+		setMessages([]);
+		// const resp = await getMessages(userId);
+		// setMessages(resp.data)
 	};
 
 	const handleGoBack = () => {
 		setRealHeight(window.innerHeight);
-		setSelectedUser(null);
+		setReceiver(null);
 	};
 
 	const [submitMsgClicked, setSubmitMsgClicked] = useState(false);
@@ -84,18 +74,59 @@ export default function Message() {
 	const textBoxOnKeyDown = (e) => {
 		if (window.innerWidth <= 640) return;
 		if (e.key === "Enter" && !e.shiftKey) {
-			sendMessage(textbox.current.innerText);
+			handleSendMsg();
 		}
 	};
-
-	const { messages, sendMessage, setReceiver } = useWebSocket(user.userId);
 
 	const [trigger, setTrigger] = useState(true); // trigger auto focus lại textbox
 	const textbox = useRef(null); // messsage chuẩn bị gửi lưu ở đây
 
 	const handleSendMsg = () => {
+		const { innerText, innerHTML } = getTextboxData(textbox);
+		if (!innerText || !innerHTML) {
+			setTimeout(() => {
+				textbox.current.innerHTML = "";
+				setTrigger(!trigger);
+			}, 1);
+			return;
+		}
+		setSubmitMsgClicked(true);
 		sendMessage(textbox.current.innerText);
+		setSubmitMsgClicked(false);
+		const date = new Date();
+		const timeStamp = date.toISOString().replace("Z", "+00:00");
+		const baseMessage = {
+			id: Math.random() * 1000,
+			sender: user.userId,
+			receiver: receiver.userId,
+			content: innerText,
+			timestamp: timeStamp,
+		};
+		setMessages((prev) => [...prev, baseMessage]);
+		setTimeout(() => {
+			textbox.current.innerHTML = "";
+			setTrigger(!trigger);
+		}, 1);
+		setTrigger(!trigger);
 	};
+
+	const [avatarPosition, setAvatarPosition] = useState([null, null]);
+	useEffect(() => {
+		const pos = [];
+		for (let i = messages.length - 1; i >= 0; i--) {
+			if (messages[i].sender === user.userId) {
+				pos[0] = i;
+				break;
+			}
+		}
+		for (let i = messages.length - 1; i >= 0; i--) {
+			if (messages[i].sender !== user.userId) {
+				pos[1] = i;
+				break;
+			}
+		}
+		setAvatarPosition(pos);
+	}, [messages]);
 
 	// handle căn chỉnh chiều cao khi bàn phím ảo mở lên trên mobile
 	const [realHeight, setRealHeight] = useState(window.visualViewport.height);
@@ -103,7 +134,7 @@ export default function Message() {
 		const handleRezise = () => {
 			const height = window.visualViewport.height;
 
-			if (textbox.current) textbox.current.innerText = height;
+			// if (textbox.current) textbox.current.innerText = height;
 			setRealHeight(height);
 		};
 		window.addEventListener("resize", handleRezise);
@@ -114,7 +145,7 @@ export default function Message() {
 		<div
 			style={{ height: realHeight }}
 			className={`${
-				selectedUser && "sm:relative fixed top-0 sm:z-0 z-10"
+				receiver && "sm:relative fixed top-0 sm:z-0 z-10"
 			} flex-grow sm:flex bg-background overflow-hidden transition`}
 		>
 			{/* Danh sách hội thoại */}
@@ -144,7 +175,7 @@ export default function Message() {
 						<div
 							key={user.userId}
 							className="px-3 py-2.5 rounded-md flex items-center gap-3 hover:bg-gray-3light ct-transition cursor-pointer"
-							onClick={() => handleChooseConversation(user.userId)}
+							onClick={() => handleChooseConversation(user)}
 						>
 							<div className="max-w-12 aspect-square rounded-full overflow-hidden">
 								<img src={user.avatar} className="size-full object-cover" alt="" />
@@ -170,33 +201,57 @@ export default function Message() {
 			<div
 				style={{ height: realHeight }}
 				className={` sm:flex-grow flex flex-col bg-background ${
-					selectedUser && "sm:translate-y-0 -translate-y-full"
+					receiver && "sm:translate-y-0 -translate-y-full"
 				} transition`}
 			>
 				{/* header info */}
-				<div className={`py-3 px-4 border-b flex items-center justify-between ${!selectedUser && "hidden"} `}>
+				<div className={`py-3 px-4 border-b flex items-center justify-between ${!receiver && "hidden"} `}>
 					<div className="flex items-center">
 						<button onClick={handleGoBack}>
 							<ArrowLeftIcon className={"sm:hidden me-3"} />
 						</button>
-						<img src="./temp/default_avatar.svg" className="size-9 me-2" alt="" />
-						<p className="font-semibold">Phúc Trần</p>
+						<Avatar className={`size-9 me-2`}>
+							<AvatarImage src={receiver?.avatar} />
+							<AvatarFallback className="fs-xs">{user.firstName.charAt(0) ?? "?"}</AvatarFallback>
+						</Avatar>
+						<p className="font-semibold">{receiver?.displayName}</p>
 					</div>
 					<Glyph />
 				</div>
 
-				{!selectedUser ? (
+				{!receiver ? (
 					<div className="size-full grid place-content-center">Cùng bắt đầu trò chuyện với người theo dõi của bạn</div>
 				) : (
-					<div className="overflow-auto px-5 flex-grow" id="allow-scroll">
-						{messages.map((message) => (
-							<p>{message}</p>
+					<div className="overflow-auto px-3 pt-4 pb-1 flex-grow" id="allow-scroll">
+						{messages.map((message, index) => (
+							<div key={message.id}>
+								<p className="text-center fs-sm text-gray mb-1">{dateTimeToPostTime(message.timestamp)}</p>
+								<div className="flex items-end gap-1">
+									{message.sender !== user.userId ? (
+										<>
+											{avatarPosition[1] === index ? (
+												<Avatar className={`size-7`}>
+													<AvatarImage src={receiver.avatar} />
+													<AvatarFallback className="fs-xs">{user.firstName.charAt(0) ?? "?"}</AvatarFallback>
+												</Avatar>
+											) : (
+												<div className="size-7" />
+											)}
+											<div className={`px-3 py-1 rounded-2xl w-fit max-w-[70vw] bg-secondary`}>{message.content}</div>
+										</>
+									) : (
+										<div className={`px-3 py-1 rounded-2xl w-fit max-w-[70vw] ms-auto bg-primary text-txtWhite`}>
+											{message.content}
+										</div>
+									)}
+								</div>
+							</div>
 						))}
 					</div>
 				)}
 
 				{/* Thanh nhập tin nhắn */}
-				{selectedUser && (
+				{receiver && (
 					<div className="bg-background border-t sm:px-6 px-4 sm:py-4 py-3 flex items-end gap-3">
 						<div className="md:py-2 py-1.5">
 							<SmileIcon className="size-6" />
@@ -204,13 +259,13 @@ export default function Message() {
 						<TextBox
 							texboxRef={textbox}
 							placeholder="Soạn tin nhắn"
-							className="sm:py-2 py-1.5 max-h-[120px] bg-gray-3light border rounded-3xl px-5 flex-grow scrollable-div"
+							className="py-1.5 max-h-[120px] bg-gray-3light border rounded-3xl px-5 flex-grow scrollable-div"
 							contentEditable={!submitMsgClicked}
 							onKeyDown={textBoxOnKeyDown}
 							autoFocus={true}
 							trigger={trigger}
 						/>
-						<button onClick={handleSendMsg} className="bg-primary sm:py-2 py-1.5 px-5 rounded-full">
+						<button onClick={handleSendMsg} className="bg-primary py-1.5 px-5 rounded-full">
 							<SendIcon color="stroke-txtWhite" />
 						</button>
 					</div>
