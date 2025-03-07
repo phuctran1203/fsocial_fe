@@ -26,8 +26,6 @@ const useWebSocket = (senderId) => {
 
 	// 🔹 Khi `receiver` thay đổi, đổi subscription nhưng không hủy WebSocket
 	useEffect(() => {
-		console.log(`Registed listening: /queue/private-${senderId}`);
-
 		if (!stompClientRef.current || !stompClientRef.current.connected || !receiver) return;
 
 		// Hủy đăng ký cũ trước khi đăng ký mới

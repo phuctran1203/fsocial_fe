@@ -60,8 +60,8 @@ export default function Message() {
 		setTrigger(!trigger);
 		setReceiver(user);
 		setMessages([]);
-		// const resp = await getMessages(userId);
-		// setMessages(resp.data)
+		// const resp = await getMessages(user.userId);
+		// setMessages(resp.data);
 	};
 
 	const handleGoBack = () => {
@@ -99,7 +99,7 @@ export default function Message() {
 			id: Math.random() * 1000,
 			sender: user.userId,
 			receiver: receiver.userId,
-			content: innerText,
+			content: innerHTML,
 			timestamp: timeStamp,
 		};
 		setMessages((prev) => [...prev, baseMessage]);
@@ -126,7 +126,32 @@ export default function Message() {
 			}
 		}
 		setAvatarPosition(pos);
+		// process label time cho cụm message
 	}, [messages]);
+
+	// kiểm soát message đang show thời gian
+	const checkboxRef = useRef(null);
+	const [checkboxActive, setCheckboxActive] = useState(null);
+	const handleCheckboxChange = (e) => {
+		const el = e.target;
+		if (el !== checkboxActive && el.checked) {
+			checkboxActive.checked = false;
+			setCheckboxActive(el);
+		}
+	};
+
+	useEffect(() => {
+		if (!checkboxRef.current) return;
+		if (checkboxActive?.checked) {
+			checkboxActive.checked = false;
+		}
+		checkboxRef.current.checked = true;
+		setCheckboxActive(checkboxRef.current);
+	}, [checkboxRef?.current]);
+
+	const openIcon = () => {
+		// window.open("/path/to/icon.ico", "_blank");
+	};
 
 	// handle căn chỉnh chiều cao khi bàn phím ảo mở lên trên mobile
 	const [realHeight, setRealHeight] = useState(window.visualViewport.height);
@@ -222,12 +247,27 @@ export default function Message() {
 				{!receiver ? (
 					<div className="size-full grid place-content-center">Cùng bắt đầu trò chuyện với người theo dõi của bạn</div>
 				) : (
-					<div className="overflow-auto px-3 pt-4 pb-1 flex-grow" id="allow-scroll">
+					<div className="overflow-auto px-3 pt-4 pb-1 flex-grow space-y-0.5" id="allow-scroll">
 						{messages.map((message, index) => (
 							<div key={message.id}>
-								<p className="text-center fs-sm text-gray mb-1">{dateTimeToPostTime(message.timestamp)}</p>
-								<div className="flex items-end gap-1">
-									{message.sender !== user.userId ? (
+								<div className="flex gap-1">
+									{message.sender === user.userId ? (
+										<div className="ms-auto relative transition overflow-hidden">
+											<input
+												ref={index === messages.length - 1 ? checkboxRef : null}
+												type="checkbox"
+												className="peer !absolute right-0 !max-w-[100%] !w-14 !h-full opacity-0"
+												onChange={(e) => handleCheckboxChange(e)}
+											/>
+											<div
+												className={`px-3 py-1 ms-auto rounded-2xl w-fit max-w-[70vw] bg-primary text-txtWhite`}
+												dangerouslySetInnerHTML={{ __html: message.content }}
+											></div>
+											<p className="fs-xs -z-10 w-fit ms-auto pe-1 text-center text-gray absolute invisible -translate-y-2 peer-checked:static peer-checked:visible peer-checked:translate-y-0 peer-checked:transition">
+												{dateTimeToPostTime(message.timestamp)}
+											</p>
+										</div>
+									) : (
 										<>
 											{avatarPosition[1] === index ? (
 												<Avatar className={`size-7`}>
@@ -237,12 +277,19 @@ export default function Message() {
 											) : (
 												<div className="size-7" />
 											)}
-											<div className={`px-3 py-1 rounded-2xl w-fit max-w-[70vw] bg-secondary`}>{message.content}</div>
+											<div className="me-auto relative transition overflow-hidden">
+												<input
+													ref={index === messages.length - 1 ? checkboxRef : null}
+													type="checkbox"
+													className="peer !absolute left-0 !max-w-[100%] !w-14 !h-full opacity-0"
+													onChange={(e) => handleCheckboxChange(e)}
+												/>
+												<div className={`px-3 py-1 rounded-2xl w-fit max-w-[70vw] bg-secondary`}>{message.content}</div>
+												<p className="fs-xs -z-10 w-fit ps-1 text-center text-gray absolute invisible -translate-y-2 peer-checked:static peer-checked:visible peer-checked:translate-y-0 peer-checked:transition">
+													{dateTimeToPostTime(message.timestamp)}
+												</p>
+											</div>
 										</>
-									) : (
-										<div className={`px-3 py-1 rounded-2xl w-fit max-w-[70vw] ms-auto bg-primary text-txtWhite`}>
-											{message.content}
-										</div>
 									)}
 								</div>
 							</div>
@@ -253,9 +300,9 @@ export default function Message() {
 				{/* Thanh nhập tin nhắn */}
 				{receiver && (
 					<div className="bg-background border-t sm:px-6 px-4 sm:py-4 py-3 flex items-end gap-3">
-						<div className="md:py-2 py-1.5">
+						<button className="md:py-2 py-1.5" onClick={openIcon}>
 							<SmileIcon className="size-6" />
-						</div>
+						</button>
 						<TextBox
 							texboxRef={textbox}
 							placeholder="Soạn tin nhắn"

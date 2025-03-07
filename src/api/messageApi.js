@@ -6,7 +6,7 @@ export async function getMessages(receiverId) {
 	const user = ownerAccountStore.getState().user;
 	const senderId = user.userId;
 	try {
-		const resp = await axios.get(`http://localhost:8082/chat/messages/${senderId}/${receiverId}`);
+		const resp = await API.get(`/message/chat/${senderId}/${receiverId}`);
 		const data = resp.data;
 		console.log("Resp getMessages: ", data);
 		return data;
