@@ -37,6 +37,11 @@ export default {
 					"3light": "var(--gray-3light-clr)",
 				},
 				txtWhite: "var(--text-white)",
+				chart: {
+					orange: "var(--orange-chart-clr)",
+					blue: "var(--blue-chart-clr)",
+					green: "var(--green-chart-clr)",
+				},
 
 				// foreground: "hsl(var(--foreground))",
 				// card: {
