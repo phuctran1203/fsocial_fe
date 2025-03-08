@@ -7,6 +7,9 @@ import { ownerAccountStore } from "@/store/ownerAccountStore";
 import { getMessages } from "@/api/messageApi";
 import { getTextboxData } from "@/utils/processTextboxData";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import EmojiPicker from "emoji-picker-react";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { themeStore } from "@/store/themeStore";
 
 const listUsers = [
 	{
@@ -56,6 +59,8 @@ export default function Message() {
 
 	const { messages, setMessages, sendMessage, receiver, setReceiver } = useWebSocket(user.userId);
 
+	const theme = themeStore((state) => state.theme);
+
 	const handleChooseConversation = async (user) => {
 		setTrigger(!trigger);
 		setReceiver(user);
@@ -84,10 +89,7 @@ export default function Message() {
 	const handleSendMsg = () => {
 		const { innerText, innerHTML } = getTextboxData(textbox);
 		if (!innerText || !innerHTML) {
-			setTimeout(() => {
-				textbox.current.innerHTML = "";
-				setTrigger(!trigger);
-			}, 1);
+			setTrigger(!trigger);
 			return;
 		}
 		setSubmitMsgClicked(true);
@@ -149,8 +151,9 @@ export default function Message() {
 		setCheckboxActive(checkboxRef.current);
 	}, [checkboxRef?.current]);
 
-	const openIcon = () => {
-		// window.open("/path/to/icon.ico", "_blank");
+	// handle show hide emoji picker
+	const handleEmojiClick = (emojiObject) => {
+		textbox.current.innerHTML += emojiObject.emoji;
 	};
 
 	// handle căn chỉnh chiều cao khi bàn phím ảo mở lên trên mobile
@@ -299,14 +302,24 @@ export default function Message() {
 
 				{/* Thanh nhập tin nhắn */}
 				{receiver && (
-					<div className="bg-background border-t sm:px-6 px-4 sm:py-4 py-3 flex items-end gap-3">
-						<button className="md:py-2 py-1.5" onClick={openIcon}>
-							<SmileIcon className="size-6" />
-						</button>
+					<div className="relative bg-background border-t sm:px-6 px-4 sm:py-4 py-3 flex items-end gap-3 transition">
+						<Popover>
+							<PopoverTrigger className="md:py-2 py-1.5">
+								<SmileIcon className="size-6" />
+								<PopoverContent
+									side="bottom"
+									align="start"
+									sideOffset={30}
+									className="bg-background w-fit p-2 rounded-2xl"
+								>
+									<EmojiPicker onEmojiClick={handleEmojiClick} theme={theme} />
+								</PopoverContent>
+							</PopoverTrigger>
+						</Popover>
 						<TextBox
 							texboxRef={textbox}
 							placeholder="Soạn tin nhắn"
-							className="py-1.5 max-h-[120px] bg-gray-3light border rounded-3xl px-5 flex-grow scrollable-div"
+							className="py-1.5 max-h-[120px] bg-gray-3light border rounded-3xl px-4 flex-grow scrollable-div"
 							contentEditable={!submitMsgClicked}
 							onKeyDown={textBoxOnKeyDown}
 							autoFocus={true}
