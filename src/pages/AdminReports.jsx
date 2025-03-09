@@ -7,58 +7,104 @@ import {
 	ChartTooltipContent,
 } from "@/components/ui/chart";
 import { Area, AreaChart, CartesianGrid, XAxis, YAxis, Label, Pie, PieChart } from "recharts";
-import { ComplaintIcon, GenderIcon, NewCreatedAccountIcon, PostProfileTabIcon } from "@/components/Icon";
+import {
+	ComplaintIcon,
+	CrownTop1Icon,
+	CrownTop2Icon,
+	CrownTop3Icon,
+	GenderIcon,
+	NewCreatedAccountIcon,
+	PostProfileTabIcon,
+	StarIcon,
+} from "@/components/Icon";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Calendar } from "@/components/ui/calendar";
+import { vi } from "date-fns/locale";
+import { Link } from "react-router-dom";
+import Button from "@/components/Button";
+import {
+	fakeChartDataPosts,
+	fakeChartDataNumberCreatedAccounts,
+	fakeChartDataNumberComplaints,
+	fakeChartDataGender,
+	fakeTopKOL,
+} from "../data/fakeDataAdminReports";
 
-const fakeChartDataPosts = [
-	{ month: "T1", numberPosts: 186 },
-	{ month: "T2", numberPosts: 305 },
-	{ month: "T3", numberPosts: 237 },
-	{ month: "T4", numberPosts: 73 },
-	{ month: "T5", numberPosts: 209 },
-	{ month: "T6", numberPosts: 214 },
-	{ month: "T7", numberPosts: 280 },
-	{ month: "T8", numberPosts: 350 },
-	{ month: "T9", numberPosts: 260 },
-	{ month: "T10", numberPosts: 190 },
-	{ month: "T11", numberPosts: 240 },
-	{ month: "T12", numberPosts: 300 },
-];
+const RenderLineChart = (props) => {
+	const { icon, label, total, idFill, colorClassName, data, config, amountHorizoneLine, legend } = props;
 
-const fakeChartDataNumberCreatedAccounts = [
-	{ month: "T1", numberCreatedAccounts: 80 },
-	{ month: "T2", numberCreatedAccounts: 95 },
-	{ month: "T3", numberCreatedAccounts: 120 }, // Tăng lên đỉnh
-	{ month: "T4", numberCreatedAccounts: 130 }, // Đỉnh nhẹ
-	{ month: "T5", numberCreatedAccounts: 115 }, // Giảm sau đỉnh
-	{ month: "T6", numberCreatedAccounts: 90 },
-	{ month: "T7", numberCreatedAccounts: 105 },
-	{ month: "T8", numberCreatedAccounts: 85 },
-	{ month: "T9", numberCreatedAccounts: 100 },
-	{ month: "T10", numberCreatedAccounts: 75 }, // Đáy thấp
-	{ month: "T11", numberCreatedAccounts: 95 },
-	{ month: "T12", numberCreatedAccounts: 110 },
-];
+	return (
+		<>
+			<div className="flex items-center gap-3">
+				<span className="border shadow rounded-full size-8 grid place-content-center fill-gray">{icon}</span>
+				<span className="flex-grow fs-xs text-gray">{label}</span>
+				<div className="w-fit text-end">
+					<span className="fs-xs text-gray">Tổng</span>
+					<h4 className={colorClassName}>{total}</h4>
+				</div>
+			</div>
+			<ChartContainer config={config} className="size-full flex-grow min-h-0">
+				<AreaChart
+					accessibilityLayer
+					data={data}
+					margin={{
+						left: -20,
+						right: 12,
+					}}
+				>
+					<CartesianGrid vertical={false} strokeDasharray="3 3" className="stroke-1 stroke-gray-2light" />
 
-const fakeChartDataNumberComplaints = [
-	{ month: "T1", numberComplaints: 50 },
-	{ month: "T2", numberComplaints: 70 },
-	{ month: "T3", numberComplaints: 90 },
-	{ month: "T4", numberComplaints: 60 },
-	{ month: "T5", numberComplaints: 85 },
-	{ month: "T6", numberComplaints: 100 },
-	{ month: "T7", numberComplaints: 95 },
-	{ month: "T8", numberComplaints: 120 },
-	{ month: "T9", numberComplaints: 80 },
-	{ month: "T10", numberComplaints: 65 },
-	{ month: "T11", numberComplaints: 75 },
-	{ month: "T12", numberComplaints: 90 },
-];
+					<XAxis
+						dataKey="label"
+						tickLine={false}
+						axisLine={false}
+						tickMargin={8}
+						tickFormatter={(value) => value.slice(0, 5)}
+					/>
+					<YAxis tickLine={false} axisLine={false} tickMargin={8} tickCount={amountHorizoneLine} />
+					<ChartTooltip cursor={false} content={<ChartTooltipContent />} />
+					<defs>
+						<linearGradient id={`fill-${idFill}`} x1="0" y1="0" x2="0" y2="1">
+							<stop offset="5%" stopColor={`var(--color-value)`} stopOpacity={0.9} />
+							<stop offset="95%" stopColor={`var(--color-value)`} stopOpacity={0.2} />
+						</linearGradient>
+					</defs>
 
-const fakeChartDataGender = [
-	{ gender: "male", amount: 275, fill: "var(--orange-chart-clr)" },
-	{ gender: "female", amount: 200, fill: "var(--blue-chart-clr)" },
-	{ gender: "others", amount: 287, fill: "var(--green-chart-clr)" },
-];
+					<Area
+						dataKey="value"
+						type="natural"
+						fill={`url(#fill-${idFill})`}
+						fillOpacity={0.4}
+						stroke={`var(--color-value)`}
+						stackId="a"
+					/>
+					{legend && <ChartLegend content={<ChartLegendContent />} />}
+				</AreaChart>
+			</ChartContainer>
+		</>
+	);
+};
+
+const chartConfigPosts = {
+	value: {
+		label: "Số lượng bài đăng mới",
+		color: "var(--orange-chart-clr)",
+	},
+};
+
+const chartConfigNumberCreatedAccounts = {
+	value: {
+		label: "Số lượng tài khoản mới",
+		color: "var(--blue-chart-clr)",
+	},
+};
+
+const chartConfigNumberComplaints = {
+	value: {
+		label: "Số lượng khiếu nại",
+		color: "var(--green-chart-clr)",
+	},
+};
 
 const chartConfigGender = {
 	amount: {
@@ -78,97 +124,72 @@ const chartConfigGender = {
 	},
 };
 
-const RenderLineChart = (props) => {
-	const { icon, label, total, keyName, colorClassName, data, config, amountHorizoneLine, legend } = props;
-
-	return (
-		<>
-			<div className="flex items-center gap-3">
-				<span className="border shadow rounded-full size-8 grid place-content-center fill-gray">{icon}</span>
-				<span className="flex-grow fs-xs text-gray">{label}</span>
-				<div className="w-fit text-end">
-					<span className="fs-xs text-gray">Tổng</span>
-					<h5 className={colorClassName}>{total}</h5>
-				</div>
-			</div>
-			<ChartContainer config={config} className="size-full flex-grow min-h-0">
-				<AreaChart
-					accessibilityLayer
-					data={data}
-					margin={{
-						left: -20,
-						right: 12,
-					}}
-				>
-					<CartesianGrid vertical={false} strokeDasharray="3 3" className="stroke-1 stroke-gray-2light" />
-
-					<XAxis
-						dataKey="month"
-						tickLine={false}
-						axisLine={false}
-						tickMargin={8}
-						tickFormatter={(value) => value.slice(0, 3)}
-					/>
-					<YAxis tickLine={false} axisLine={false} tickMargin={8} tickCount={amountHorizoneLine} />
-					<ChartTooltip cursor={false} content={<ChartTooltipContent />} />
-					<defs>
-						<linearGradient id={`fill-${keyName}`} x1="0" y1="0" x2="0" y2="1">
-							<stop offset="5%" stopColor={`var(--color-${keyName})`} stopOpacity={0.8} />
-							<stop offset="95%" stopColor={`var(--color-${keyName})`} stopOpacity={0.1} />
-						</linearGradient>
-					</defs>
-
-					<Area
-						dataKey={keyName}
-						type="natural"
-						fill={`url(#fill-${keyName})`}
-						fillOpacity={0.4}
-						stroke={`var(--color-${keyName})`}
-						stackId="a"
-					/>
-					{legend && <ChartLegend content={<ChartLegendContent />} />}
-				</AreaChart>
-			</ChartContainer>
-		</>
-	);
-};
-
-const chartConfigPosts = {
-	numberPosts: {
-		label: "Số lượng bài đăng mới",
-		color: "var(--orange-chart-clr)",
+const analyzeTemplate = [
+	{
+		label: "Hôm nay",
+		from: new Date(),
+		to: new Date(),
 	},
-};
-
-const chartConfigNumberCreatedAccounts = {
-	numberCreatedAccounts: {
-		label: "Số lượng tài khoản mới",
-		color: "var(--blue-chart-clr)",
+	{
+		label: "7 ngày trước",
+		from: new Date(new Date().setDate(new Date().getDate() - 7)),
+		to: new Date(),
 	},
-};
-
-const chartConfigNumberComplaints = {
-	numberComplaints: {
-		label: "Số lượng khiếu nại",
-		color: "var(--green-chart-clr)",
+	{
+		label: "14 ngày trước",
+		from: new Date(new Date().setDate(new Date().getDate() - 14)),
+		to: new Date(),
 	},
-};
+	{
+		label: "Tháng trước",
+		from: new Date(new Date().getFullYear(), new Date().getMonth() - 1, 1), // Ngày 1 của tháng trước
+		to: new Date(new Date().getFullYear(), new Date().getMonth(), 0, 23, 59, 59), // Ngày cuối cùng của tháng trước
+	},
+	{
+		label: "Từ đầu năm",
+		from: new Date(new Date().getFullYear(), 0, 1),
+		to: new Date(),
+	},
+];
 
 export default function AdminReports() {
 	const [chartDataPosts, setChartDataPosts] = useState([]);
 	const [chartDataNumberCreatedAccounts, setChartDataNumberCreatedAccounts] = useState([]);
 	const [chartDataNumberComplaints, setChartDataNumberComplaints] = useState([]);
+	const [topKOL, setTopKOL] = useState([]);
 	// tính total
-	const totalPosts = chartDataPosts.reduce((sum, item) => item.numberPosts + sum, 0);
-	const totalCreatedAccount = chartDataNumberCreatedAccounts.reduce((sum, item) => item.numberCreatedAccounts + sum, 0);
-	const totalComplaint = chartDataNumberComplaints.reduce((sum, item) => item.numberComplaints + sum, 0);
-	const totalVisitors = fakeChartDataGender.reduce((acc, curr) => acc + curr.amount, 0);
+	const totalPosts = chartDataPosts.reduce((sum, item) => item.value + sum, 0);
+	const totalCreatedAccount = chartDataNumberCreatedAccounts.reduce((sum, item) => item.value + sum, 0);
+	const totalComplaint = chartDataNumberComplaints.reduce((sum, item) => item.value + sum, 0);
+	const totalVisitors = fakeChartDataGender.reduce((sum, item) => sum + item.value, 0);
+
+	// state for date picker
+	const [templateSelect, setTemplateSelect] = useState(-1); //active UI các template tự chọn date
+	const [date, setDate] = useState({ from: new Date(), to: new Date() });
+
+	const handleOnSelectDate = (data) => {
+		setTemplateSelect(-1);
+		setDate(data);
+	};
+
+	const handleAcceptDate = () => {};
+
+	const handleCancleDate = () => {
+		setTemplateSelect(-1);
+		setDate({ from: undefined, to: undefined });
+	};
+
+	const handleSetTemplate = (template, index) => {
+		setTemplateSelect(index);
+		setDate({ from: template.from, to: template.to });
+	};
 
 	useEffect(() => {
 		// get data
 		setChartDataPosts(fakeChartDataPosts);
 		setChartDataNumberCreatedAccounts(fakeChartDataNumberCreatedAccounts);
 		setChartDataNumberComplaints(fakeChartDataNumberComplaints);
+		setTopKOL(fakeTopKOL);
 	}, []);
 
 	return (
@@ -178,7 +199,7 @@ export default function AdminReports() {
 					icon={<PostProfileTabIcon className="size-3.5" />}
 					label="Số lượng bài đăng"
 					total={totalPosts}
-					keyName="numberPosts"
+					idFill="numberPosts"
 					colorClassName="text-chart-orange"
 					data={chartDataPosts}
 					config={chartConfigPosts}
@@ -187,7 +208,31 @@ export default function AdminReports() {
 				/>
 			</div>
 			{/* lịch */}
-			<div className="col-span-4 bg-background rounded-lg border shadow">2</div>
+			<div className="col-span-4 bg-background rounded-lg border shadow flex gap-2 p-2">
+				<div className="flex-grow space-y-1">
+					{analyzeTemplate.map((templatePicker, index) => (
+						<button
+							className={`w-full text-left p-2 rounded-md hover:bg-gray-3light font-medium text-gray fs-xs ${
+								templateSelect === index && "bg-gray-2light text-primary-text"
+							}`}
+							onClick={() => handleSetTemplate(templatePicker, index)}
+						>
+							{templatePicker.label}
+						</button>
+					))}
+				</div>
+				<div>
+					<Calendar locale={vi} mode="range" selected={date} onSelect={handleOnSelectDate} className="p-0" />
+					<div className="flex gap-4 mt-1">
+						<Button className="fs-xs px-8 py-1.5 btn-primary text-nowrap" onClick={handleAcceptDate}>
+							Thống kê
+						</Button>
+						<Button className="fs-xs px-8 py-1.5 btn-transparent border text-nowrap" onClick={handleCancleDate}>
+							Đặt lại
+						</Button>
+					</div>
+				</div>
+			</div>
 			{/* chart đôi */}
 			<div className="col-span-6 bg-background p-3 rounded-lg border shadow grid grid-rows-2 gap-2">
 				<div className="flex flex-col">
@@ -195,7 +240,7 @@ export default function AdminReports() {
 						icon={<NewCreatedAccountIcon />}
 						label="Lượt tạo tài khoản mới"
 						total={totalCreatedAccount}
-						keyName="numberCreatedAccounts"
+						idFill="numberCreatedAccounts"
 						colorClassName="text-chart-blue"
 						data={chartDataNumberCreatedAccounts}
 						config={chartConfigNumberCreatedAccounts}
@@ -208,7 +253,7 @@ export default function AdminReports() {
 						icon={<ComplaintIcon className="size-3.5" />}
 						label="Lượt khiếu nại"
 						total={totalComplaint}
-						keyName="numberComplaints"
+						idFill="numberComplaints"
 						colorClassName="text-chart-green"
 						data={chartDataNumberComplaints}
 						config={chartConfigNumberComplaints}
@@ -228,7 +273,7 @@ export default function AdminReports() {
 				<ChartContainer config={chartConfigGender} className="aspect-square">
 					<PieChart>
 						<ChartTooltip cursor={false} content={<ChartTooltipContent />} />
-						<Pie data={fakeChartDataGender} dataKey="amount" nameKey="gender" innerRadius={55} strokeWidth={5}>
+						<Pie data={fakeChartDataGender} dataKey="value" nameKey="label" innerRadius={55} strokeWidth={5}>
 							<Label
 								content={({ viewBox }) => {
 									if (viewBox && "cx" in viewBox && "cy" in viewBox) {
@@ -251,7 +296,39 @@ export default function AdminReports() {
 				</ChartContainer>
 			</div>
 			{/* top KOL */}
-			<div className="col-span-3 bg-background rounded-lg border shadow">5</div>
+			<div className="pb-1 col-span-3 bg-background rounded-lg border shadow flex flex-col">
+				<div className="p-3 flex items-center gap-3">
+					<span className="border shadow rounded-full size-8 grid place-content-center fill-gray">
+						<StarIcon />
+					</span>
+					<span className="flex-grow fs-xs text-gray">Bảng xếp hạng KOL</span>
+				</div>
+				<div className="flex-grow overflow-y-auto">
+					{topKOL.map((kol, index) => (
+						<div key={kol.id} className="px-4 py-2 flex gap-3 items-center hover:bg-gray-3light">
+							<span className="fs-xs">{index + 1}</span>
+							<div className="relative">
+								<Avatar className={`size-10`}>
+									<AvatarImage src={kol.avatar} />
+									<AvatarFallback className="fs-xm">{kol.fistName?.charAt(0) ?? "?"}</AvatarFallback>
+								</Avatar>
+								<div className="absolute right-0 top-0 translate-x-1/3 -translate-y-1/3">
+									{index + 1 === 1 && <CrownTop1Icon />}
+									{index + 1 === 2 && <CrownTop2Icon />}
+									{index + 1 === 3 && <CrownTop3Icon />}
+								</div>
+							</div>
+							<div className="flex-grow">
+								<p className="font-medium fs-sm">{kol.firstName + " " + kol.lastName}</p>
+								<Link to="" className="fs-xs text-gray hover:underline">
+									{kol.username}
+								</Link>
+							</div>
+							<span className="fs-xs">{kol.numberFollowers}</span>
+						</div>
+					))}
+				</div>
+			</div>
 		</div>
 	);
 }
