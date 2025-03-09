@@ -13,7 +13,7 @@ export const adminNavRout = [
 	},
 	{
 		name: "Thống kê",
-		to: "/admin/statistical",
+		to: "/admin/reports",
 		icon: <StatisticalIcon />,
 	},
 	{

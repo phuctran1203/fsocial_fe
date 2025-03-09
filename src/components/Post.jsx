@@ -22,12 +22,12 @@ export default function Post({ post, isChildren, className = "" }) {
 	const user = ownerAccountStore.getState().user;
 
 	const showCommentPopup = () => {
-		showPopup(`Bài viết của ${post.displayName}`, <CommentModal id={post.id} />, "h-full");
+		showPopup(`Bài viết của ${post.displayName}`, <CommentModal id={post.id} />);
 	};
 
 	const handlePopupReport = () => {
 		setPopoverOpen(false);
-		showPopup("Báo cáo vi phạm", <ReportModal id={post.id} />, " sm:max-h-[60dvh] max-h-full");
+		showPopup("Báo cáo vi phạm", <ReportModal id={post.id} />);
 	};
 
 	const handlePopupEdit = () => {

@@ -1,3 +1,4 @@
+import { cn } from "@/lib/utils";
 import { useEffect, useState } from "react";
 
 export function Field({
@@ -178,10 +179,12 @@ export function TextBox({
 	return (
 		<div
 			ref={texboxRef}
-			className={`
+			className={cn(
+				`
 			relative w-full outline-none overflow-auto scroll-pb-2
-			before:absolute before:ps-0.5 empty:before:content-[attr(data-placeholder)] before:text-gray before:pointer-events-none 
-			${className}`}
+			before:absolute before:ps-0.5 empty:before:content-[attr(data-placeholder)] before:text-gray before:pointer-events-none transition`,
+				className
+			)}
 			contentEditable={contentEditable}
 			data-placeholder={placeholder}
 			onKeyDown={onKeyDown}

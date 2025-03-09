@@ -7,6 +7,9 @@ import { ownerAccountStore } from "@/store/ownerAccountStore";
 import { getMessages } from "@/api/messageApi";
 import { getTextboxData } from "@/utils/processTextboxData";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import EmojiPicker from "emoji-picker-react";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { themeStore } from "@/store/themeStore";
 
 const listUsers = [
 	{
@@ -56,12 +59,14 @@ export default function Message() {
 
 	const { messages, setMessages, sendMessage, receiver, setReceiver } = useWebSocket(user.userId);
 
+	const theme = themeStore((state) => state.theme);
+
 	const handleChooseConversation = async (user) => {
 		setTrigger(!trigger);
 		setReceiver(user);
 		setMessages([]);
-		// const resp = await getMessages(userId);
-		// setMessages(resp.data)
+		// const resp = await getMessages(user.userId);
+		// setMessages(resp.data);
 	};
 
 	const handleGoBack = () => {
@@ -84,10 +89,7 @@ export default function Message() {
 	const handleSendMsg = () => {
 		const { innerText, innerHTML } = getTextboxData(textbox);
 		if (!innerText || !innerHTML) {
-			setTimeout(() => {
-				textbox.current.innerHTML = "";
-				setTrigger(!trigger);
-			}, 1);
+			setTrigger(!trigger);
 			return;
 		}
 		setSubmitMsgClicked(true);
@@ -99,7 +101,7 @@ export default function Message() {
 			id: Math.random() * 1000,
 			sender: user.userId,
 			receiver: receiver.userId,
-			content: innerText,
+			content: innerHTML,
 			timestamp: timeStamp,
 		};
 		setMessages((prev) => [...prev, baseMessage]);
@@ -126,7 +128,33 @@ export default function Message() {
 			}
 		}
 		setAvatarPosition(pos);
+		// process label time cho cụm message
 	}, [messages]);
+
+	// kiểm soát message đang show thời gian
+	const checkboxRef = useRef(null);
+	const [checkboxActive, setCheckboxActive] = useState(null);
+	const handleCheckboxChange = (e) => {
+		const el = e.target;
+		if (el !== checkboxActive && el.checked) {
+			checkboxActive.checked = false;
+			setCheckboxActive(el);
+		}
+	};
+
+	useEffect(() => {
+		if (!checkboxRef.current) return;
+		if (checkboxActive?.checked) {
+			checkboxActive.checked = false;
+		}
+		checkboxRef.current.checked = true;
+		setCheckboxActive(checkboxRef.current);
+	}, [checkboxRef?.current]);
+
+	// handle show hide emoji picker
+	const handleEmojiClick = (emojiObject) => {
+		textbox.current.innerHTML += emojiObject.emoji;
+	};
 
 	// handle căn chỉnh chiều cao khi bàn phím ảo mở lên trên mobile
 	const [realHeight, setRealHeight] = useState(window.visualViewport.height);
@@ -222,12 +250,27 @@ export default function Message() {
 				{!receiver ? (
 					<div className="size-full grid place-content-center">Cùng bắt đầu trò chuyện với người theo dõi của bạn</div>
 				) : (
-					<div className="overflow-auto px-3 pt-4 pb-1 flex-grow" id="allow-scroll">
+					<div className="overflow-auto px-3 pt-4 pb-1 flex-grow space-y-0.5" id="allow-scroll">
 						{messages.map((message, index) => (
 							<div key={message.id}>
-								<p className="text-center fs-sm text-gray mb-1">{dateTimeToPostTime(message.timestamp)}</p>
-								<div className="flex items-end gap-1">
-									{message.sender !== user.userId ? (
+								<div className="flex gap-1">
+									{message.sender === user.userId ? (
+										<div className="ms-auto relative transition overflow-hidden">
+											<input
+												ref={index === messages.length - 1 ? checkboxRef : null}
+												type="checkbox"
+												className="peer !absolute right-0 !max-w-[100%] !w-14 !h-full opacity-0"
+												onChange={(e) => handleCheckboxChange(e)}
+											/>
+											<div
+												className={`px-3 py-1 ms-auto rounded-2xl w-fit max-w-[70vw] bg-primary text-txtWhite`}
+												dangerouslySetInnerHTML={{ __html: message.content }}
+											></div>
+											<p className="fs-xs -z-10 w-fit ms-auto pe-1 text-center text-gray absolute invisible -translate-y-2 peer-checked:static peer-checked:visible peer-checked:translate-y-0 peer-checked:transition">
+												{dateTimeToPostTime(message.timestamp)}
+											</p>
+										</div>
+									) : (
 										<>
 											{avatarPosition[1] === index ? (
 												<Avatar className={`size-7`}>
@@ -237,12 +280,19 @@ export default function Message() {
 											) : (
 												<div className="size-7" />
 											)}
-											<div className={`px-3 py-1 rounded-2xl w-fit max-w-[70vw] bg-secondary`}>{message.content}</div>
+											<div className="me-auto relative transition overflow-hidden">
+												<input
+													ref={index === messages.length - 1 ? checkboxRef : null}
+													type="checkbox"
+													className="peer !absolute left-0 !max-w-[100%] !w-14 !h-full opacity-0"
+													onChange={(e) => handleCheckboxChange(e)}
+												/>
+												<div className={`px-3 py-1 rounded-2xl w-fit max-w-[70vw] bg-secondary`}>{message.content}</div>
+												<p className="fs-xs -z-10 w-fit ps-1 text-center text-gray absolute invisible -translate-y-2 peer-checked:static peer-checked:visible peer-checked:translate-y-0 peer-checked:transition">
+													{dateTimeToPostTime(message.timestamp)}
+												</p>
+											</div>
 										</>
-									) : (
-										<div className={`px-3 py-1 rounded-2xl w-fit max-w-[70vw] ms-auto bg-primary text-txtWhite`}>
-											{message.content}
-										</div>
 									)}
 								</div>
 							</div>
@@ -252,14 +302,24 @@ export default function Message() {
 
 				{/* Thanh nhập tin nhắn */}
 				{receiver && (
-					<div className="bg-background border-t sm:px-6 px-4 sm:py-4 py-3 flex items-end gap-3">
-						<div className="md:py-2 py-1.5">
-							<SmileIcon className="size-6" />
-						</div>
+					<div className="relative bg-background border-t sm:px-6 px-4 sm:py-4 py-3 flex items-end gap-3 transition">
+						<Popover>
+							<PopoverTrigger className="md:py-2 py-1.5">
+								<SmileIcon className="size-6" />
+								<PopoverContent
+									side="bottom"
+									align="start"
+									sideOffset={30}
+									className="bg-background w-fit p-2 rounded-2xl"
+								>
+									<EmojiPicker onEmojiClick={handleEmojiClick} theme={theme} />
+								</PopoverContent>
+							</PopoverTrigger>
+						</Popover>
 						<TextBox
 							texboxRef={textbox}
 							placeholder="Soạn tin nhắn"
-							className="py-1.5 max-h-[120px] bg-gray-3light border rounded-3xl px-5 flex-grow scrollable-div"
+							className="py-1.5 max-h-[120px] bg-gray-3light border rounded-3xl px-4 flex-grow scrollable-div"
 							contentEditable={!submitMsgClicked}
 							onKeyDown={textBoxOnKeyDown}
 							autoFocus={true}

@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useRef } from "react";
 import { Outlet } from "react-router-dom";
 import Nav from "../components/Nav";
 import Notification from "../components/Notification";
@@ -13,16 +13,19 @@ import { jwtDecode } from "jwt-decode";
 export default function UserLayout() {
 	const setUser = ownerAccountStore((state) => state.setUser);
 
+	const abortControllerRef = useRef(null);
+
 	const getUserDetail = async () => {
-		const resp = await getOwnerProfile();
-		// if (resp.statusCode === 200) {
+		if (abortControllerRef.current) {
+			abortControllerRef.current.abort();
+		}
+		const controller = new AbortController();
+		abortControllerRef.current = controller;
+		const resp = await getOwnerProfile(controller);
 		const accessToken = getCookie("access-token");
 		let userId = jwtDecode(accessToken).sub;
-		console.log("userId: ", userId);
 		setUser({ userId, ...resp.data });
 		console.log(ownerAccountStore.getState().user);
-
-		// }
 	};
 
 	useEffect(() => {
