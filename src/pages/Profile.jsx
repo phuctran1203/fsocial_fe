@@ -153,9 +153,12 @@ export default function Profile() {
 	useEffect(() => {
 		if (!user?.userId) return;
 		setCurrentTab(0);
+		console.log("zooooo: ", user);
+
 		if (queryParams.get("id") === user.userId) {
 			setAccountInfo(user);
 		} else {
+			// handleGetProfile();
 			setAccountInfo({
 				firstName: "Fake",
 				lastName: "Người khác",
@@ -215,7 +218,7 @@ export default function Profile() {
 							<Avatar className={`size-[120px]`}>
 								<AvatarImage src={accountInfo.avatar} />
 								<AvatarFallback className="text-[40px] transition">
-									{accountInfo.firstName?.charAt(0) ?? ""}
+									{accountInfo.firstName.charAt(0) + accountInfo.lastName.charAt(0)}
 								</AvatarFallback>
 							</Avatar>
 							{isOwner && (

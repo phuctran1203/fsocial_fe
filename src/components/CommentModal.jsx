@@ -27,14 +27,16 @@ function CommentReuse(props) {
 				<Link to="">
 					<Avatar className={`size-9`}>
 						<AvatarImage src={comment.avatar} />
-						<AvatarFallback className="fs-xm">{comment.fistName?.charAt(0) ?? "?"}</AvatarFallback>
+						<AvatarFallback className="fs-xs">
+							{comment.firstName.charAt(0) + comment.lastName.charAt(0)}
+						</AvatarFallback>
 					</Avatar>
 				</Link>
 
 				<div className="space-y-1">
 					<div>
 						<Link to="" className="font-semibold text-gray fs-xs hover:underline hover:text-primary-text">
-							{comment.displayName}
+							{comment.firstName + " " + comment.lastName}
 						</Link>
 						<div dangerouslySetInnerHTML={{ __html: comment.content.htmltext }}></div>
 					</div>
@@ -251,7 +253,7 @@ export default function CommentModal({ id }) {
 				<div className=" bg-background flex items-end gap-4 px-4 pt-2 pb-3 border-t">
 					<Avatar className={`size-9`}>
 						<AvatarImage src={user.avatar} />
-						<AvatarFallback className="fs-xm">{user.firstName.charAt(0) ?? "?"}</AvatarFallback>
+						<AvatarFallback className="fs-xs">{user.firstName.charAt(0) + user.lastName.charAt(0)}</AvatarFallback>
 					</Avatar>
 					<TextBox
 						texboxRef={textbox}

@@ -1,79 +1,56 @@
 import React, { useState, useEffect, useRef } from "react";
-import { ArrowLeftIcon, Glyph, SearchIcon, SendIcon, SmileIcon } from "../components/Icon";
+import { ArrowLeftIcon, Glyph, PlusIcon, SearchIcon, SendIcon, SmileIcon } from "../components/Icon";
 import { dateTimeToMessageTime, dateTimeToNotiTime, dateTimeToPostTime } from "../utils/convertDateTime";
 import { TextBox } from "../components/Field";
 import useWebSocket from "@/hooks/useWebSocket";
 import { ownerAccountStore } from "@/store/ownerAccountStore";
-import { getMessages } from "@/api/messageApi";
+import { getConversations, getMessages } from "@/api/messageApi";
 import { getTextboxData } from "@/utils/processTextboxData";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import EmojiPicker from "emoji-picker-react";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { themeStore } from "@/store/themeStore";
-
-const listUsers = [
-	{
-		userId: "4a3e83c8-9d36-4ec1-b4f9-d6e9f2961a60",
-		displayName: "Phúc Thịnh",
-		latestMessage: "Chào bạn!",
-		avatar: "./temp/user_2.png",
-		time: "2025-02-10 10:00:00",
-		read: true,
-	},
-	{
-		userId: "677d104e-e1df-4fdc-8ed3-2ddc34cdced4",
-		displayName: "Phương Nam",
-		latestMessage: "Lấy dùm tui cái laptop nha 🤧",
-		avatar: "./temp/user_3.png",
-		time: "2025-02-10 10:00:00",
-		read: true,
-	},
-	{
-		userId: "3",
-		displayName: "Đức Khải",
-		latestMessage: "",
-		avatar: "./temp/user_4.png",
-		time: "",
-		read: false,
-	},
-	{
-		userId: "4",
-		displayName: "Cang Ngô",
-		latestMessage: "",
-		avatar: "./temp/user_5.png",
-		time: "",
-		read: false,
-	},
-	{
-		userId: "5",
-		displayName: "Tấn Đạt",
-		latestMessage: "Biết ông lích không?",
-		avatar: "./temp/user_6.png",
-		time: "2025-02-10 10:00:00",
-		read: false,
-	},
-];
+import Button from "@/components/Button";
 
 export default function Message() {
 	const user = ownerAccountStore((state) => state.user);
-
 	const { messages, setMessages, sendMessage, receiver, setReceiver } = useWebSocket(user.userId);
-
 	const theme = themeStore((state) => state.theme);
+	const [contentActive, setContentActive] = useState(0);
+	const handleCreateConversation = () => {};
 
-	const handleChooseConversation = async (user) => {
+	const handleChooseConversation = async (conversation) => {
+		setContentActive(2);
 		setTrigger(!trigger);
-		setReceiver(user);
+		setReceiver(conversation);
 		setMessages([]);
-		// const resp = await getMessages(user.userId);
-		// setMessages(resp.data);
+		const resp = await getMessages(conversation.id);
+		setMessages(resp.data);
 	};
 
+	// handle load all conversations
+	const [conversations, setConversation] = useState([]);
+
+	const handleGetAllConversation = async () => {
+		const resp = await getConversations();
+		const data = resp.data;
+		setConversation(data);
+	};
+
+	useEffect(() => {
+		if (!user?.userId) return;
+		// get all conversation
+		handleGetAllConversation();
+	}, [user?.userId]);
+
+	// go back button in mobile
 	const handleGoBack = () => {
+		setContentActive(0);
 		setRealHeight(window.innerHeight);
 		setReceiver(null);
 	};
 
+	const containerMessagesRef = useRef(null);
 	const [submitMsgClicked, setSubmitMsgClicked] = useState(false);
 
 	const textBoxOnKeyDown = (e) => {
@@ -92,64 +69,63 @@ export default function Message() {
 			setTrigger(!trigger);
 			return;
 		}
+
 		setSubmitMsgClicked(true);
-		sendMessage(textbox.current.innerText);
-		setSubmitMsgClicked(false);
+		sendMessage(innerHTML);
+		// tạo data message mới gửi update lên UI
 		const date = new Date();
-		const timeStamp = date.toISOString().replace("Z", "+00:00");
+		const createAt = date.toISOString().replace("Z", "+00:00");
 		const baseMessage = {
-			id: Math.random() * 1000,
+			conversationId: receiver.conversationId,
 			sender: user.userId,
-			receiver: receiver.userId,
 			content: innerHTML,
-			timestamp: timeStamp,
+			createAt: createAt,
 		};
 		setMessages((prev) => [...prev, baseMessage]);
+		// reset textbox
 		setTimeout(() => {
 			textbox.current.innerHTML = "";
 			setTrigger(!trigger);
 		}, 1);
 		setTrigger(!trigger);
+		setSubmitMsgClicked(false);
 	};
 
-	const [avatarPosition, setAvatarPosition] = useState([null, null]);
+	const [avatarReceiverPosition, setAvatarReceiverPosition] = useState(null);
+
 	useEffect(() => {
-		const pos = [];
-		for (let i = messages.length - 1; i >= 0; i--) {
-			if (messages[i].sender === user.userId) {
-				pos[0] = i;
-				break;
-			}
-		}
+		// tìm tin nhắn mới nhất người gửi đã gửi
 		for (let i = messages.length - 1; i >= 0; i--) {
 			if (messages[i].sender !== user.userId) {
-				pos[1] = i;
+				setAvatarReceiverPosition(i);
 				break;
 			}
 		}
-		setAvatarPosition(pos);
+
+		setIndexMsgShow(messages.length - 1);
+
+		if (containerMessagesRef.current) {
+			setTimeout(() => {
+				containerMessagesRef.current.scrollTo({
+					top: containerMessagesRef.current.scrollHeight,
+				});
+				// bắt đầu intersectionObserver tin nhắn cũ nhất trong messages ở đây
+				// để call API lấy tiếp tin nhắn cũ hơn
+			}, 120);
+		}
 		// process label time cho cụm message
 	}, [messages]);
 
 	// kiểm soát message đang show thời gian
-	const checkboxRef = useRef(null);
-	const [checkboxActive, setCheckboxActive] = useState(null);
-	const handleCheckboxChange = (e) => {
-		const el = e.target;
-		if (el !== checkboxActive && el.checked) {
-			checkboxActive.checked = false;
-			setCheckboxActive(el);
-		}
-	};
+	const [indexMsgShow, setIndexMsgShow] = useState(-1);
 
-	useEffect(() => {
-		if (!checkboxRef.current) return;
-		if (checkboxActive?.checked) {
-			checkboxActive.checked = false;
+	const showTimeLabel = (index) => {
+		if (index === indexMsgShow) {
+			setIndexMsgShow(-1);
+			return;
 		}
-		checkboxRef.current.checked = true;
-		setCheckboxActive(checkboxRef.current);
-	}, [checkboxRef?.current]);
+		setIndexMsgShow(index);
+	};
 
 	// handle show hide emoji picker
 	const handleEmojiClick = (emojiObject) => {
@@ -158,11 +134,10 @@ export default function Message() {
 
 	// handle căn chỉnh chiều cao khi bàn phím ảo mở lên trên mobile
 	const [realHeight, setRealHeight] = useState(window.visualViewport.height);
+
 	useEffect(() => {
 		const handleRezise = () => {
 			const height = window.visualViewport.height;
-
-			// if (textbox.current) textbox.current.innerText = height;
 			setRealHeight(height);
 		};
 		window.addEventListener("resize", handleRezise);
@@ -172,9 +147,7 @@ export default function Message() {
 	return (
 		<div
 			style={{ height: realHeight }}
-			className={`${
-				receiver && "sm:relative fixed top-0 sm:z-0 z-10"
-			} flex-grow sm:flex bg-background overflow-hidden transition`}
+			className={`${receiver && "sm:relative fixed top-0 sm:z-0 z-10"} flex-grow sm:flex bg-background transition`}
 		>
 			{/* Danh sách hội thoại */}
 			<div
@@ -183,7 +156,12 @@ export default function Message() {
 				sm:w-2/5 sm:min-w-[300px] sm:max-w-[350px] sm:gap-4 sm:border-r
 				w-screen gap-2 transition"
 			>
-				<h2 className="px-4">Tin nhắn</h2>
+				<div className="px-4 flex items-center justify-between">
+					<h2 className="">Tin nhắn</h2>
+					<Button className="btn-transparent !w-fit p-1" onClick={() => setContentActive(1)}>
+						<PlusIcon />
+					</Button>
+				</div>
 				{/* search bar */}
 				<label
 					htmlFor="search-message"
@@ -197,26 +175,36 @@ export default function Message() {
 						className="w-full outline-none bg-transparent"
 					/>
 				</label>
-				{/* list user's messages */}
+				{/* list conversations */}
 				<div className="h-full px-2 flex-grow overflow-auto">
-					{listUsers.map((user) => (
+					{conversations.map((conversation, index) => (
 						<div
-							key={user.userId}
+							key={index}
 							className="px-3 py-2.5 rounded-md flex items-center gap-3 hover:bg-gray-3light ct-transition cursor-pointer"
-							onClick={() => handleChooseConversation(user)}
+							onClick={() => handleChooseConversation(conversation)}
 						>
-							<div className="max-w-12 aspect-square rounded-full overflow-hidden">
-								<img src={user.avatar} className="size-full object-cover" alt="" />
-							</div>
+							<Avatar className={`size-11`}>
+								<AvatarImage src={conversation.avatar} />
+								<AvatarFallback className="fs-xs">{user.firstName.charAt(0) ?? "?"}</AvatarFallback>
+							</Avatar>
+
 							<div>
-								<div className="flex items-center gap-3">
-									<span className="font-semibold">{user.displayName}</span>
-									{user.latestMessage !== "" && !user.read && <span className="size-2 bg-primary rounded-full" />}
+								<div className="flex items-center gap-2">
+									<span className="font-semibold">{conversation.firstName + " " + conversation.lastName}</span>
+									{/* dấu chấm đánh dấu chưa đọc */}
+									{conversation.lastMessage && !conversation.lastMessage.read && (
+										<span className="size-2 bg-primary rounded-full" />
+									)}
 								</div>
-								{user.latestMessage !== "" && (
-									<div className="flex gap-1">
-										<p className={`line-clamp-1 ${!user.read && "font-semibold"}`}>{user.latestMessage}</p>
-										<span className="text-[--gray-clr] text-nowrap">{dateTimeToMessageTime(user.time).textTime}</span>
+								{conversation.lastMessage && (
+									<div className="flex gap-2">
+										<div
+											className={`line-clamp-1 ${!conversation.lastMessage.read && "font-semibold"}`}
+											dangerouslySetInnerHTML={{ __html: conversation.lastMessage.content }}
+										></div>
+										<span className="text-gray text-nowrap">
+											{dateTimeToMessageTime(conversation.lastMessage.createAt)}
+										</span>
 									</div>
 								)}
 							</div>
@@ -225,109 +213,131 @@ export default function Message() {
 				</div>
 			</div>
 
-			{/* Cửa sổ tin nhắn */}
+			{/* content */}
 			<div
 				style={{ height: realHeight }}
-				className={` sm:flex-grow flex flex-col bg-background ${
-					receiver && "sm:translate-y-0 -translate-y-full"
+				className={`size-full bg-background ${
+					[1, 2].includes(contentActive) && "sm:translate-y-0 -translate-y-full"
 				} transition`}
 			>
-				{/* header info */}
-				<div className={`py-3 px-4 border-b flex items-center justify-between ${!receiver && "hidden"} `}>
-					<div className="flex items-center">
-						<button onClick={handleGoBack}>
-							<ArrowLeftIcon className={"sm:hidden me-3"} />
-						</button>
-						<Avatar className={`size-9 me-2`}>
-							<AvatarImage src={receiver?.avatar} />
-							<AvatarFallback className="fs-xs">{user.firstName.charAt(0) ?? "?"}</AvatarFallback>
-						</Avatar>
-						<p className="font-semibold">{receiver?.displayName}</p>
-					</div>
-					<Glyph />
-				</div>
-
-				{!receiver ? (
-					<div className="size-full grid place-content-center">Cùng bắt đầu trò chuyện với người theo dõi của bạn</div>
-				) : (
-					<div className="overflow-auto px-3 pt-4 pb-1 flex-grow space-y-0.5" id="allow-scroll">
-						{messages.map((message, index) => (
-							<div key={message.id}>
-								<div className="flex gap-1">
-									{message.sender === user.userId ? (
-										<div className="ms-auto relative transition overflow-hidden">
-											<input
-												ref={index === messages.length - 1 ? checkboxRef : null}
-												type="checkbox"
-												className="peer !absolute right-0 !max-w-[100%] !w-14 !h-full opacity-0"
-												onChange={(e) => handleCheckboxChange(e)}
-											/>
-											<div
-												className={`px-3 py-1 ms-auto rounded-2xl w-fit max-w-[70vw] bg-primary text-txtWhite`}
-												dangerouslySetInnerHTML={{ __html: message.content }}
-											></div>
-											<p className="fs-xs -z-10 w-fit ms-auto pe-1 text-center text-gray absolute invisible -translate-y-2 peer-checked:static peer-checked:visible peer-checked:translate-y-0 peer-checked:transition">
-												{dateTimeToPostTime(message.timestamp)}
-											</p>
-										</div>
-									) : (
-										<>
-											{avatarPosition[1] === index ? (
-												<Avatar className={`size-7`}>
-													<AvatarImage src={receiver.avatar} />
-													<AvatarFallback className="fs-xs">{user.firstName.charAt(0) ?? "?"}</AvatarFallback>
-												</Avatar>
-											) : (
-												<div className="size-7" />
-											)}
-											<div className="me-auto relative transition overflow-hidden">
-												<input
-													ref={index === messages.length - 1 ? checkboxRef : null}
-													type="checkbox"
-													className="peer !absolute left-0 !max-w-[100%] !w-14 !h-full opacity-0"
-													onChange={(e) => handleCheckboxChange(e)}
-												/>
-												<div className={`px-3 py-1 rounded-2xl w-fit max-w-[70vw] bg-secondary`}>{message.content}</div>
-												<p className="fs-xs -z-10 w-fit ps-1 text-center text-gray absolute invisible -translate-y-2 peer-checked:static peer-checked:visible peer-checked:translate-y-0 peer-checked:transition">
-													{dateTimeToPostTime(message.timestamp)}
-												</p>
-											</div>
-										</>
-									)}
-								</div>
-							</div>
-						))}
+				{contentActive === 0 && (
+					<div className="size-full place-content-center sm:grid hidden">
+						Cùng bắt đầu trò chuyện với người theo dõi của bạn
 					</div>
 				)}
 
-				{/* Thanh nhập tin nhắn */}
-				{receiver && (
-					<div className="relative bg-background border-t sm:px-6 px-4 sm:py-4 py-3 flex items-end gap-3 transition">
-						<Popover>
-							<PopoverTrigger className="md:py-2 py-1.5">
-								<SmileIcon className="size-6" />
-								<PopoverContent
-									side="bottom"
-									align="start"
-									sideOffset={30}
-									className="bg-background w-fit p-2 rounded-2xl"
-								>
-									<EmojiPicker onEmojiClick={handleEmojiClick} theme={theme} />
-								</PopoverContent>
-							</PopoverTrigger>
-						</Popover>
-						<TextBox
-							texboxRef={textbox}
-							placeholder="Soạn tin nhắn"
-							className="py-1.5 max-h-[120px] bg-gray-3light border rounded-3xl px-4 flex-grow scrollable-div"
-							contentEditable={!submitMsgClicked}
-							onKeyDown={textBoxOnKeyDown}
-							autoFocus={true}
-							trigger={trigger}
-						/>
-						<button onClick={handleSendMsg} className="bg-primary py-1.5 px-5 rounded-full">
-							<SendIcon color="stroke-txtWhite" />
-						</button>
+				{contentActive === 1 && (
+					<div className="size-full flex flex-col">
+						{/* head */}
+						<div className="py-4 px-5 border-b space-x-2 flex items-center">
+							<button onClick={handleGoBack}>
+								<ArrowLeftIcon className={"sm:hidden me-3"} />
+							</button>
+							<label htmlFor="new-to">Đến:</label>
+							<input id="new-to" autoFocus className="bg-transparent outline-none" placeholder="Nhập tên người dùng" />
+						</div>
+						<div className="overflow-y-auto px-3 pt-4 pb-2 flex-grow">list friends or something</div>
+					</div>
+				)}
+
+				{contentActive === 2 && (
+					<div className="flex flex-col size-full">
+						{/* header thông tin */}
+						<div className={`py-3 px-5 border-b flex items-center justify-between `}>
+							<div className="flex items-center">
+								<button onClick={handleGoBack}>
+									<ArrowLeftIcon className={"sm:hidden me-3"} />
+								</button>
+								<Avatar className={`size-9 me-2`}>
+									<AvatarImage src={receiver.avatar} />
+									<AvatarFallback className="fs-xs">{receiver.firstName.charAt(0) ?? "?"}</AvatarFallback>
+								</Avatar>
+								<p className="font-semibold">{receiver.firstName + " " + receiver.lastName}</p>
+							</div>
+							<Glyph />
+						</div>
+						{/* tin nhắn */}
+						<div ref={containerMessagesRef} className="overflow-y-auto px-3 pt-4 pb-2 flex-grow space-y-0.5">
+							{messages.map((message, index) => (
+								<div key={index}>
+									{/* label time for messages block */}
+									{/* <p className={`fs-xs -z-10 text-gray text-center transition`}>{dateTimeToPostTime(message.createAt)}</p> */}
+									{message.sender === user.userId ? (
+										// when owner-account's message
+										<div className={`relative ${index === indexMsgShow && "pb-5"} transition`}>
+											<div
+												className={`px-3 py-1 ms-auto rounded-2xl w-fit max-w-[70vw] bg-primary text-txtWhite cursor-pointer`}
+												dangerouslySetInnerHTML={{ __html: message.content }}
+												onClick={() => showTimeLabel(index)}
+											/>
+											<p
+												className={`fs-xs -z-10 text-gray absolute bottom-0 right-1 ${
+													index === indexMsgShow ? "opacity-100" : "opacity-0"
+												} transition`}
+											>
+												{dateTimeToMessageTime(message.createAt)}
+											</p>
+										</div>
+									) : (
+										// when not owner-account's message
+										<div className={`relative ${index === indexMsgShow && "pb-5"} transition`}>
+											<div className="flex gap-1 items-end">
+												{avatarReceiverPosition === index ? (
+													<Avatar className={`size-6`}>
+														<AvatarImage src={receiver.avatar} />
+														<AvatarFallback className="text-[8px]">
+															{receiver.firstName.charAt(0) ?? "?"}
+														</AvatarFallback>
+													</Avatar>
+												) : (
+													<div className="size-6" />
+												)}
+												<div
+													className={`px-3 py-1 rounded-2xl w-fit max-w-[70vw] bg-secondary cursor-pointer`}
+													dangerouslySetInnerHTML={{ __html: message.content }}
+													onClick={() => showTimeLabel(index)}
+												/>
+											</div>
+											<p
+												className={`fs-xs -z-10 text-gray absolute bottom-0 left-8 ${
+													index === indexMsgShow ? "opacity-100" : "opacity-0"
+												} transition`}
+											>
+												{dateTimeToMessageTime(message.createAt)}
+											</p>
+										</div>
+									)}
+								</div>
+							))}
+						</div>
+						{/* Thanh nhập tin nhắn */}
+						<div className="relative bg-background border-t sm:px-6 px-4 sm:py-4 py-3 flex items-end gap-3 transition">
+							<Popover>
+								<PopoverTrigger className="md:py-2 py-1.5">
+									<SmileIcon className="size-6" />
+									<PopoverContent
+										side="bottom"
+										align="start"
+										sideOffset={30}
+										className="bg-background w-fit p-2 rounded-2xl"
+									>
+										<EmojiPicker onEmojiClick={handleEmojiClick} theme={theme} />
+									</PopoverContent>
+								</PopoverTrigger>
+							</Popover>
+							<TextBox
+								texboxRef={textbox}
+								placeholder="Soạn tin nhắn"
+								className="py-1.5 max-h-[120px] bg-gray-3light border rounded-3xl px-4 flex-grow scrollable-div"
+								contentEditable={!submitMsgClicked}
+								onKeyDown={textBoxOnKeyDown}
+								autoFocus={true}
+								trigger={trigger}
+							/>
+							<button onClick={handleSendMsg} className="bg-primary py-1.5 px-5 rounded-full">
+								<SendIcon color="stroke-txtWhite" />
+							</button>
+						</div>
 					</div>
 				)}
 			</div>

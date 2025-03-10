@@ -13,15 +13,9 @@ import { jwtDecode } from "jwt-decode";
 export default function UserLayout() {
 	const setUser = ownerAccountStore((state) => state.setUser);
 
-	const abortControllerRef = useRef(null);
-
 	const getUserDetail = async () => {
-		if (abortControllerRef.current) {
-			abortControllerRef.current.abort();
-		}
-		const controller = new AbortController();
-		abortControllerRef.current = controller;
-		const resp = await getOwnerProfile(controller);
+		const resp = await getOwnerProfile();
+		if (!resp) return;
 		const accessToken = getCookie("access-token");
 		let userId = jwtDecode(accessToken).sub;
 		setUser({ userId, ...resp.data });

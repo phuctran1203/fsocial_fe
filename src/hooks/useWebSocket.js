@@ -13,7 +13,9 @@ const useWebSocket = (senderId) => {
 		const client = new Client({
 			brokerURL: "ws://localhost:8082/message/ws",
 			reconnectDelay: 5000,
-			onConnect: () => console.log("🔗 Kết nối WebSocket!"),
+			onConnect: () => {
+				console.log("🔗 Kết nối WebSocket!");
+			},
 		});
 
 		client.activate();
@@ -44,10 +46,9 @@ const useWebSocket = (senderId) => {
 	const sendMessage = (content) => {
 		if (stompClientRef.current && stompClientRef.current.connected && receiver) {
 			const dataSending = {
-				sender: senderId,
-				receiver: receiver.userId,
+				receiverId: receiver.receiverId,
+				conversationId: receiver.id,
 				content: content,
-				type: "CHAT",
 			};
 			console.log("dataSending: ", dataSending);
 

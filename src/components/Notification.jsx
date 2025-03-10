@@ -4,6 +4,7 @@ import { Check, Bell, CloseCollapseIcon, CommentNoti, Glyph, HeartNoti, TrashCan
 import { dateTimeToNotiTime } from "../utils/convertDateTime";
 import { popupNotificationtStore, popupExpandNoti3DotStore } from "../store/popupStore";
 import Button from "./Button";
+import { data } from "../data/fakeDataNotification";
 
 const Noti = (props) => {
 	const { id, type, image, name, read, textTime, index } = props;
@@ -102,19 +103,6 @@ const Noti = (props) => {
 		</div>
 	);
 };
-
-const data = [
-	{ id: 1, type: "commentPost", image: "user_2.png", name: "Phương Nam", time: "2025-02-09 16:32:19", read: false },
-	{ id: 2, type: "commentPost", image: "user_2.png", name: "Phương Nam", time: "2025-02-08 16:32:19", read: false },
-	{ id: 3, type: "commentPost", image: "user_2.png", name: "Phương Nam", time: "2025-02-07 15:22:19", read: false },
-	{ id: 4, type: "likePost", image: "user_2.png", name: "Phương Nam", time: "2025-02-06 10:22:19", read: true },
-	{ id: 5, type: "likePost", image: "user_2.png", name: "Phương Nam", time: "2025-02-02 10:22:19", read: true },
-	{ id: 5, type: "likePost", image: "user_2.png", name: "Phương Nam", time: "2025-02-02 10:22:19", read: true },
-	{ id: 6, type: "commentPost", image: "user_2.png", name: "Phương Nam", time: "2025-01-10 10:22:19", read: false },
-	{ id: 7, type: "likePost", image: "user_2.png", name: "Phương Nam", time: "2024-09-07 10:22:19", read: true },
-	{ id: 8, type: "commentPost", image: "user_2.png", name: "Phương Nam", time: "2024-02-07 10:22:19", read: true },
-	{ id: 9, type: "likePost", image: "user_2.png", name: "Phương Nam", time: "2024-02-07 10:22:19", read: true },
-];
 
 export default function Notification() {
 	const location = useLocation();
