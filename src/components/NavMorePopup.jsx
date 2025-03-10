@@ -5,6 +5,9 @@ import styles from "./Nav.module.scss";
 import { useNavigate } from "react-router-dom";
 import { deleteCookie } from "@/utils/cookie";
 import { themeStore } from "@/store/themeStore";
+import { usePopupStore } from "@/store/popupStore";
+import ChangePasswordModal from './ChangePasswordModal';
+
 
 export default function NavMorePopup({ inMobile }) {
 	const { theme, setTheme } = themeStore();
@@ -22,6 +25,12 @@ export default function NavMorePopup({ inMobile }) {
 		navigate("/login");
 	};
 
+	const { showPopup } = usePopupStore();
+
+	const handlePopupChangePassword = () => {
+		showPopup("Đổi mật khẩu", <ChangePasswordModal />);
+	};
+
 	return (
 		<>
 			<Popover onOpenChange={setSwitchThemeOpen}>
@@ -29,9 +38,8 @@ export default function NavMorePopup({ inMobile }) {
 					<SunIcon />
 					<span>Chế độ hiển thị</span>
 					<svg
-						className={`ms-auto me-1 sm:group-hover:opacity-100 ${
-							switchThemeOpen ? "sm:opacity-100 opacity-0" : "opacity-0"
-						} size-4 transition`}
+						className={`ms-auto me-1 sm:group-hover:opacity-100 ${switchThemeOpen ? "sm:opacity-100 opacity-0" : "opacity-0"
+							} size-4 transition`}
 						viewBox="0 0 16 16"
 						fill="none"
 					>
@@ -68,7 +76,7 @@ export default function NavMorePopup({ inMobile }) {
 				</PopoverContent>
 			</Popover>
 
-			<button className={styles.navMore}>
+			<button className={styles.navMore} onClick={handlePopupChangePassword}>
 				<KeyIcon />
 				<span>Đổi mật khẩu</span>
 			</button>
@@ -78,6 +86,7 @@ export default function NavMorePopup({ inMobile }) {
 			<button className={styles.navMore}>
 				<SwitchIcon />
 				<span>Đổi tài khoản</span>
+
 			</button>
 
 			<button className={styles.navMore} onClick={handleLogout}>
