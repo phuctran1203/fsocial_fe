@@ -8,20 +8,14 @@ import { ownerAccountStore } from "@/store/ownerAccountStore";
 export default function Follow() {
 	const setPosts = postsStore((state) => state.setPosts);
 	const user = ownerAccountStore((state) => state.user);
-	const abortControllerRef = useRef(null);
 
 	const fetchPosts = async () => {
-		const resp = await getPosts(user.userId, abortControllerRef.current);
+		const resp = await getPosts(user.userId);
 		setPosts(resp?.data || []);
 	};
 
 	useEffect(() => {
 		if (!user?.userId) return;
-		if (abortControllerRef.current) {
-			abortControllerRef.current.abort();
-		}
-		const controller = new AbortController();
-		abortControllerRef.current = controller;
 		fetchPosts();
 	}, [user?.userId]);
 

@@ -125,8 +125,8 @@ export default function Nav() {
 							<>
 								<Avatar className={`size-[26px]`}>
 									<AvatarImage src={user.avatar} />
-									<AvatarFallback className="text-[12px] font-semibold">
-										{user.firstName.charAt(0) ?? "?"}
+									<AvatarFallback className="text-[8px] font-semibold">
+										{user.firstName.charAt(0) + user.lastName.charAt(0)}
 									</AvatarFallback>
 								</Avatar>
 

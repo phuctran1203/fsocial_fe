@@ -44,6 +44,6 @@ export const sendingCreateAccount = (data) =>
 			return data;
 		})
 		.catch((error) => {
-			console.error("Error at validOTP: ", error);
+			console.error("Error at sendingCreateAccount: ", error);
 			return error.response?.data || {};
 		});

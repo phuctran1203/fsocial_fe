@@ -69,7 +69,7 @@ export default function Post({ post, isChildren, className = "" }) {
 					</div>
 				</div>
 				<Popover open={popoverOpen} onOpenChange={setPopoverOpen}>
-					<PopoverTrigger className={`btn-transparent !w-fit px-2 py-3 ${isChildren && "!hidden"}`}>
+					<PopoverTrigger className={`btn-transparent !w-fit px-2 py-3.5 ${isChildren && "!hidden"}`}>
 						<Glyph />
 					</PopoverTrigger>
 					<PopoverContent side="left" align="start" sideOffset={20} className="z-10 bg-background w-52 shadow-2xl p-2">

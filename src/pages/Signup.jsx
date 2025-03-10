@@ -153,7 +153,6 @@ export default function Signup() {
 				.toString()
 				.padStart(2, "0")}`,
 			gender: form.gender.value,
-			otp: OTPValue.join(""),
 		};
 
 		const sendingOTP = {

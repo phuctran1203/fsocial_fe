@@ -30,7 +30,7 @@ export default function Search() {
 	useEffect(() => {
 		timeout.current = setTimeout(() => {
 			handleSendKeyword();
-		}, 400);
+		}, 800);
 		return () => clearTimeout(timeout.current);
 	}, [query]);
 
