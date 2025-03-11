@@ -3,6 +3,8 @@ import { Field, Select } from "../components/Field";
 import Button from "../components/Button";
 // import { ownerAccountStore } from "@/store/ownerAccountStore";
 import { adminStore } from "../store/adminStore";
+
+const currentYear = new Date().getFullYear(); // 🔹 Định nghĩa biến năm hiện tại
 import {
   EyeIcon,
   EyeSplashIcon,
@@ -13,7 +15,8 @@ import {
 } from "../components/Icon";
 
 const AdminProfile = () => {
-  const form = adminStore((state) => state.form);
+  const form = adminStore((state) => state.form) || {};
+
   // const adminStore = ownerAccountStore();
   // const user = adminStore?.user || {};
 
@@ -24,19 +27,40 @@ const AdminProfile = () => {
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
   const [userData, setUserData] = useState({
-    ten: form.ten.value,
-    ho: form.ho.value,
-    day: form.day.value,
-    month: form.month.value,
-    year: form.year.value,
-    gender: form.gender.value,
-    username: form.username.value,
-    email: form.email.value,
+    ten: form.ten?.value || "",
+    ho: form.ho?.value || "",
+    day: form.day?.value || "",
+    month: form.month?.value || "",
+    year: form.year?.value || "",
+    gender: form.gender?.value || "",
+    username: form.username?.value || "",
+    email: form.email?.value || "",
     oldPassword: "",
     newPassword: "",
     confirmPassword: "",
-    avatar: form.avatar.value || "../temp/default_avatar.svg",
+    avatar: form.avatar?.value || "../temp/default_avatar.svg",
   });
+
+  // const useAdminStore = create((set) => ({
+  //   form: {
+  //     ten: { value: "" },
+  //     ho: { value: "" },
+  //     day: { value: "" },
+  //     month: { value: "" },
+  //     year: { value: "" },
+  //     gender: { value: "" },
+  //     username: { value: "" },
+  //     email: { value: "" },
+  //     oldPassword: { value: "" },
+  //     newPassword: { value: "" },
+  //     confirmPassword: { value: "" },
+  //     avatar: { value: "../temp/default_avatar.svg" },
+  //   },
+  //   updateField: (id, data) =>
+  //     set((state) => ({
+  //       form: { ...state.form, [id]: { ...state.form[id], ...data } },
+  //     })),
+  // }));
 
   const fileInputRef = useRef(null);
 
@@ -114,42 +138,47 @@ const AdminProfile = () => {
 
           <div className="grid grid-cols-2 gap-2 w-[480px]">
             <Field
-              store={adminStore}
-              id="ten"
               label="Tên"
-              name="firstName"
-              className="w-[240px]"
+              id="ten"
+              required
+              pattern="^[A-Za-zÀ-ỹ\s]+$"
+              errorMessage="Tên không được để trống và chỉ chứa chữ cái."
+              store={adminStore}
             />
             <Field
-              store={adminStore}
-              id="ho"
               label="Họ"
-              name="lastName"
-              className="w-[240px]"
+              id="ho"
+              required
+              pattern="^[A-Za-zÀ-ỹ\s]+$"
+              errorMessage="Họ không được để trống và chỉ chứa chữ cái."
+              store={adminStore}
             />
           </div>
 
           <div className="grid grid-cols-3 gap-2 w-[480px]">
             <Field
-              store={adminStore}
-              id="day"
               label="Ngày sinh"
-              name="birthDate"
-              className="w-[160px]"
+              id="day"
+              required
+              pattern="^(0?[1-9]|[12][0-9]|3[01])$"
+              errorMessage="Ngày sinh phải từ 1 - 31."
+              store={adminStore}
             />
             <Field
-              store={adminStore}
-              id="month"
               label="Tháng sinh"
-              name="birthMonth"
-              className="w-[160px]"
+              id="month"
+              required
+              pattern="^(0?[1-9]|1[0-2])$"
+              errorMessage="Tháng sinh phải từ 1 - 12."
+              store={adminStore}
             />
             <Field
-              store={adminStore}
-              id="year"
               label="Năm sinh"
-              name="birthYear"
-              className="w-[160px]"
+              id="year"
+              required
+              pattern={`^(19[0-9]{2}|20[0-${currentYear % 10}][0-9])$`}
+              errorMessage={`Năm sinh phải từ 1900 đến ${currentYear}.`}
+              store={adminStore}
             />
           </div>
 
@@ -197,11 +226,14 @@ const AdminProfile = () => {
             </Field>
 
             <Field
-              store={adminStore}
-              id="email"
               label="Email"
-              name="email"
-              className="w-[480px]"
+              id="email"
+              type="email"
+              required
+              pattern="^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$"
+              compareFunction={async (value) => !(await checkDuplicate(value))}
+              errorMessage="Email không hợp lệ hoặc đã tồn tại."
+              store={adminStore}
             >
               <AtIcon />
             </Field>
@@ -233,7 +265,9 @@ const AdminProfile = () => {
               store={adminStore}
               id="newPassword"
               label="Mật khẩu mới"
-              name="newPassword"
+              required
+              pattern="^(?=.*[A-Z])(?=.*[a-z])(?=.*[0-9]).{8,}$"
+              errorMessage="Mật khẩu mới phải có ít nhất 8 ký tự, bao gồm chữ hoa, chữ thường và số."
               className="w-[480px]"
             >
               <div
@@ -253,7 +287,9 @@ const AdminProfile = () => {
               store={adminStore}
               id="confirmPassword"
               label="Nhập lại mật khẩu mới"
-              name="confirmPassword"
+              required
+              compareFunction={(value) => value === form.newPassword.value}
+              errorMessage="Mật khẩu xác nhận không khớp."
               className="w-[480px]"
             >
               <div
