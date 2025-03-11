@@ -1,7 +1,7 @@
 import React, { useState, useRef } from "react";
 import { Field, Select } from "../components/Field";
 import Button from "../components/Button";
-// import { ownerAccountStore } from "@/store/ownerAccountStore";
+
 import { adminStore } from "../store/adminStore";
 
 const currentYear = new Date().getFullYear(); // 🔹 Định nghĩa biến năm hiện tại
@@ -16,9 +16,6 @@ import {
 
 const AdminProfile = () => {
   const form = adminStore((state) => state.form) || {};
-
-  // const adminStore = ownerAccountStore();
-  // const user = adminStore?.user || {};
 
   // Handle ẩn hiện mật khẩu
   const [isShowPassword, setIsShowPassword] = useState(false);
@@ -41,40 +38,12 @@ const AdminProfile = () => {
     avatar: form.avatar?.value || "../temp/default_avatar.svg",
   });
 
-  // const useAdminStore = create((set) => ({
-  //   form: {
-  //     ten: { value: "" },
-  //     ho: { value: "" },
-  //     day: { value: "" },
-  //     month: { value: "" },
-  //     year: { value: "" },
-  //     gender: { value: "" },
-  //     username: { value: "" },
-  //     email: { value: "" },
-  //     oldPassword: { value: "" },
-  //     newPassword: { value: "" },
-  //     confirmPassword: { value: "" },
-  //     avatar: { value: "../temp/default_avatar.svg" },
-  //   },
-  //   updateField: (id, data) =>
-  //     set((state) => ({
-  //       form: { ...state.form, [id]: { ...state.form[id], ...data } },
-  //     })),
-  // }));
-
   const fileInputRef = useRef(null);
 
   // Xử lý thay đổi dữ liệu nhập vào
   const handleChange = (field, value) => {
     setUserData((prev) => ({ ...prev, [field]: value }));
   };
-  // const handleImageUpload = (event) => {
-  //   const file = event.target.files[0];
-  //   if (file) {
-  //     const imageUrl = URL.createObjectURL(file);
-  //     // setProfile((prev) => ({ ...prev, avatar: imageUrl }));
-  //   }
-  // };
 
   const handleImageUpload = (event) => {
     const file = event.target.files[0];
@@ -140,7 +109,7 @@ const AdminProfile = () => {
             <Field
               label="Tên"
               id="ten"
-              required
+              required={true}
               pattern="^[A-Za-zÀ-ỹ\s]+$"
               errorMessage="Tên không được để trống và chỉ chứa chữ cái."
               store={adminStore}
@@ -148,7 +117,7 @@ const AdminProfile = () => {
             <Field
               label="Họ"
               id="ho"
-              required
+              required={true}
               pattern="^[A-Za-zÀ-ỹ\s]+$"
               errorMessage="Họ không được để trống và chỉ chứa chữ cái."
               store={adminStore}
@@ -159,7 +128,7 @@ const AdminProfile = () => {
             <Field
               label="Ngày sinh"
               id="day"
-              required
+              required={true}
               pattern="^(0?[1-9]|[12][0-9]|3[01])$"
               errorMessage="Ngày sinh phải từ 1 - 31."
               store={adminStore}
@@ -167,7 +136,7 @@ const AdminProfile = () => {
             <Field
               label="Tháng sinh"
               id="month"
-              required
+              required={true}
               pattern="^(0?[1-9]|1[0-2])$"
               errorMessage="Tháng sinh phải từ 1 - 12."
               store={adminStore}
@@ -175,7 +144,7 @@ const AdminProfile = () => {
             <Field
               label="Năm sinh"
               id="year"
-              required
+              required={true}
               pattern={`^(19[0-9]{2}|20[0-${currentYear % 10}][0-9])$`}
               errorMessage={`Năm sinh phải từ 1900 đến ${currentYear}.`}
               store={adminStore}
@@ -229,9 +198,9 @@ const AdminProfile = () => {
               label="Email"
               id="email"
               type="email"
-              required
+              required={true}
               pattern="^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$"
-              compareFunction={async (value) => !(await checkDuplicate(value))}
+              //  compareFunction={async (value) => !(await checkDuplicate(value))} // phúc kt chỗ này nhé hihi (kt email đã tồn tại chưa)
               errorMessage="Email không hợp lệ hoặc đã tồn tại."
               store={adminStore}
             >
@@ -265,7 +234,7 @@ const AdminProfile = () => {
               store={adminStore}
               id="newPassword"
               label="Mật khẩu mới"
-              required
+              required={true}
               pattern="^(?=.*[A-Z])(?=.*[a-z])(?=.*[0-9]).{8,}$"
               errorMessage="Mật khẩu mới phải có ít nhất 8 ký tự, bao gồm chữ hoa, chữ thường và số."
               className="w-[480px]"
@@ -287,7 +256,7 @@ const AdminProfile = () => {
               store={adminStore}
               id="confirmPassword"
               label="Nhập lại mật khẩu mới"
-              required
+              required={true}
               compareFunction={(value) => value === form.newPassword.value}
               errorMessage="Mật khẩu xác nhận không khớp."
               className="w-[480px]"
