@@ -19,44 +19,46 @@ import AdminManagerUser from "./pages/AdminManageUser";
 import AdminComplaint from "./pages/AdminComplaint";
 import AdminPolicySettings from "./pages/AdminPolicySettings";
 import AdminReports from "./pages/AdminReports";
+import AdminProfile from "./pages/AdminProfile";
 
 function App() {
-	const theme = themeStore((state) => state.theme);
-	useEffect(() => {
-		if (theme === "light") {
-			document.body.classList.remove("dark");
-		} else if (theme === "dark") {
-			document.body.classList.add("dark");
-		}
-	}, [theme]);
+  const theme = themeStore((state) => state.theme);
+  useEffect(() => {
+    if (theme === "light") {
+      document.body.classList.remove("dark");
+    } else if (theme === "dark") {
+      document.body.classList.add("dark");
+    }
+  }, [theme]);
 
-	return (
-		<BrowserRouter basename={import.meta.env.BASE_URL}>
-			<Routes>
-				<Route path="/login" element={<Login />} />
-				<Route path="/signup" element={<Signup />} />
-				<Route path="/forgot-password" element={<ForgotPassword />} />
+  return (
+    <BrowserRouter basename={import.meta.env.BASE_URL}>
+      <Routes>
+        <Route path="/login" element={<Login />} />
+        <Route path="/signup" element={<Signup />} />
+        <Route path="/forgot-password" element={<ForgotPassword />} />
 
-				<Route path="/" element={<UserLayout />}>
-					<Route index element={<Home />} />
-					<Route path="/home" element={<Home />} />
-					<Route path="/follow" element={<Follow />} />
-					<Route path="/search" element={<Search />} />
-					<Route path="/message" element={<Message />} />
-					<Route path="/profile" element={<Profile />} />
-				</Route>
+        <Route path="/" element={<UserLayout />}>
+          <Route index element={<Home />} />
+          <Route path="/home" element={<Home />} />
+          <Route path="/follow" element={<Follow />} />
+          <Route path="/search" element={<Search />} />
+          <Route path="/message" element={<Message />} />
+          <Route path="/profile" element={<Profile />} />
+        </Route>
 
-				<Route path="/admin" element={<AdminLayout />}>
-					<Route path="complaint" element={<AdminComplaint />} />
-					<Route path="user-management" element={<AdminManagerUser />} />
-					<Route path="reports" element={<AdminReports />} />
-					<Route path="policy-setting" element={<AdminPolicySettings />} />
-				</Route>
+        <Route path="/admin" element={<AdminLayout />}>
+          <Route path="complaint" element={<AdminComplaint />} />
+          <Route path="user-management" element={<AdminManagerUser />} />
+          <Route path="reports" element={<AdminReports />} />
+          <Route path="policy-setting" element={<AdminPolicySettings />} />
+          <Route path="profile" element={<AdminProfile />} />
+        </Route>
 
-				<Route path="*" element={<NotFound />} />
-			</Routes>
-		</BrowserRouter>
-	);
+        <Route path="*" element={<NotFound />} />
+      </Routes>
+    </BrowserRouter>
+  );
 }
 
 export default App;
