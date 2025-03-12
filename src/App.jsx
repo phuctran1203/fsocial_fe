@@ -20,6 +20,7 @@ import AdminComplaint from "./pages/AdminComplaint";
 import AdminPolicySettings from "./pages/AdminPolicySettings";
 import AdminReports from "./pages/AdminReports";
 import AdminProfile from "./pages/AdminProfile";
+import UserForgotPassword from "./pages/UserForgotPassword";
 
 function App() {
   const theme = themeStore((state) => state.theme);
@@ -45,6 +46,10 @@ function App() {
           <Route path="/search" element={<Search />} />
           <Route path="/message" element={<Message />} />
           <Route path="/profile" element={<Profile />} />
+          <Route
+            path="/user-forgot-password"
+            element={<UserForgotPassword />}
+          />
         </Route>
 
         <Route path="/admin" element={<AdminLayout />}>

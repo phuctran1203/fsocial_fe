@@ -16,8 +16,10 @@ import styles from "./Nav.module.scss";
 import { useNavigate } from "react-router-dom";
 import { deleteCookie } from "@/utils/cookie";
 import { themeStore } from "@/store/themeStore";
+import { usePopupStore } from "@/store/popupStore";
+import ChangePasswordModal from "./ChangePasswordModal";
 
-export default function NavMorePopup({ inMobile }) {
+export default function NavMorePopup({ inMobile, setPopoverOpen }) {
   const { theme, setTheme } = themeStore();
 
   const handleSetMode = (modePicked) => {
@@ -31,6 +33,13 @@ export default function NavMorePopup({ inMobile }) {
     deleteCookie("refresh-token");
     deleteCookie("access-token");
     navigate("/login");
+  };
+
+  const { showPopup } = usePopupStore();
+
+  const handlePopupChangePassword = () => {
+    setPopoverOpen(false);
+    showPopup("Đổi mật khẩu", <ChangePasswordModal />);
   };
 
   return (
@@ -87,7 +96,7 @@ export default function NavMorePopup({ inMobile }) {
         </PopoverContent>
       </Popover>
 
-      <button className={styles.navMore}>
+      <button className={styles.navMore} onClick={handlePopupChangePassword}>
         <KeyIcon />
         <span>Đổi mật khẩu</span>
       </button>
