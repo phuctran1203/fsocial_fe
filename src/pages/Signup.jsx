@@ -4,10 +4,23 @@ import { Field, Select } from "../components/Field";
 import { useSignupStore } from "../store/signupStore";
 import { useEffect, useRef, useState } from "react";
 import EnterOTPCode from "../components/EnterOTPCode";
-import { ArrowLeftIcon, AtIcon, EyeIcon, EyeSplashIcon, LoadingIcon, UserIcon } from "../components/Icon";
-import { checkDuplicate, requestOTP, validOTP, sendingCreateAccount } from "../api/signupApi";
+import {
+	ArrowLeftIcon,
+	AtIcon,
+	EyeIcon,
+	EyeSplashIcon,
+	LoadingIcon,
+	UserIcon,
+} from "../components/Icon";
+import {
+	checkDuplicate,
+	requestOTP,
+	validOTP,
+	sendingCreateAccount,
+} from "../api/signupApi";
 import { getCookie } from "@/utils/cookie";
 import { removeVietnameseAccents } from "@/utils/removeSpecialWord";
+import InputOTP4Digit from "@/components/inputOTP4Digit";
 
 export default function Signup() {
 	const navigate = useNavigate();
@@ -40,18 +53,28 @@ export default function Signup() {
 			const stepHeight = stepsRef.current[currentStep].offsetHeight;
 			stepsWrapper.current.style.height = `${stepHeight + 4}px`;
 			// Cập nhật lại translate X cho stepWrapper
-			stepsWrapper.current.style.transform = `translateX(-${formContainer.current.offsetWidth * (currentStep - 1)}px)`;
+			stepsWrapper.current.style.transform = `translateX(-${
+				formContainer.current.offsetWidth * (currentStep - 1)
+			}px)`;
 		});
 		resizeObserver.observe(parent);
 		return () => {
 			resizeObserver.disconnect();
 		};
-	}, [currentStep, form.ten.isTouched, form.ho.isTouched, stepsRef.current[currentStep]?.offsetHeight]);
+	}, [
+		currentStep,
+		form.ten.isTouched,
+		form.ho.isTouched,
+		stepsRef.current[currentStep]?.offsetHeight,
+	]);
 
 	// Check điều kiện vượt qua step 1 và sinh username mặc định
-	const hoten = useRef(form.ten.value + form.ho.value + (Math.floor(Math.random() * 9000) + 1000));
+	const hoten = useRef(
+		form.ten.value + form.ho.value + (Math.floor(Math.random() * 9000) + 1000)
+	);
 
 	const [stepsPass, setStepsPass] = useState({ s1: false, s2: false });
+	const [errorStep1Msg, setErrorStep1Msg] = useState("");
 
 	const handleStep1 = () => {
 		const valid = form.ho.isValid && form.ten.isValid;
@@ -67,7 +90,11 @@ export default function Signup() {
 
 	// Check điều kiện vượt qua step 2
 	const handleStep2 = () => {
-		const valid = form.username.isValid && form.email.isValid && form.password.isValid && form.rePassword.isValid;
+		const valid =
+			form.username.isValid &&
+			form.email.isValid &&
+			form.password.isValid &&
+			form.rePassword.isValid;
 		setStepsPass((prev) => {
 			if (prev.s2 === valid) return prev;
 			return { ...prev, s2: valid };
@@ -76,7 +103,12 @@ export default function Signup() {
 
 	useEffect(() => {
 		handleStep2();
-	}, [form.username.isValid, form.email.isValid, form.password.isValid, form.rePassword.isValid]);
+	}, [
+		form.username.isValid,
+		form.email.isValid,
+		form.password.isValid,
+		form.rePassword.isValid,
+	]);
 
 	const gotoStep1 = () => {
 		setCurrentStep(1);
@@ -91,7 +123,9 @@ export default function Signup() {
 		autoFocusOTP.current = false;
 	};
 
-	const [errMessageEmail, setErrMessageEmail] = useState("Điền đúng định dạng email");
+	const [errMessageEmail, setErrMessageEmail] = useState(
+		"Điền đúng định dạng email"
+	);
 
 	const [requestOTPClicked, setRequestOTPClicked] = useState(false);
 
@@ -99,7 +133,6 @@ export default function Signup() {
 
 	const goToStep3 = async () => {
 		// const duplicateInto = await ;
-		setRequestOTPClicked(true);
 		// check đã tồn tại username và email
 		const dataCheck = {
 			username: form.username.value,
@@ -107,9 +140,17 @@ export default function Signup() {
 		};
 
 		const respCheckDuplicateInto = await checkDuplicate(dataCheck);
-		console.log(respCheckDuplicateInto);
+		if (!respCheckDuplicateInto) {
+			setErrorStep1Msg("*Lỗi không xác định");
+			return;
+		}
 
-		if (respCheckDuplicateInto?.status === 500 || respCheckDuplicateInto.message != "Thông tin hợp lệ.") {
+		setRequestOTPClicked(true);
+
+		if (
+			respCheckDuplicateInto?.status === 500 ||
+			respCheckDuplicateInto.message != "Thông tin hợp lệ."
+		) {
 			// updateField("username", { isValid: false });
 			// updateField("email", { isValid: false });
 			// setErrMessageUsernname(respCheckDuplicateInto.data.username);
@@ -149,15 +190,15 @@ export default function Signup() {
 			email: form.email.value,
 			firstName: form.ten.value,
 			lastName: form.ho.value,
-			dob: `${form.year.value}-${form.month.value.toString().padStart(2, "0")}-${form.day.value
+			dob: `${form.year.value}-${form.month.value
 				.toString()
-				.padStart(2, "0")}`,
+				.padStart(2, "0")}-${form.day.value.toString().padStart(2, "0")}`,
 			gender: form.gender.value,
 		};
 
 		const sendingOTP = {
 			email: form.email.value,
-			otp: OTPValue.join(""),
+			otp: OTPValue,
 			type: "REGISTER",
 		};
 
@@ -171,7 +212,6 @@ export default function Signup() {
 
 		setCurrentStep(4);
 		const responseCreateAccount = await sendingCreateAccount(sending);
-		console.log(responseCreateAccount);
 		if (responseCreateAccount.statusCode === 200) {
 			setTimeout(() => {
 				navigate("/login");
@@ -197,7 +237,7 @@ export default function Signup() {
 	}, [form.password.value, form.rePassword.value]);
 
 	// Handle nhập mã OTP xác minh email
-	const [OTPValue, setOTPValue] = useState(["", "", "", ""]);
+	const [OTPValue, setOTPValue] = useState("");
 
 	useEffect(() => {
 		if (getCookie("refresh-token")) navigate("/home");
@@ -205,7 +245,11 @@ export default function Signup() {
 
 	return (
 		<div className="lg:w-[min(85%,1440px)] md:h-fit h-[100dvh] mx-auto relative bg-background xl:px-20 lg:px-12 lg:my-4 md:px-4 py-6 rounded-md">
-			<img className="w-[max(72px,8%)] absolute bottom-0 left-0" src="./decor/form_decor.svg" alt="" />
+			<img
+				className="w-[max(72px,8%)] absolute bottom-0 left-0"
+				src="./decor/form_decor.svg"
+				alt=""
+			/>
 			<div className="md:w-10/12 md:mx-auto mx-6 md:mb-2 grid grid-cols-[repeat(15,minmax(0,1fr))] grid-rows-2 items-center">
 				<h3 className="z-0 col-start-2 justify-self-center bg-primary text-txtWhite font-semibold md:w-12 w-10 aspect-square rounded-full grid place-content-center">
 					1
@@ -256,13 +300,21 @@ export default function Signup() {
 					4
 				</h3>
 				<div />
-				<span className="col-span-3 fs-sm font-light text-center">Thông tin cơ bản</span>
+				<span className="col-span-3 fs-sm font-light text-center">
+					Thông tin cơ bản
+				</span>
 				<div />
-				<span className="col-span-3 fs-sm font-light text-center">Thông tin đăng nhập</span>
+				<span className="col-span-3 fs-sm font-light text-center">
+					Thông tin đăng nhập
+				</span>
 				<div />
-				<span className="col-span-3 fs-sm font-light text-center">Xác minh tài khoản</span>
+				<span className="col-span-3 fs-sm font-light text-center">
+					Xác minh tài khoản
+				</span>
 				<div />
-				<span className="col-span-3 fs-sm font-light text-center">Hoàn tất tạo tài khoản</span>
+				<span className="col-span-3 fs-sm font-light text-center">
+					Hoàn tất tạo tài khoản
+				</span>
 			</div>
 
 			<div className="flex md:gap-x-[5%] w-full justify-center">
@@ -272,12 +324,23 @@ export default function Signup() {
 						${currentStep !== 4 ? "" : "hidden"}
 						`}
 				>
-					<div ref={stepsWrapper} className="grid" style={{ transition: "transform 0.3s, height 0.2s" }}>
+					<div
+						ref={stepsWrapper}
+						className="grid"
+						style={{ transition: "transform 0.3s, height 0.2s" }}
+					>
 						{/* step 1 */}
-						<div ref={setStepsRef(1)} className={`md:px-8 px-6 h-fit ${currentStep === 1 ? "" : "invisible"}`}>
+						<div
+							ref={setStepsRef(1)}
+							className={`md:px-8 px-6 h-fit ${
+								currentStep === 1 ? "" : "invisible"
+							}`}
+						>
 							<div className="mb-4">
 								<h2>Thông tin cơ bản</h2>
-								<p className="text-gray">Hãy điền vào form bên dưới để hoàn tất quá trình đăng ký nhé</p>
+								<p className="text-gray">
+									Hãy điền vào form bên dưới để hoàn tất quá trình đăng ký nhé
+								</p>
 							</div>
 							<div className="space-y-5">
 								<div className="grid grid-cols-2 gap-x-3 gap-y-0.5">
@@ -308,7 +371,10 @@ export default function Signup() {
 										id="day"
 										label="Ngày"
 										store={useSignupStore}
-										options={Array.from({ length: 31 }, (_, index) => index + 1).reduce((acc, num) => {
+										options={Array.from(
+											{ length: 31 },
+											(_, index) => index + 1
+										).reduce((acc, num) => {
 											acc[num] = num;
 											return acc;
 										}, {})}
@@ -319,7 +385,10 @@ export default function Signup() {
 										id="month"
 										label="Tháng"
 										store={useSignupStore}
-										options={Array.from({ length: 12 }, (_, index) => index + 1).reduce((acc, num) => {
+										options={Array.from(
+											{ length: 12 },
+											(_, index) => index + 1
+										).reduce((acc, num) => {
 											acc[num] = num;
 											return acc;
 										}, {})}
@@ -345,12 +414,20 @@ export default function Signup() {
 									id="gender"
 									label="Giới tính"
 									store={useSignupStore}
-									options={{ 0: "Nam", 1: "Nữ", 2: "Khác", 3: "Không muốn tiết lộ" }}
+									options={{
+										0: "Nam",
+										1: "Nữ",
+										2: "Khác",
+										3: "Không muốn tiết lộ",
+									}}
 									allowTab={currentStep === 1}
 								/>
 
+								<p className="text-red-500">{errorStep1Msg}</p>
 								<Button
-									className={`btn-primary py-3 ${!stepsPass.s1 && "disable-btn"}`}
+									className={`btn-primary py-3 ${
+										!stepsPass.s1 && "disable-btn"
+									}`}
 									onClick={!stepsPass.s1 ? () => {} : goToStep2}
 									allowTab={currentStep === 1}
 								>
@@ -360,10 +437,17 @@ export default function Signup() {
 						</div>
 
 						{/* step 2 */}
-						<div ref={setStepsRef(2)} className={`md:px-8 px-6 h-fit ${currentStep === 2 ? "" : "invisible"}`}>
+						<div
+							ref={setStepsRef(2)}
+							className={`md:px-8 px-6 h-fit ${
+								currentStep === 2 ? "" : "invisible"
+							}`}
+						>
 							<div className="mb-4">
 								<h2>Thông tin đăng nhập</h2>
-								<p className="text-gray">Đây là thông tin quan trọng. Hãy luôn giữ bảo mật nhé!</p>
+								<p className="text-gray">
+									Đây là thông tin quan trọng. Hãy luôn giữ bảo mật nhé!
+								</p>
 							</div>
 							<div className="space-y-5">
 								<Field
@@ -404,8 +488,16 @@ export default function Signup() {
 									allowTab={currentStep === 2}
 								>
 									<div onClick={() => setIsShowPassword(!isShowPassword)}>
-										<EyeIcon className={`w-full ${isShowPassword ? "hidden" : "block"}`} />
-										<EyeSplashIcon className={`w-full ${!isShowPassword ? "hidden" : "block"}`} />
+										<EyeIcon
+											className={`w-full ${
+												isShowPassword ? "hidden" : "block"
+											}`}
+										/>
+										<EyeSplashIcon
+											className={`w-full ${
+												!isShowPassword ? "hidden" : "block"
+											}`}
+										/>
 									</div>
 								</Field>
 
@@ -421,19 +513,33 @@ export default function Signup() {
 									allowTab={currentStep === 2}
 								>
 									<div onClick={() => setIsShowRePassword(!isShowRePassword)}>
-										<EyeIcon className={`w-full ${isShowRePassword ? "hidden" : "block"}`} />
-										<EyeSplashIcon className={`w-full ${!isShowRePassword ? "hidden" : "block"}`} />
+										<EyeIcon
+											className={`w-full ${
+												isShowRePassword ? "hidden" : "block"
+											}`}
+										/>
+										<EyeSplashIcon
+											className={`w-full ${
+												!isShowRePassword ? "hidden" : "block"
+											}`}
+										/>
 									</div>
 								</Field>
 								<div className="space-y-4">
 									<Button
-										className={`btn-primary py-3 ${(!stepsPass.s2 || requestOTPClicked) && "disable-btn"}`}
+										className={`btn-primary py-3 ${
+											(!stepsPass.s2 || requestOTPClicked) && "disable-btn"
+										}`}
 										onClick={!stepsPass.s2 ? () => {} : goToStep3}
 										allowTab={currentStep === 2}
 									>
 										{requestOTPClicked ? <LoadingIcon /> : "Tiếp theo"}
 									</Button>
-									<Button className="btn-secondary gap-2 py-3" onClick={gotoStep1} allowTab={currentStep === 2}>
+									<Button
+										className="btn-secondary gap-2 py-3"
+										onClick={gotoStep1}
+										allowTab={currentStep === 2}
+									>
 										<ArrowLeftIcon /> Quay lại
 									</Button>
 								</div>
@@ -442,30 +548,42 @@ export default function Signup() {
 						{/* step 3 */}
 						<div
 							ref={setStepsRef(3)}
-							className={`space-y-5 md:px-8 px-6 h-fit ${currentStep === 3 ? "" : "invisible"}`}
+							className={`space-y-5 md:px-8 px-6 h-fit ${
+								currentStep === 3 ? "" : "invisible"
+							}`}
 						>
 							<div className="mb-4">
 								<h2>Xác minh tài khoản</h2>
-								<p className="text-gray">Yeah! Chỉ còn một bước cuối cùng thôi</p>
+								<p className="text-gray">
+									Yeah! Chỉ còn một bước cuối cùng thôi
+								</p>
 							</div>
 
-							<p>Hãy kiểm tra email để nhận mã xác minh gồm 4 số và điền vào bên dưới nhé</p>
+							<p>
+								Hãy kiểm tra email để nhận mã xác minh gồm 4 số và điền vào bên
+								dưới nhé
+							</p>
 
-							<EnterOTPCode
-								OTPValue={OTPValue}
-								setOTPValue={setOTPValue}
-								allowTab={currentStep === 1}
-								autoFocus={autoFocusOTP.current}
-							/>
+							<div className="flex justify-center">
+								<InputOTP4Digit value={OTPValue} setValue={setOTPValue} />
+							</div>
 
 							<div className="space-y-4">
 								<div>
 									<p className="text-red-600">{OTPErr}</p>
-									<Button className={`btn-primary py-3`} allowTab={currentStep === 3} onClick={goToStep4}>
+									<Button
+										className={`btn-primary py-3`}
+										allowTab={currentStep === 3}
+										onClick={goToStep4}
+									>
 										{validOTPClicked ? <LoadingIcon /> : "Xác nhận"}
 									</Button>
 								</div>
-								<Button className="btn-secondary gap-2 py-3" allowTab={currentStep === 3} onClick={goToStep2}>
+								<Button
+									className="btn-secondary gap-2 py-3"
+									allowTab={currentStep === 3}
+									onClick={goToStep2}
+								>
 									<ArrowLeftIcon /> Quay lại
 								</Button>
 							</div>
@@ -485,7 +603,10 @@ export default function Signup() {
 							</Button>
 							<p className="text-gray text-center">
 								Bạn đã có tài khoản?{" "}
-								<Link to="/login" className="underline font-semibold text-primary-text">
+								<Link
+									to="/login"
+									className="underline font-semibold text-primary-text"
+								>
 									Quay lại đăng nhập
 								</Link>
 							</p>
@@ -496,14 +617,18 @@ export default function Signup() {
 				<div className="relative overflow-hidden flex-grow">
 					<img
 						className={`absolute w-full left-0 mt-20 ${
-							currentStep === 1 ? "translate-y-0 opacity-100" : "translate-y-1/4 opacity-0 invisible"
+							currentStep === 1
+								? "translate-y-0 opacity-100"
+								: "translate-y-1/4 opacity-0 invisible"
 						} transition duration-300`}
 						src="./decor/signup_step_1_decor.svg"
 						alt=""
 					/>
 					<img
 						className={`absolute w-11/12 left-1/2 -translate-x-1/2 ${
-							currentStep === 2 ? "translate-y-0 opacity-100" : "translate-y-1/4 opacity-0 invisible"
+							currentStep === 2
+								? "translate-y-0 opacity-100"
+								: "translate-y-1/4 opacity-0 invisible"
 						} transition duration-300`}
 						src="./decor/signup_step_2_decor.svg"
 						alt=""
@@ -517,7 +642,13 @@ export default function Signup() {
 						src="./decor/signup_step_3_decor.svg"
 						alt=""
 					/>
-					<div className={currentStep === 4 ? "flex flex-col items-center text-center mt-4 px-4" : "hidden"}>
+					<div
+						className={
+							currentStep === 4
+								? "flex flex-col items-center text-center mt-4 px-4"
+								: "hidden"
+						}
+					>
 						<h1 className="lg:text-4xl md:text-3xl text-2xl text-primary mb-2">
 							Đã tạo tài khoản thành công
 							<br /> 🎉🎉🎉

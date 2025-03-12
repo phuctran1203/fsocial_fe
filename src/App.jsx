@@ -19,6 +19,8 @@ import AdminManagerUser from "./pages/AdminManageUser";
 import AdminComplaint from "./pages/AdminComplaint";
 import AdminPolicySettings from "./pages/AdminPolicySettings";
 import AdminReports from "./pages/AdminReports";
+import AdminProfile from "./pages/AdminProfile";
+import UserForgotPassword from "./pages/UserForgotPassword";
 
 function App() {
 	const theme = themeStore((state) => state.theme);
@@ -33,6 +35,7 @@ function App() {
 	return (
 		<BrowserRouter basename={import.meta.env.BASE_URL}>
 			<Routes>
+				{/* for testing only */}
 				<Route path="/login" element={<Login />} />
 				<Route path="/signup" element={<Signup />} />
 				<Route path="/forgot-password" element={<ForgotPassword />} />
@@ -44,6 +47,10 @@ function App() {
 					<Route path="/search" element={<Search />} />
 					<Route path="/message" element={<Message />} />
 					<Route path="/profile" element={<Profile />} />
+					<Route
+						path="/user-forgot-password"
+						element={<UserForgotPassword />}
+					/>
 				</Route>
 
 				<Route path="/admin" element={<AdminLayout />}>
@@ -51,6 +58,7 @@ function App() {
 					<Route path="user-management" element={<AdminManagerUser />} />
 					<Route path="reports" element={<AdminReports />} />
 					<Route path="policy-setting" element={<AdminPolicySettings />} />
+					<Route path="profile" element={<AdminProfile />} />
 				</Route>
 
 				<Route path="*" element={<NotFound />} />

@@ -7,7 +7,8 @@ export function dateTimeToNotiTime(time) {
 	if (diffSeconds < 60) return { textTime: `Vừa xong`, labelType: 0 };
 
 	const diffMinutes = Math.floor(diffSeconds / 60);
-	if (diffMinutes < 60) return { textTime: `${diffMinutes} phút`, labelType: 0 };
+	if (diffMinutes < 60)
+		return { textTime: `${diffMinutes} phút`, labelType: 0 };
 
 	const diffHours = Math.floor(diffMinutes / 60);
 	if (diffHours < 24) return { textTime: `${diffHours} giờ`, labelType: 0 };
@@ -59,13 +60,18 @@ export function dateTimeToPostTime(time) {
 	const yesterday = new Date();
 	yesterday.setDate(yesterday.getDate() - 1);
 	if (previousTime.toDateString() === yesterday.toDateString()) {
-		return `${previousTime.getHours()}:${previousTime.getMinutes().toString().padStart(2, "0")} hôm qua`;
+		return `${previousTime.getHours()}:${previousTime
+			.getMinutes()
+			.toString()
+			.padStart(2, "0")} hôm qua`;
 	}
 	// Nếu trước hôm qua
 	return `${previousTime.getHours().toString().padStart(2, "0")}:${previousTime
 		.getMinutes()
 		.toString()
-		.padStart(2, "0")} ${previousTime.getDate().toString().padStart(2, "0")}/${(previousTime.getMonth() + 1)
+		.padStart(2, "0")} ${previousTime.getDate().toString().padStart(2, "0")}/${(
+		previousTime.getMonth() + 1
+	)
 		.toString()
 		.padStart(2, "0")}/${previousTime.getFullYear()}`;
 }
@@ -81,31 +87,43 @@ export function dateTimeToMessageTime(time) {
 	thisWeekStart.setDate(currentTime.getDate() - currentTime.getDay() + 1); // Chuyển về thứ Hai tuần này
 	thisWeekStart.setHours(0, 0, 0, 0); // Đặt giờ về 00:00:00
 
-	let text = "";
-
 	// Hôm nay -> hh:mm
 	if (previousTime.toDateString() === currentTime.toDateString()) {
-		text = `${previousTime.getHours().toString().padStart(2, "0")}:${previousTime
-			.getMinutes()
-			.toString()
-			.padStart(2, "0")}`;
+		const diffSecond = Math.floor((currentTime - previousTime) / 1000);
+		if (diffSecond < 60) {
+			return "Vừa xong";
+		}
+		const diffMinutes = Math.floor(diffSecond / 60);
+		if (diffMinutes < 60) return `${diffMinutes} phút`;
+
+		return `${currentTime.getHours() - previousTime.getHours()} giờ`;
 	}
 	// Từ hôm qua đến thứ Hai tuần này -> Thứ n hh:mm
 	else if (previousTime >= thisWeekStart) {
-		const dayName = previousTime.toLocaleDateString("vi-VN", { weekday: "long" });
-		text = `${dayName} ${previousTime.getHours().toString().padStart(2, "0")}:${previousTime
+		const dayName = previousTime.toLocaleDateString("vi-VN", {
+			weekday: "long",
+		});
+		return `${dayName} ${previousTime
+			.getHours()
+			.toString()
+			.padStart(2, "0")}:${previousTime
 			.getMinutes()
 			.toString()
 			.padStart(2, "0")}`;
 	}
 	// Chủ nhật tuần trước về trước đó -> hh:mm dd/MM/yyyy
 	else {
-		text = `${previousTime.getHours().toString().padStart(2, "0")}:${previousTime
+		return `${previousTime
+			.getHours()
+			.toString()
+			.padStart(2, "0")}:${previousTime
 			.getMinutes()
 			.toString()
-			.padStart(2, "0")} ${previousTime.getDate().toString().padStart(2, "0")}/${(previousTime.getMonth() + 1)
+			.padStart(2, "0")} ${previousTime
+			.getDate()
+			.toString()
+			.padStart(2, "0")}/${(previousTime.getMonth() + 1)
 			.toString()
 			.padStart(2, "0")}/${previousTime.getFullYear()}`;
 	}
-	return text;
 }
