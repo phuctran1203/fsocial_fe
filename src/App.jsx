@@ -21,6 +21,7 @@ import AdminPolicySettings from "./pages/AdminPolicySettings";
 import AdminReports from "./pages/AdminReports";
 import AdminProfile from "./pages/AdminProfile";
 import UserForgotPassword from "./pages/UserForgotPassword";
+import Test from "./pages/Test";
 
 function App() {
   const theme = themeStore((state) => state.theme);
@@ -35,6 +36,8 @@ function App() {
   return (
     <BrowserRouter basename={import.meta.env.BASE_URL}>
       <Routes>
+        {/* for testing only */}
+        <Route path="/test" element={<Test />} />
         <Route path="/login" element={<Login />} />
         <Route path="/signup" element={<Signup />} />
         <Route path="/forgot-password" element={<ForgotPassword />} />

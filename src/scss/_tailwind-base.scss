@@ -26,7 +26,11 @@
 	$min: cal-font-size($base-min-size, $step);
 	$max: cal-font-size($base-max-size, $step);
 	$scaling: scaling-factor($min, $max, $step);
-	@return clamp(font-to-rem($min), scaling-factor($min, $max, $step), font-to-rem($max));
+	@return clamp(
+		font-to-rem($min),
+		scaling-factor($min, $max, $step),
+		font-to-rem($max)
+	);
 }
 
 $base-min-size: 14; //for mobile
@@ -62,9 +66,15 @@ $fs-5xl: clamp-font-size(6);
 		// background color
 		--lower-background-clr: hsl(220, 16%, 96%);
 		--background-clr: #ffffff;
+		// mute color
+		--muted-clr: hsl(0, 0%, 92%);
 		// addition color support
 		--gray-clr: hsl(0, 0%, 45%);
-		--gray-light-clr: hsl(0, 0%, 68%); //for field border or st in slighly bright
+		--gray-light-clr: hsl(
+			0,
+			0%,
+			68%
+		); //for field border or st in slighly bright
 		--gray-2light-clr: hsl(0, 0%, 90%); //for others hover
 		--gray-3light-clr: hsl(0, 0%, 96%); //for others active
 		// border, shadow
@@ -108,8 +118,11 @@ $fs-5xl: clamp-font-size(6);
 		--lower-background-clr: hsl(220, 14%, 2%);
 		--background-clr: hsl(0, 0%, 0%);
 
+		// mute color
+		--muted-clr: hsl(0, 0%, 10%);
+
 		--gray-clr: hsl(0, 0%, 60%);
-		--gray-light-clr: hsl(0, 0%, 30%); //for field border or st in slighly bright
+		--gray-light-clr: #4d4d4d; //for field border or st in slighly bright
 		--gray-2light-clr: hsl(0, 0%, 25%); //for others hover
 		--gray-3light-clr: hsl(0, 0%, 12%); //for others active
 

@@ -21,7 +21,7 @@ export const validOTP = (data) =>
 		})
 		.catch((error) => {
 			console.error("Error at validOTP: ", error);
-			return error.response?.data || {};
+			return error.response?.data || null;
 		});
 
 export const changePassword = (data) =>
