@@ -3,9 +3,7 @@ import API from "./axiosInstance";
 
 export async function getNotification(userId) {
   try {
-    const resp = await axios.get(
-      `http://localhost:8087/notification/all/${userId}`
-    );
+    const resp = await API.get(`/notification/all/${userId}`);
     const data = resp.data;
     console.log("Resp getNotification: ", data);
     return data;

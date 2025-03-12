@@ -15,7 +15,13 @@ import { useLocation } from "react-router-dom";
 import { postsStore } from "@/store/postsStore";
 import { getPosts } from "@/api/postsApi";
 import RenderPosts from "@/components/RenderPosts";
-import { getOwnerProfile, getProfile } from "@/api/profileApi";
+import {
+  getFollowers,
+  getOwnerProfile,
+  getProfile,
+  requestFollow,
+  unfollow,
+} from "@/api/profileApi";
 
 const listFriends = [
   {
@@ -86,7 +92,13 @@ export default function Profile() {
 
   const showVideos = async () => {};
 
-  const showFollowers = async () => {};
+  const [followers, setFollowers] = useState(null);
+  const showFollowers = async () => {
+    if (followers) return;
+    const resp = await getFollowers();
+    if (!resp || resp.statusCode !== 200) return;
+    setFollowers(resp.data);
+  };
 
   const showPostsReacted = async () => {};
 
@@ -156,22 +168,19 @@ export default function Profile() {
 
   const handleGetProfile = async () => {
     const resp = await getProfile(queryParams.get("id"));
-    const data = resp.data;
+    if (!resp || resp.statusCode !== 200) return;
+    const data = await resp.data;
+    setAccountInfo(data);
   };
 
   useEffect(() => {
     if (!user?.userId) return;
     setCurrentTab(0);
-    console.log("zooooo: ", user);
 
     if (queryParams.get("id") === user.userId) {
       setAccountInfo(user);
     } else {
-      // handleGetProfile();
-      setAccountInfo({
-        firstName: "Fake",
-        lastName: "Người khác",
-      });
+      handleGetProfile();
     }
   }, [user?.userId, queryParams.get("id")]);
 
@@ -202,11 +211,23 @@ export default function Profile() {
 
   const handleUpdateUserInfo = () => {};
 
+  const handleRequestFollow = () => {
+    requestFollow(queryParams.get("id"));
+    console.log("current account is: ", accountInfo);
+    setAccountInfo({ ...accountInfo, relationship: true });
+  };
+
+  const handleUnfollow = () => {
+    unfollow(queryParams.get("id"));
+    console.log("current account is: ", accountInfo);
+    setAccountInfo({ ...accountInfo, relationship: false });
+  };
+
   return (
     <div className="flex-grow bg-background transition overflow-auto scrollable-div">
       <div className="lg:max-w-[630px] mx-auto">
         {/* banner */}
-        <div className="relative sm:mt-5 mt-2 aspect-[3/1] overflow-hidden rounded-lg border">
+        <div className="relative sm:mt-5 mt-2 aspect-[3/1] overflow-hidden lg:rounded-lg border">
           {accountInfo.banner ? (
             <img
               src={accountInfo.banner}
@@ -214,9 +235,11 @@ export default function Profile() {
               className="object-cover size-full object-center"
             />
           ) : (
-            <div className="size-full grid place-content-center">
-              <p>Cập nhật ảnh bìa của bạn</p>
-            </div>
+            isOwner && (
+              <div className="size-full grid place-content-center">
+                <p>Cập nhật ảnh bìa của bạn</p>
+              </div>
+            )
           )}
           {isOwner && (
             <Button
@@ -235,9 +258,8 @@ export default function Profile() {
               <Avatar className={`size-[120px]`}>
                 <AvatarImage src={accountInfo.avatar} />
                 <AvatarFallback className="text-[40px] transition">
-                  {accountInfo.firstName?.charAt(0) ||
-                    "" + accountInfo.lastName?.charAt(0) ||
-                    ""}
+                  {(accountInfo.firstName?.charAt(0) || "") +
+                    (accountInfo.lastName?.charAt(0) || "")}
                 </AvatarFallback>
               </Avatar>
               {isOwner && (
@@ -284,21 +306,30 @@ export default function Profile() {
             </div>
 
             <div className="self-center flex gap-4 ">
-              <Button className="!hidden sm:!block btn-transparent px-3 h-10">
+              <Button className="btn-secondary px-3 h-10">
                 <Glyph />
               </Button>
-              {!isOwner && (
-                <Button className="btn-primary px-8 text-nowrap h-10">
+              {!isOwner && !accountInfo.relationship && (
+                <Button
+                  className="btn-primary px-8 text-nowrap h-10"
+                  onClick={handleRequestFollow}
+                >
                   Theo dõi
+                </Button>
+              )}
+              {!isOwner && accountInfo.relationship && (
+                <Button
+                  className="btn-secondary px-8 text-nowrap h-10"
+                  onClick={handleUnfollow}
+                >
+                  Đang theo dõi
                 </Button>
               )}
             </div>
           </div>
 
           {/* bio */}
-          <div className="mt-4 text-center">
-            Tôi là người, tôi không phải robot
-          </div>
+          <div className="mt-4 text-center">{accountInfo.bio}</div>
 
           <div className="mt-8 flex flex-col gap-2 h-[100dvh]">
             {/* button head */}
@@ -384,19 +415,25 @@ export default function Profile() {
                   ))}
                 </div>
                 {/* owner followers */}
-                <div className="snap-start grid grid-cols-4 sm:gap-3 gap-2 h-fit overflow-y-auto w-full max-h-full scrollable-div">
-                  {listFriends.map((friend) => (
-                    <div key={friend.firstName}>
-                      <div className="aspect-square overflow-hidden rounded-md">
-                        <img
-                          src={friend.avatar}
-                          alt=""
-                          className="size-full object-cover object-center"
-                        />
+                <div className="snap-start grid grid-cols-4 sm:gap-3 gap-2 min-h-1 h-fit overflow-y-auto w-full max-h-full scrollable-div">
+                  {followers &&
+                    followers.map((friend) => (
+                      <div key={friend.firstName}>
+                        <div className="aspect-square overflow-hidden rounded-md">
+                          <img
+                            src={friend.avatar}
+                            alt=""
+                            className="size-full object-cover object-center"
+                          />
+                        </div>
+                        <p className="font-semibold">{friend.displayName}</p>
                       </div>
-                      <p className="font-semibold">{friend.displayName}</p>
-                    </div>
-                  ))}
+                    ))}
+                  {(!followers || followers.length === 0) && (
+                    <p className="text-center col-span-4">
+                      Không có người theo dõi
+                    </p>
+                  )}
                 </div>
                 {/* owner posts reacted */}
                 {isOwner && (
