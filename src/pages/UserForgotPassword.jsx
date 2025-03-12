@@ -101,28 +101,28 @@ export default function UserForgotPassword() {
     const [OTPValue, setOTPValue] = useState(["", "", "", ""]);
 
     const handleSubmitOTP = async () => {
-        // setValidOTPClicked(true);
-        // const OTP = OTPValue.join("");
-        // let isAnyEmpty = OTPValue.find((otp) => otp === "");
+        setValidOTPClicked(true);
+        const OTP = OTPValue.join("");
+        let isAnyEmpty = OTPValue.find((otp) => otp === "");
 
-        // if (OTP === "" || isAnyEmpty !== undefined) {
-        //     setOTPErrMessage("*Mã không đúng, hãy kiểm tra lại");
-        //     return;
-        // }
+        if (OTP === "" || isAnyEmpty !== undefined) {
+            setOTPErrMessage("*Mã không đúng, hãy kiểm tra lại");
+            return;
+        }
 
-        // const sendingOTP = {
-        //     email: form.email.value,
-        //     otp: OTP,
-        //     type: "RESET",
-        // };
-        // const resp = await validOTP(sendingOTP);
-        // if (resp.statusCode === 200) {
-        //     gotoStep2();
-        // } else {
-        //     setOTPErrMessage(resp.message);
-        // }
-        // setValidOTPClicked(false);
-        gotoStep2();
+        const sendingOTP = {
+            email: form.email.value,
+            otp: OTP,
+            type: "RESET",
+        };
+        const resp = await validOTP(sendingOTP);
+        if (resp.statusCode === 200) {
+            gotoStep2();
+        } else {
+            setOTPErrMessage(resp.message);
+        }
+        setValidOTPClicked(false);
+        
     };
 
     //handle show & hide password
