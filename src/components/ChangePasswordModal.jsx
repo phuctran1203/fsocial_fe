@@ -21,7 +21,7 @@ export default function ChangePasswordModal() {
     const [validClicked, setValidClicked] = useState(false);
 
     const handleshowHidePassword = () => {
-        if (form.oldPassword.value !== form.newPassword.value) {
+        if (form.oldPassword.value === form.newPassword.value) {
             updateField(newPassword, { isValid: false });
         } else {
             updateField(newPassword, { isValid: true });
@@ -60,9 +60,8 @@ export default function ChangePasswordModal() {
 
     return (
         <div className='relative flex-grow flex flex-col m-2
-         bg-background sm:w-[550px] sm:min-h-[50dvh] sm:h-fit sm:max-h-[90dvh] w-screen h-[100dvh]'>
+         bg-background sm:w-[550px] sm:min-h-[300px] sm:h-fit sm:max-h-[400px] w-screen lg:min-h-[350px]'>
             <div className="overflow-y-auto flex-grow space-y-2">
-
                 <p className="text-base text-gray my-5">Luôn giữ bảo mật cho tài khoản của bạn</p>
                 <div className='space-y-3'>
                     <div className='grid gap-5'>
@@ -116,18 +115,20 @@ export default function ChangePasswordModal() {
                             </div>
                         </Field>
                     </div>
-                    <div className="m-4 text-base text-balance cursor-pointer hover:underline font-semibold"
-                        onClick={gotoForgetPassword}
-                    >
-                        Quên mật khẩu?
-                    </div>
+                    <div className="pt-1">
+                        <div className="m-4 text-base text-balance cursor-pointer hover:underline font-semibold"
+                            onClick={gotoForgetPassword}
+                        >
+                            Quên mật khẩu?
+                        </div>
 
-                    <Button
-                        className={`btn-primary mt-4 px-8 py-3`}
-                        onClick={gotoHome}
-                    >
-                        {validClicked ? <LoadingIcon /> : "Xác nhận thay đổi"}
-                    </Button>
+                        <Button
+                            className='btn-primary mt-4 px-8 py-3'
+                            onClick={gotoHome}
+                        >
+                            {validClicked ? <LoadingIcon /> : "Xác nhận thay đổi"}
+                        </Button>
+                    </div>
                 </div>
             </div>
         </div>
