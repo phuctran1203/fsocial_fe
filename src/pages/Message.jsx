@@ -30,6 +30,11 @@ import Button from "@/components/Button";
 import { getTimeLabelIndexes } from "@/utils/groupTimeLabelMessages";
 import { getFollowing } from "@/api/profileApi";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import DOMPurify from "dompurify";
+import {
+	combineIntoAvatarName,
+	combineIntoDisplayName,
+} from "@/utils/combineName";
 
 export default function Message() {
 	const user = ownerAccountStore((state) => state.user);
@@ -37,7 +42,7 @@ export default function Message() {
 		useWebSocket(user.userId);
 	const theme = themeStore((state) => state.theme);
 	// chỉ định content hiển thị ở bên phải tương ứng button bên trái cột danh sách hội thoại
-	const [contentActive, setContentActive] = useState(0);
+	const [contentActive, setContentActive] = useState(-1);
 	// tạo cuộc hội thoại mới
 	const [friendsList, setFriendsList] = useState(null);
 	// Ẩn, hiện popup danh sách bạn bè tìm được
@@ -89,25 +94,12 @@ export default function Message() {
 	};
 
 	const updateConversations = (baseConversation) => {
-		// nếu đã có conversation
-		// -> kéo lên đầu list conversations
-		// -> udpate lại lastMessage
-		// không có conversation
-		// -> tạo mới 1 conversation và đẩy lên đầu list conversations
 		setConversations((prevConversations) => {
 			const existConversation = conversations.find(
 				(conver) => conver.id === baseConversation.id
 			);
 			if (existConversation) {
 				existConversation.lastMessage = baseConversation.lastMessage;
-				const result = [
-					existConversation,
-					prevConversations.filter(
-						(conver) => conver.id !== existConversation.id
-					),
-				];
-				console.log("result updateConversations if has conver: ", result);
-
 				return [
 					existConversation,
 					...prevConversations.filter(
@@ -115,8 +107,6 @@ export default function Message() {
 					),
 				];
 			}
-			const result = [baseConversation, ...prevConversations];
-			console.log("result updateConversations if not conver: ", result);
 			return [baseConversation, ...prevConversations];
 		});
 	};
@@ -128,20 +118,24 @@ export default function Message() {
 	}, [user?.userId]);
 
 	// click chọn đoạn hội thoại
-	const handleChooseConversation = async (conversation) => {
+	const handleChooseConversation = async (selectedConver) => {
+		if (conversation && conversation.id === selectedConver.id) return;
+		setConversation(selectedConver);
+		console.log("selectedConver is: ", selectedConver);
 		setContentActive(2);
 		setTrigger(!trigger);
-		setConversation(conversation);
-		console.log("Conversation is: ", conversation);
-
-		setMessages([]);
-		const resp = await getMessages(conversation.id);
+		const resp = await getMessages(selectedConver.id);
+		if (!resp || resp.statusCode !== 200) {
+			setMessages([]);
+			return;
+		}
 		setMessages(resp.data.reverse());
 	};
 
 	// Quay lại danh sách cuộc hội thoại (chỉ có ở mobile)
 	const handleGoBack = () => {
 		setContentActive(0);
+		setConversation(null);
 		setRealHeight(window.innerHeight);
 	};
 
@@ -210,8 +204,6 @@ export default function Message() {
 	const [avatarReceiverPosition, setAvatarReceiverPosition] = useState(null);
 	// vị trí các nhãn thời gian của từng block tin nhắn
 	const [timeLabelIndexes, setTimeLabelIndexes] = useState([]);
-	// container chứa tin nhắn
-	const containerMessagesRef = useRef(null);
 
 	useEffect(() => {
 		// tìm tin nhắn mới nhất người gửi đã gửi
@@ -226,17 +218,51 @@ export default function Message() {
 		// handle chia block tin nhắn
 		setTimeLabelIndexes(getTimeLabelIndexes(messages));
 		console.log("Group label time indexes: ", getTimeLabelIndexes(messages));
-		// delay 120ms sẽ tự scroll đến tin nhắn cuối cùng
-		if (containerMessagesRef.current) {
+		if (conversation) handleScrollMessages();
+	}, [messages]);
+
+	// container chứa tin nhắn
+	const containerMessagesRef = useRef(null);
+	const oldConverId = useRef("");
+	const observer = useRef();
+	const callBackAPI = (entries) => {
+		if (entries[0].isIntersecting) {
+			observer.current.unobserve(entries[0].target);
+			console.log("scroll đến element thứ 1, trigger call API lấy message cũ");
+		}
+	};
+	const handleScrollMessages = () => {
+		// Tổng chiều cao toàn bộ nội dung trong scroll <= chiều cao phần scroll đang hiển thị
+		if (
+			containerMessagesRef.current.scrollHeight <=
+			containerMessagesRef.current.clientHeight
+		)
+			return;
+		// cuộn lên không quá 800 || conversationId cũ khác conversationId hiện tại || tin nhắn mới là của bản thân
+		// tự scroll đến đáy
+		if (
+			containerMessagesRef.current.scrollHeight -
+				containerMessagesRef.current.scrollTop <
+				800 ||
+			oldConverId.current !== conversation.id ||
+			messages.at(-1).receiverId !== user.userId
+		) {
 			setTimeout(() => {
+				console.log("okay scroll");
 				containerMessagesRef.current.scrollTo({
 					top: containerMessagesRef.current.scrollHeight,
 				});
+				oldConverId.current = conversation.id;
 				// bắt đầu intersectionObserver tin nhắn cũ nhất trong messages ở đây
 				// để call API lấy tiếp tin nhắn cũ hơn
-			}, 120);
+				if (observer.current) observer.current.disconnect();
+				observer.current = new IntersectionObserver(callBackAPI, {
+					root: containerMessagesRef.current,
+				});
+				observer.current.observe(containerMessagesRef.current.childNodes[1]);
+			}, 100);
 		}
-	}, [messages]);
+	};
 
 	// kiểm soát message đang show message time
 	const [indexMsgShow, setIndexMsgShow] = useState(-1);
@@ -268,9 +294,10 @@ export default function Message() {
 	return (
 		<div
 			style={{ height: realHeight }}
-			className={`${
-				conversation && "sm:relative fixed top-0 sm:z-0 z-10"
-			} flex-grow sm:flex bg-background transition`}
+			className={`
+			${[1, 2].includes(contentActive) && "sm:relative fixed top-0 sm:z-0 z-10"} 
+			${![1, 2].includes(contentActive) && "overflow-hidden"}
+			flex-grow sm:flex bg-background transition`}
 		>
 			{/* Danh sách hội thoại */}
 			<div
@@ -312,14 +339,20 @@ export default function Message() {
 							<Avatar className={`size-11`}>
 								<AvatarImage src={conversation.avatar} />
 								<AvatarFallback className="fs-xs">
-									{user.firstName.charAt(0) ?? "?"}
+									{combineIntoAvatarName(
+										conversation.firstName,
+										conversation.lastName
+									)}
 								</AvatarFallback>
 							</Avatar>
 
 							<div>
 								<div className="flex items-center gap-2">
 									<span className="font-semibold">
-										{conversation.firstName + " " + conversation.lastName}
+										{combineIntoDisplayName(
+											conversation.firstName,
+											conversation.lastName
+										)}
 									</span>
 									{/* dấu chấm đánh dấu chưa đọc */}
 									{conversation.lastMessage &&
@@ -350,7 +383,6 @@ export default function Message() {
 
 			{/* content */}
 			<div
-				style={{ height: realHeight }}
 				className={`size-full bg-background ${
 					[1, 2].includes(contentActive) && "sm:translate-y-0 -translate-y-full"
 				} transition`}
@@ -361,9 +393,10 @@ export default function Message() {
 						Cùng bắt đầu trò chuyện với người theo dõi của bạn
 					</div>
 				)}
+
 				{/* tạo conversation */}
 				{contentActive === 1 && (
-					<div className="size-full flex flex-col">
+					<div className="size-full">
 						{/* head */}
 						<div className="relative h-14 px-5 border-b space-x-2 flex items-center">
 							<button onClick={handleGoBack}>
@@ -412,24 +445,28 @@ export default function Message() {
 													</AvatarFallback>
 												</Avatar>
 												<p className="font-semibold">
-													{friend.firstName + " " + friend.lastName}
+													{combineIntoDisplayName(
+														friend.firstName,
+														friend.lastName
+													)}
 												</p>
 											</Button>
 										))}
 								</ScrollArea>
 							</div>
 						</div>
-						<div className="overflow-y-auto px-3 pt-4 pb-2 flex-grow">
-							list friends or something
-						</div>
 					</div>
 				)}
+
 				{/* đang nhắn tin */}
 				{contentActive === 2 && (
-					<div className="flex flex-col size-full">
+					<div
+						style={{ height: realHeight }}
+						className="flex flex-col size-full"
+					>
 						{/* header thông tin */}
 						<div
-							className={`py-3 px-5 border-b flex items-center justify-between `}
+							className={`py-3 px-5 border-b flex items-center justify-between`}
 						>
 							<div className="flex items-center">
 								<button onClick={handleGoBack}>
@@ -442,7 +479,10 @@ export default function Message() {
 									</AvatarFallback>
 								</Avatar>
 								<p className="font-semibold">
-									{conversation.firstName + " " + conversation.lastName}
+									{combineIntoDisplayName(
+										conversation.firstName,
+										conversation.lastName
+									)}
 								</p>
 							</div>
 							<Glyph />
@@ -463,15 +503,21 @@ export default function Message() {
 										</p>
 									)}
 									{message.receiverId !== user.userId ? (
-										// when owner-account's message
+										// when is owner-account's message
 										<div
 											className={`relative ${
 												index === indexMsgShow && "pb-5"
 											} transition`}
 										>
 											<div
-												className={`px-3 py-1 ms-auto rounded-2xl w-fit max-w-[70vw] bg-primary text-txtWhite cursor-pointer`}
-												dangerouslySetInnerHTML={{ __html: message.content }}
+												className={`
+												px-3 py-1 ms-auto rounded-2xl w-fit max-w-[70vw] text-txtWhite 
+												${
+													theme === "light" ? "bg-primary" : "bg-gray-3light"
+												} cursor-pointer transition`}
+												dangerouslySetInnerHTML={{
+													__html: message.content,
+												}}
 												onClick={() => showTimeLabel(index)}
 											/>
 											<p
@@ -483,7 +529,7 @@ export default function Message() {
 											</p>
 										</div>
 									) : (
-										// when not owner-account's message
+										// when is not owner-account's message
 										<div
 											className={`relative ${
 												index === indexMsgShow && "pb-5"
@@ -501,8 +547,14 @@ export default function Message() {
 													<div className="size-6" />
 												)}
 												<div
-													className={`px-3 py-1 rounded-2xl w-fit max-w-[70vw] bg-secondary cursor-pointer`}
-													dangerouslySetInnerHTML={{ __html: message.content }}
+													className={`px-3 py-1 rounded-2xl w-fit max-w-[70vw] ${
+														theme === "light"
+															? "bg-secondary"
+															: "bg-background ring-1 ring-gray-3light ring-inset"
+													} cursor-pointer transition`}
+													dangerouslySetInnerHTML={{
+														__html: message.content,
+													}}
 													onClick={() => showTimeLabel(index)}
 												/>
 											</div>
@@ -528,6 +580,7 @@ export default function Message() {
 										align="start"
 										sideOffset={30}
 										className="bg-background w-fit p-2 rounded-2xl"
+										onClick={(e) => e.stopPropagation()}
 									>
 										<EmojiPicker
 											onEmojiClick={handleEmojiClick}

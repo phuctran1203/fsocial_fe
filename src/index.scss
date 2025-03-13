@@ -1,4 +1,5 @@
 @use "./scss/_tailwind-base.scss" as *;
+@use "./scss/_tailwind-components" as *;
 
 @tailwind base;
 @tailwind components;

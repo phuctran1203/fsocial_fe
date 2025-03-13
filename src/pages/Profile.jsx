@@ -22,6 +22,10 @@ import {
 	requestFollow,
 	unfollow,
 } from "@/api/profileApi";
+import {
+	combineIntoAvatarName,
+	combineIntoDisplayName,
+} from "@/utils/combineName";
 
 const listFriends = [
 	{
@@ -259,8 +263,10 @@ export default function Profile() {
 							<Avatar className={`size-[120px]`}>
 								<AvatarImage src={accountInfo.avatar} />
 								<AvatarFallback className="text-[40px] transition">
-									{(accountInfo.firstName?.charAt(0) || "") +
-										(accountInfo.lastName?.charAt(0) || "")}
+									{combineIntoAvatarName(
+										accountInfo.firstName,
+										accountInfo.lastName
+									)}
 								</AvatarFallback>
 							</Avatar>
 							{isOwner && (
@@ -275,9 +281,10 @@ export default function Profile() {
 
 						<div className="sm:self-end sm:block flex flex-col items-center flex-grow sm:mb-2">
 							<h3>
-								{(accountInfo.firstName ?? "") +
-									" " +
-									(accountInfo.lastName ?? "")}
+								{combineIntoDisplayName(
+									accountInfo.firstName,
+									accountInfo.lastName
+								)}
 							</h3>
 							<p>12 người theo dõi</p>
 							<div className="mt-1 flex -space-x-2">

@@ -24,7 +24,7 @@ export async function getMessages(conversationId) {
 		return data;
 	} catch (error) {
 		console.error("Error at getMessages: ", error);
-		return error.response?.data || [];
+		return error.response?.data || null;
 	}
 }
 

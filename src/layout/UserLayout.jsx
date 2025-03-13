@@ -11,32 +11,32 @@ import { getCookie } from "@/utils/cookie";
 import { jwtDecode } from "jwt-decode";
 
 export default function UserLayout() {
-  const setUser = ownerAccountStore((state) => state.setUser);
+	const setUser = ownerAccountStore((state) => state.setUser);
 
-  const getUserDetail = async () => {
-    const resp = await getOwnerProfile();
-    if (!resp) return;
-    const accessToken = getCookie("access-token");
-    let userId = jwtDecode(accessToken).sub;
-    setUser({ userId, ...resp.data });
-    console.log(ownerAccountStore.getState().user);
-  };
+	const getUserDetail = async () => {
+		const resp = await getOwnerProfile();
+		if (!resp) return;
+		const accessToken = getCookie("access-token");
+		let userId = jwtDecode(accessToken).sub;
+		setUser({ userId, ...resp.data });
+		// console.log(ownerAccountStore.getState().user);
+	};
 
-  useEffect(() => {
-    getUserDetail();
-  }, []);
+	useEffect(() => {
+		getUserDetail();
+	}, []);
 
-  return (
-    <>
-      {/* nav top appear in mobile */}
-      <main className="sm:flex relative h-[100dvh]">
-        <Header />
-        <Nav />
-        <Outlet />
-        <Notification />
-      </main>
-      <Popup />
-      <Toaster position="top-center" />
-    </>
-  );
+	return (
+		<>
+			{/* nav top appear in mobile */}
+			<main className="sm:flex relative h-[100dvh]">
+				<Header />
+				<Nav />
+				<Outlet />
+				<Notification />
+			</main>
+			<Popup />
+			<Toaster position="top-center" />
+		</>
+	);
 }
