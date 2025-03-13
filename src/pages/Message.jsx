@@ -33,7 +33,7 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 
 export default function Message() {
 	const user = ownerAccountStore((state) => state.user);
-	const { messages, setMessages, sendMessage, receiver, setReceiver } =
+	const { messages, setMessages, sendMessage, conversation, setConversation } =
 		useWebSocket(user.userId);
 	const theme = themeStore((state) => state.theme);
 	// chỉ định content hiển thị ở bên phải tương ứng button bên trái cột danh sách hội thoại
@@ -65,22 +65,60 @@ export default function Message() {
 		console.log("Friend được chọn để tạo hội thoại mới: ", friend);
 		const userId = friend.userId;
 		delete friend.userId;
-		setReceiver({ ...friend, receiverId: userId });
+		setConversation({ ...friend, receiverId: userId });
 		setContentActive(2);
 		setTrigger(!trigger);
 	};
 
 	const handleCreateConversation = async () => {
-		console.log("will create new conversation from this data: ", receiver);
+		console.log("will create new conversation from this data: ", conversation);
+		const resp = await createConversation(conversation.receiverId);
+		if (!resp || resp.statusCode !== 200) return null;
+		const data = await resp.data;
+		console.log("id crated is: ", data.id);
+		return data.id;
 	};
 
 	// Load tất cả các cuộc hội thoại
-	const [conversations, setConversation] = useState([]);
+	const [conversations, setConversations] = useState([]);
 
 	const handleGetAllConversation = async () => {
 		const resp = await getConversations();
 		const data = resp.data;
-		setConversation(data);
+		setConversations(data);
+	};
+
+	const updateConversations = (baseConversation) => {
+		// nếu đã có conversation
+		// -> kéo lên đầu list conversations
+		// -> udpate lại lastMessage
+		// không có conversation
+		// -> tạo mới 1 conversation và đẩy lên đầu list conversations
+		setConversations((prevConversations) => {
+			const existConversation = conversations.find(
+				(conver) => conver.id === baseConversation.id
+			);
+			if (existConversation) {
+				existConversation.lastMessage = baseConversation.lastMessage;
+				const result = [
+					existConversation,
+					prevConversations.filter(
+						(conver) => conver.id !== existConversation.id
+					),
+				];
+				console.log("result updateConversations if has conver: ", result);
+
+				return [
+					existConversation,
+					...prevConversations.filter(
+						(conver) => conver.id !== existConversation.id
+					),
+				];
+			}
+			const result = [baseConversation, ...prevConversations];
+			console.log("result updateConversations if not conver: ", result);
+			return [baseConversation, ...prevConversations];
+		});
 	};
 
 	useEffect(() => {
@@ -93,7 +131,7 @@ export default function Message() {
 	const handleChooseConversation = async (conversation) => {
 		setContentActive(2);
 		setTrigger(!trigger);
-		setReceiver(conversation);
+		setConversation(conversation);
 		console.log("Conversation is: ", conversation);
 
 		setMessages([]);
@@ -132,20 +170,36 @@ export default function Message() {
 		const date = new Date();
 		const createAt = date.toISOString().replace("Z", "+00:00");
 		const baseMessage = {
-			conversationId: receiver.conversationId,
-			sender: user.userId,
 			content: innerHTML,
+			conversationId: conversation.id,
 			createAt: createAt,
+			read: true,
+			receiverId: conversation.receiverId,
+		};
+		// base conversation
+		const baseConversation = {
+			...conversation,
+			lastMessage: {
+				content: innerHTML,
+				createAt: createAt,
+				read: true,
+			},
 		};
 		// Update UI
 		setMessages((prev) => [...prev, baseMessage]);
-		if (!receiver.id) {
+		// check conversationId đã tồn tại không
+		if (!conversation.id) {
 			console.log("Chưa có conversation Id!!!");
-			await handleCreateConversation();
-			return;
+			const id = await handleCreateConversation();
+			console.log("id conversation response: ", id);
+			setConversation((prev) => ({ ...prev, id }));
+			sendMessage(innerHTML, id);
+			updateConversations({ ...baseConversation, id });
+		} else {
+			sendMessage(innerHTML);
+			updateConversations({ ...baseConversation, id: conversation.id });
 		}
-		// send qua websocket
-		sendMessage(innerHTML);
+
 		// reset textbox
 		setTimeout(() => {
 			textbox.current.innerHTML = "";
@@ -162,7 +216,7 @@ export default function Message() {
 	useEffect(() => {
 		// tìm tin nhắn mới nhất người gửi đã gửi
 		for (let i = messages.length - 1; i >= 0; i--) {
-			if (messages[i].receiverId !== receiver.receiverId) {
+			if (messages[i].receiverId !== conversation.receiverId) {
 				setAvatarReceiverPosition(i);
 				break;
 			}
@@ -215,7 +269,7 @@ export default function Message() {
 		<div
 			style={{ height: realHeight }}
 			className={`${
-				receiver && "sm:relative fixed top-0 sm:z-0 z-10"
+				conversation && "sm:relative fixed top-0 sm:z-0 z-10"
 			} flex-grow sm:flex bg-background transition`}
 		>
 			{/* Danh sách hội thoại */}
@@ -339,6 +393,11 @@ export default function Message() {
 											<LoadingIcon />
 										</div>
 									)}
+									{friendsList && friendsList.length === 0 && (
+										<p className="text-center p-2">
+											Hãy theo dõi ai đó để bắt đầu cuộc trò chuyện mới nhé
+										</p>
+									)}
 									{friendsList &&
 										friendsList.map((friend) => (
 											<Button
@@ -377,13 +436,13 @@ export default function Message() {
 									<ArrowLeftIcon className={"sm:hidden me-3"} />
 								</button>
 								<Avatar className={`size-9 me-2`}>
-									<AvatarImage src={receiver.avatar} />
+									<AvatarImage src={conversation.avatar} />
 									<AvatarFallback className="fs-xs">
-										{receiver.firstName.charAt(0) ?? "?"}
+										{conversation.firstName.charAt(0) ?? "?"}
 									</AvatarFallback>
 								</Avatar>
 								<p className="font-semibold">
-									{receiver.firstName + " " + receiver.lastName}
+									{conversation.firstName + " " + conversation.lastName}
 								</p>
 							</div>
 							<Glyph />
@@ -433,9 +492,9 @@ export default function Message() {
 											<div className="flex gap-1 items-end">
 												{avatarReceiverPosition === index ? (
 													<Avatar className={`size-6`}>
-														<AvatarImage src={receiver.avatar} />
+														<AvatarImage src={conversation.avatar} />
 														<AvatarFallback className="text-[8px]">
-															{receiver.firstName.charAt(0) ?? "?"}
+															{conversation.firstName.charAt(0) ?? "?"}
 														</AvatarFallback>
 													</Avatar>
 												) : (
