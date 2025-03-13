@@ -18,15 +18,14 @@ export const popupDeletePostStore = create((set) => ({
 }));
 
 export const usePopupStore = create((set) => ({
-	popupHeading: null,
+	heading: null,
 	isOpen: false,
 	children: null,
-	className: null,
-	showPopup: (popupHeading, children, className) => set({ isOpen: true, popupHeading, children, className }),
+	showPopup: (heading, children) => set({ isOpen: true, heading, children }),
 	hidePopup: () => {
 		set({ isOpen: false });
 		setTimeout(() => {
-			set({ popupHeading: null, children: null, className: null });
+			set({ heading: null, children: null });
 		}, 50);
 	},
 }));

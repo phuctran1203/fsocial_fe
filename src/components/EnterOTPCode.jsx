@@ -2,7 +2,12 @@ import { useEffect, useRef, useState } from "react";
 
 import React from "react";
 
-export default function EnterOTPCode({ OTPValue, setOTPValue, allowTab = true, autoFocus = false }) {
+export default function EnterOTPCode({
+	OTPValue,
+	setOTPValue,
+	allowTab = true,
+	autoFocus = false,
+}) {
 	// Handle nhập mã OTP xác minh email
 	const inputsOTPRef = useRef([]);
 
@@ -63,7 +68,11 @@ export default function EnterOTPCode({ OTPValue, setOTPValue, allowTab = true, a
 	const rendered = useRef(false);
 
 	useEffect(() => {
-		if (rendered.current && inputsOTPRef.current[0] && inputsOTPRef.current[0].value === "") {
+		if (
+			rendered.current &&
+			inputsOTPRef.current[0] &&
+			inputsOTPRef.current[0].value === ""
+		) {
 			setTimeout(() => {
 				inputsOTPRef.current[0].focus();
 			}, 200);

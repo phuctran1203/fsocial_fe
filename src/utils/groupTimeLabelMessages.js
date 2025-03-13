@@ -1,58 +1,42 @@
 export const getTimeLabelIndexes = (messages) => {
-  if (messages.length === 0) return [];
+	if (messages.length === 0) return [];
 
-  const indexes = [];
-  let lastTimestamp = null;
-  let lastSender = null;
-  let firstIndexInGroup = 0;
-  let today = new Date().toDateString();
-  let lastDate = null;
-  let isTodayGroup = false;
+	const indexes = [];
+	let today = new Date().toDateString();
+	let lastDate = null;
+	let firstIndexInGroup = 0;
+	let lastTimestamp = null;
+	let lastReceiver = null;
 
-  messages.forEach((msg, index) => {
-    const currentTimestamp = new Date(msg.createdAt).getTime();
-    const currentDate = new Date(msg.createdAt).toDateString();
-    const isNewDay = lastDate && currentDate !== lastDate;
+	messages.forEach((msg, index) => {
+		const currentTimestamp = new Date(msg.dateTime).getTime();
+		const currentDate = new Date(msg.dateTime).toDateString();
+		const isNewDay = lastDate && currentDate !== lastDate;
 
-    if (isNewDay) {
-      // Nếu là ngày mới và trước đó không phải hôm nay -> lưu lại index của nhóm trước
-      if (!isTodayGroup) {
-        indexes.push(firstIndexInGroup);
-      }
+		if (currentDate !== today) {
+			// Nếu là ngày mới hoặc ngày đầu tiên trong danh sách
+			if (isNewDay || index === 0) {
+				indexes.push(index);
+			}
+			firstIndexInGroup = index; // Reset block mới
+		} else {
+			// Nếu là tin nhắn của hôm nay
+			if (
+				!lastTimestamp ||
+				msg.receiverId !== lastReceiver ||
+				currentTimestamp - lastTimestamp > 30 * 1000
+			) {
+				indexes.push(index);
+				firstIndexInGroup = index; // Reset block mới
+			}
+		}
 
-      // Reset trạng thái
-      firstIndexInGroup = index;
-      isTodayGroup = currentDate === today;
-    }
+		lastTimestamp = currentTimestamp;
+		lastReceiver = msg.receiverId;
+		lastDate = currentDate;
+	});
 
-    if (currentDate !== today) {
-      // Nếu là tin nhắn của ngày cũ, chỉ lưu index đầu tiên của nhóm
-      if (!isTodayGroup) {
-        firstIndexInGroup = index;
-      }
-    } else {
-      // Nếu là tin nhắn của hôm nay, kiểm tra khoảng cách thời gian và sender
-      if (
-        !lastTimestamp ||
-        msg.senderId !== lastSender ||
-        currentTimestamp - lastTimestamp > 10 * 1000
-      ) {
-        indexes.push(index);
-        firstIndexInGroup = index;
-      }
-    }
-
-    lastTimestamp = currentTimestamp;
-    lastSender = msg.senderId;
-    lastDate = currentDate;
-  });
-
-  // Nếu nhóm cuối cùng không phải hôm nay, lưu lại index đầu tiên của nó
-  if (!isTodayGroup) {
-    indexes.push(firstIndexInGroup);
-  }
-
-  return indexes;
+	return indexes;
 };
 
 // 🔹 **Ví dụ sử dụng**

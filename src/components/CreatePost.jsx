@@ -8,9 +8,13 @@ import { createPost } from "../api/postsApi";
 import { postsStore } from "../store/postsStore";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { toast } from "sonner";
+import {
+	combineIntoAvatarName,
+	combineIntoDisplayName,
+} from "@/utils/combineName";
 
 export default function CreatePost() {
-	const { isOpen, hidePopup } = usePopupStore();
+	const hidePopup = usePopupStore((state) => state.hidePopup);
 
 	const insertPost = postsStore((state) => state.insertPost);
 
@@ -25,7 +29,7 @@ export default function CreatePost() {
 	const textbox = useRef();
 
 	const closePopup = () => {
-		hidePopup(false);
+		hidePopup();
 		textbox.current.innerHTML = "";
 		setFileUploads([]);
 		setFilePreviews([]);
@@ -44,36 +48,16 @@ export default function CreatePost() {
 			types.push(type);
 		}
 
-		// Cập nhật trạng thái đúng cách
-		setFileUploads((prev) => {
-			return [...prev, ...files]; // Chuyển files thành mảng nếu cần
-		});
-
-		setFilePreviews((prev) => {
-			return [...prev, ...previewUrls];
-		});
-
-		setFileTypes((prev) => {
-			return [...prev, ...types];
-		});
+		// Cập nhật các file mới
+		setFileUploads((prev) => [...prev, ...files]);
+		setFilePreviews((prev) => [...prev, ...previewUrls]);
+		setFileTypes((prev) => [...prev, ...types]);
 	};
 
 	const deleteFile = (index) => {
-		setFileUploads((prev) => {
-			const newArr = [...prev];
-			newArr.splice(index, 1);
-			return newArr;
-		});
-		setFilePreviews((prev) => {
-			const newArr = [...prev];
-			newArr.splice(index, 1);
-			return newArr;
-		});
-		setFileTypes((prev) => {
-			const newArr = [...prev];
-			newArr.splice(index, 1);
-			return newArr;
-		});
+		setFileUploads((prev) => prev.filter((_, i) => i !== index));
+		setFilePreviews((prev) => prev.filter((_, i) => i !== index));
+		setFileTypes((prev) => prev.filter((_, i) => i !== index));
 	};
 
 	const [submitClicked, setSubmitClicked] = useState(false);
@@ -90,18 +74,21 @@ export default function CreatePost() {
 		});
 
 		const respCreatePost = await createPost(formData);
-
-		if (respCreatePost.statusCode === 100) {
-			const postCreated = {
-				...respCreatePost.data,
-				displayName: user.firstName + " " + user.lastName,
-				avatar: user.avatar,
-				createDatetime: respCreatePost.dateTime,
-			};
-			insertPost(postCreated);
-			toast.success("Bài viết của bạn đã được đăng tải");
-			closePopup();
+		if (!respCreatePost || respCreatePost.statusCode !== 100) {
+			setSubmitClicked(false);
+			return;
 		}
+
+		const postCreated = {
+			...respCreatePost.data,
+			firtName: user.firstName,
+			lastName: user.lastName,
+			avatar: user.avatar,
+		};
+		insertPost(postCreated);
+		toast.success("Bài viết của bạn đã được đăng tải");
+		closePopup();
+
 		setSubmitClicked(false);
 	};
 
@@ -111,25 +98,34 @@ export default function CreatePost() {
 				<div className="flex space-x-2 px-3 pt-3">
 					<Avatar className={`md:size-11 size-9 grid`}>
 						<AvatarImage src={user.avatar} />
-						<AvatarFallback className="font-semibold">{user.firstName.charAt(0) ?? "?"}</AvatarFallback>
+						<AvatarFallback>
+							{combineIntoAvatarName(user.firstName, user.lastName)}
+						</AvatarFallback>
 					</Avatar>
 
 					<div className="flex flex-col justify-center">
-						<span className="font-semibold">{user.firstName + " " + user.lastName}</span>
+						<span className="font-semibold">
+							{combineIntoDisplayName(user.firstName, user.lastName)}
+						</span>
 					</div>
 				</div>
 
-				<TextBox texboxRef={textbox} autoFocus={true} placeholder="Nói gì đó về bài viết của bạn" className="px-3" />
+				<TextBox
+					texboxRef={textbox}
+					autoFocus={true}
+					placeholder="Nói gì đó về bài viết của bạn"
+					className="px-3"
+				/>
 
 				<label
 					htmlFor="file-upload"
-					className={`mx-3 rounded-md aspect-video cursor-pointer flex items-center justify-center border-[2px] border-gray-2light ${
+					className={`mx-3 rounded-md aspect-video cursor-pointer flex items-center justify-center bg-gray-3light ${
 						fileUploads.length > 0 ? "hidden" : ""
 					}`}
 					onDragOver={(e) => {
 						e.preventDefault(); // Chặn hành động mặc định để không mở tệp
 						e.stopPropagation();
-						e.currentTarget.style = `background-color: black; opacity: 20%;`;
+						e.currentTarget.style = `background-color: var(--gray-2light-clr); opacity: 20%;`;
 					}}
 					onDragLeave={(e) => {
 						e.currentTarget.style = "";
@@ -137,6 +133,7 @@ export default function CreatePost() {
 					onDrop={(e) => {
 						e.preventDefault();
 						e.stopPropagation();
+						e.currentTarget.style = "";
 						const files = e.dataTransfer.files;
 						if (files.length > 0) {
 							handleOnFileChange({ target: { files } }); // Gọi hàm xử lý tệp
@@ -147,7 +144,13 @@ export default function CreatePost() {
 						<UploadDecorIcon className="size-24" />
 						<span>Chọn hoặc kéo thả ảnh/video vào đây</span>
 					</div>
-					<input type="file" id="file-upload" onChange={handleOnFileChange} hidden multiple />
+					<input
+						type="file"
+						id="file-upload"
+						onChange={handleOnFileChange}
+						hidden
+						multiple
+					/>
 				</label>
 
 				{filePreviews.map((preview, index) => (
@@ -159,7 +162,11 @@ export default function CreatePost() {
 							<XMarkIcon className="size-[15px] pointer-events-none" />
 						</Button>
 						{fileTypes[index] === "image" ? (
-							<img src={preview} alt={`Preview ${index}`} className="w-full h-auto" />
+							<img
+								src={preview}
+								alt={`Preview ${index}`}
+								className="w-full h-auto"
+							/>
 						) : fileTypes[index] === "video" ? (
 							<video controls className="w-full h-auto">
 								<source src={preview} type="video/mp4" />
@@ -182,7 +189,10 @@ export default function CreatePost() {
 					</Button>
 				)}
 
-				<Button className={`btn-primary py-2.5 ${submitClicked && "disable-btn"}`} onClick={handleSubmitPost}>
+				<Button
+					className={`btn-primary py-2.5 ${submitClicked && "disable-btn"}`}
+					onClick={handleSubmitPost}
+				>
 					{submitClicked ? <LoadingIcon /> : "Đăng bài"}
 				</Button>
 			</div>
