@@ -18,7 +18,7 @@ export default function ButtonGroup({ items, onClick }) {
 					key={index}
 					onClick={() => handleClick(index)}
 					className={`
-                        btn-transparent !rounded-none px-4 text-nowrap text-sm font-medium border-l border-gray-2light
+                        btn-transparent rounded-none px-4 text-nowrap text-sm font-medium border-l border-gray-2light
                         ${activeIndex === index ? "bg-secondary" : "!text-gray"}
                         ${index === 0 ? "border-l-0" : ""}
                     `}
