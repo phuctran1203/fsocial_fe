@@ -30,7 +30,6 @@ import Button from "@/components/Button";
 import { getTimeLabelIndexes } from "@/utils/groupTimeLabelMessages";
 import { getFollowing } from "@/api/profileApi";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import DOMPurify from "dompurify";
 import {
 	combineIntoAvatarName,
 	combineIntoDisplayName,
@@ -50,6 +49,10 @@ export default function Message() {
 
 	const timeoutSearchRef = useRef(null);
 
+	const handleOpenCreateConversation = () => {
+		setContentActive(1);
+	};
+
 	const handleSearch = (value) => {
 		if (timeoutSearchRef.current) {
 			clearTimeout(timeoutSearchRef.current);
@@ -65,6 +68,15 @@ export default function Message() {
 	};
 
 	const handleSelectFriend = (friend) => {
+		const converExist = conversations.find(
+			(conver) => conver.receiverId === friend.userId
+		);
+		if (converExist) {
+			handleChooseConversation(converExist);
+			setContentActive(2);
+			setTrigger(!trigger);
+			return;
+		}
 		// Clear message của người khác nếu có
 		setMessages([]);
 		console.log("Friend được chọn để tạo hội thoại mới: ", friend);
@@ -118,13 +130,25 @@ export default function Message() {
 	}, [user?.userId]);
 
 	// click chọn đoạn hội thoại
+	const controllerGetmsgs = useRef(null);
 	const handleChooseConversation = async (selectedConver) => {
-		if (conversation && conversation.id === selectedConver.id) return;
+		if (
+			conversation &&
+			conversation.id === selectedConver.id &&
+			contentActive === 2
+		)
+			return;
+		if (selectedConver.lastMessage) selectedConver.lastMessage.read = true;
 		setConversation(selectedConver);
 		console.log("selectedConver is: ", selectedConver);
 		setContentActive(2);
 		setTrigger(!trigger);
-		const resp = await getMessages(selectedConver.id);
+		if (controllerGetmsgs.current) controllerGetmsgs.current.abort();
+		controllerGetmsgs.current = new AbortController();
+		const resp = await getMessages(
+			selectedConver.id,
+			controllerGetmsgs.current
+		);
 		if (!resp || resp.statusCode !== 200) {
 			setMessages([]);
 			return;
@@ -213,8 +237,6 @@ export default function Message() {
 				break;
 			}
 		}
-		// tin nhắn mới nhất mặc định hiển thị message time dưới nó
-		setIndexMsgShow(messages.length - 1);
 		// handle chia block tin nhắn
 		setTimeLabelIndexes(getTimeLabelIndexes(messages));
 		console.log("Group label time indexes: ", getTimeLabelIndexes(messages));
@@ -253,14 +275,13 @@ export default function Message() {
 					top: containerMessagesRef.current.scrollHeight,
 				});
 				oldConverId.current = conversation.id;
-				// bắt đầu intersectionObserver tin nhắn cũ nhất trong messages ở đây
-				// để call API lấy tiếp tin nhắn cũ hơn
+				// intersectionObserver call API lấy tiếp tin nhắn cũ
 				if (observer.current) observer.current.disconnect();
 				observer.current = new IntersectionObserver(callBackAPI, {
 					root: containerMessagesRef.current,
 				});
 				observer.current.observe(containerMessagesRef.current.childNodes[1]);
-			}, 100);
+			}, 1);
 		}
 	};
 
@@ -310,7 +331,7 @@ export default function Message() {
 					<h2 className="">Tin nhắn</h2>
 					<Button
 						className="btn-transparent !w-fit p-1"
-						onClick={() => setContentActive(1)}
+						onClick={handleOpenCreateConversation}
 					>
 						<PlusIcon />
 					</Button>
@@ -330,48 +351,44 @@ export default function Message() {
 				</label>
 				{/* list conversations */}
 				<div className="h-full px-2 flex-grow overflow-auto">
-					{conversations.map((conversation, index) => (
+					{conversations.map((conver, index) => (
 						<div
 							key={index}
-							className="px-3 py-2.5 rounded-md flex items-center gap-3 hover:bg-gray-3light ct-transition cursor-pointer"
-							onClick={() => handleChooseConversation(conversation)}
+							className={`
+							px-3 py-2.5 rounded-md flex items-center gap-3 hover:bg-gray-2light transition cursor-pointer
+							${conver.id === conversation?.id && "bg-gray-3light"}`}
+							onClick={() => handleChooseConversation(conver)}
 						>
 							<Avatar className={`size-11`}>
-								<AvatarImage src={conversation.avatar} />
+								<AvatarImage src={conver.avatar} />
 								<AvatarFallback className="fs-xs">
-									{combineIntoAvatarName(
-										conversation.firstName,
-										conversation.lastName
-									)}
+									{combineIntoAvatarName(conver.firstName, conver.lastName)}
 								</AvatarFallback>
 							</Avatar>
 
-							<div>
+							<div className="flex-grow min-w-0">
 								<div className="flex items-center gap-2">
 									<span className="font-semibold">
-										{combineIntoDisplayName(
-											conversation.firstName,
-											conversation.lastName
-										)}
+										{combineIntoDisplayName(conver.firstName, conver.lastName)}
 									</span>
 									{/* dấu chấm đánh dấu chưa đọc */}
-									{conversation.lastMessage &&
-										!conversation.lastMessage.read && (
-											<span className="size-2 bg-primary rounded-full" />
-										)}
+									{conver.lastMessage && !conver.lastMessage.read && (
+										<span className="size-2 bg-primary-gradient rounded-full" />
+									)}
 								</div>
-								{conversation.lastMessage && (
-									<div className="flex gap-2">
+								{conver.lastMessage && (
+									<div className="flex gap-2 items-end justify-between">
 										<div
-											className={`line-clamp-1 ${
-												!conversation.lastMessage.read && "font-semibold"
+											className={`line-clamp-1 text-gray ${
+												!conver.lastMessage.read &&
+												"font-semibold text-primary-text"
 											}`}
 											dangerouslySetInnerHTML={{
-												__html: conversation.lastMessage.content,
+												__html: conver.lastMessage.content,
 											}}
 										></div>
-										<span className="text-gray text-nowrap">
-											{dateTimeToMessageTime(conversation.lastMessage.createAt)}
+										<span className="text-gray fs-xs text-nowrap">
+											{dateTimeToMessageTime(conver.lastMessage.createAt)}
 										</span>
 									</div>
 								)}
@@ -474,8 +491,11 @@ export default function Message() {
 								</button>
 								<Avatar className={`size-9 me-2`}>
 									<AvatarImage src={conversation.avatar} />
-									<AvatarFallback className="fs-xs">
-										{conversation.firstName.charAt(0) ?? "?"}
+									<AvatarFallback className="text-xs">
+										{combineIntoAvatarName(
+											conversation.firstName,
+											conversation.lastName
+										)}
 									</AvatarFallback>
 								</Avatar>
 								<p className="font-semibold">
@@ -490,14 +510,14 @@ export default function Message() {
 						{/* tin nhắn */}
 						<div
 							ref={containerMessagesRef}
-							className="overflow-y-auto px-3 pt-4 pb-2 flex-grow space-y-0.5"
+							className="overflow-y-auto px-3 pb-2 flex-grow space-y-0.5"
 						>
 							{messages.map((message, index) => (
 								<div key={index}>
 									{/* label time for messages block */}
 									{timeLabelIndexes.includes(index) && (
 										<p
-											className={`fs-xs -z-10 text-gray text-center transition`}
+											className={`fs-xs pt-3 pb-1.5 text-gray text-center transition`}
 										>
 											{dateTimeToMessageTime(message.createAt)}
 										</p>
@@ -511,9 +531,11 @@ export default function Message() {
 										>
 											<div
 												className={`
-												px-3 py-1 ms-auto rounded-2xl w-fit max-w-[70vw] text-txtWhite 
+												px-3 py-1 ms-auto rounded-2xl w-fit md:max-w-[60%] max-w-[80%] text-txtWhite 
 												${
-													theme === "light" ? "bg-primary" : "bg-gray-3light"
+													theme === "light"
+														? "bg-primary-gradient"
+														: "bg-gray-3light"
 												} cursor-pointer transition`}
 												dangerouslySetInnerHTML={{
 													__html: message.content,
@@ -539,15 +561,18 @@ export default function Message() {
 												{avatarReceiverPosition === index ? (
 													<Avatar className={`size-6`}>
 														<AvatarImage src={conversation.avatar} />
-														<AvatarFallback className="text-[8px]">
-															{conversation.firstName.charAt(0) ?? "?"}
+														<AvatarFallback className="text-[6px]">
+															{combineIntoAvatarName(
+																conversation.firstName,
+																conversation.lastName
+															)}
 														</AvatarFallback>
 													</Avatar>
 												) : (
 													<div className="size-6" />
 												)}
 												<div
-													className={`px-3 py-1 rounded-2xl w-fit max-w-[70vw] ${
+													className={`px-3 py-1 rounded-2xl w-fit md:max-w-[60%] max-w-[80%] ${
 														theme === "light"
 															? "bg-secondary"
 															: "bg-background ring-1 ring-gray-3light ring-inset"
@@ -599,7 +624,7 @@ export default function Message() {
 							/>
 							<button
 								onClick={handleSendMsg}
-								className="bg-primary py-1.5 px-5 rounded-full"
+								className="bg-primary-gradient py-1.5 px-5 rounded-full"
 							>
 								<SendIcon color="stroke-txtWhite" />
 							</button>

@@ -16,7 +16,10 @@ export default function Search() {
 
 	const handleSendKeyword = async () => {
 		setSearchAction(true);
-		const [respUsers, respPosts] = await Promise.all([searchUsers(query), searchPosts(query)]);
+		const [respUsers, respPosts] = await Promise.all([
+			searchUsers(query),
+			searchPosts(query),
+		]);
 		const dataUsers = respUsers.data;
 		const dataPosts = respPosts.data;
 		setUsers(dataUsers);
@@ -58,7 +61,9 @@ export default function Search() {
 				<div className="mx-3 xl:mx-0 flex gap-6">
 					<button
 						className={`py-2 w-full rounded-t-sm border-b hover:border-primary hover:text-primary active:bg-gray-3light ${
-							tab === "all" ? "border-primary text-primary" : "border-transparent text-gray"
+							tab === "all"
+								? "border-primary text-primary"
+								: "border-transparent text-gray"
 						} transition`}
 						onClick={() => setTab("all")}
 					>
@@ -67,7 +72,9 @@ export default function Search() {
 
 					<button
 						className={`py-2 w-full rounded-t-sm border-b hover:border-primary hover:text-primary active:bg-gray-3light ${
-							tab === "users" ? "border-primary text-primary" : "border-transparent text-gray"
+							tab === "users"
+								? "border-primary text-primary"
+								: "border-transparent text-gray"
 						} transition`}
 						onClick={() => setTab("users")}
 					>
@@ -76,7 +83,9 @@ export default function Search() {
 
 					<button
 						className={`py-2 w-full rounded-t-sm border-b hover:border-primary hover:text-primary active:bg-gray-3light ${
-							tab === "posts" ? "border-primary text-primary" : "border-transparent text-gray"
+							tab === "posts"
+								? "border-primary text-primary"
+								: "border-transparent text-gray"
 						} transition`}
 						onClick={() => setTab("posts")}
 					>
@@ -87,15 +96,28 @@ export default function Search() {
 					<div className="mx-3 xl:mx-0">
 						<h5 className="font-medium">Người dùng</h5>
 						{users.map((user) => (
-							<div key={user.userId} className="flex items-center justify-between border-b py-3 transition">
+							<div
+								key={user.userId}
+								className="flex items-center justify-between border-b py-3 transition"
+							>
 								<div className="flex items-center space-x-3">
-									<img src={user.avatar || "./temp/default_avatar.svg"} alt="avatar" className="size-12 rounded-full" />
+									<img
+										src={user.avatar || "./temp/default_avatar.svg"}
+										alt="avatar"
+										className="size-12 rounded-full"
+									/>
 									<div>
 										<p className="font-semibold">{user.displayName}</p>
-										{user.followers > 0 && <p className="fs-xs text-gray">{user.followers} người theo dõi</p>}
+										{user.followers > 0 && (
+											<p className="fs-xs text-gray">
+												{user.followers} người theo dõi
+											</p>
+										)}
 									</div>
 								</div>
-								<Button className="btn-ghost max-w-fit px-4 py-1 rounded">Theo dõi</Button>
+								<Button className="btn-ghost max-w-fit px-4 py-1 rounded">
+									Theo dõi
+								</Button>
 							</div>
 						))}
 					</div>

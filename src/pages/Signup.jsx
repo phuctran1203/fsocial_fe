@@ -251,7 +251,7 @@ export default function Signup() {
 				alt=""
 			/>
 			<div className="md:w-10/12 md:mx-auto mx-6 md:mb-2 grid grid-cols-[repeat(15,minmax(0,1fr))] grid-rows-2 items-center">
-				<h3 className="z-0 col-start-2 justify-self-center bg-primary text-txtWhite font-semibold md:w-12 w-10 aspect-square rounded-full grid place-content-center">
+				<h3 className="z-0 col-start-2 justify-self-center bg-primary-gradient text-txtWhite font-semibold md:w-12 w-10 aspect-square rounded-full grid place-content-center">
 					1
 				</h3>
 				<div
@@ -264,7 +264,9 @@ export default function Signup() {
 				/>
 				<h3
 					className={`z-0 justify-self-center font-semibold md:w-12 w-10 aspect-square rounded-full grid place-content-center ${
-						currentStep >= 2 ? "bg-primary text-txtWhite" : "bg-secondary"
+						currentStep >= 2
+							? "bg-primary-gradient text-txtWhite"
+							: "bg-secondary"
 					} transition-all duration-300 ease-in`}
 				>
 					2
@@ -279,7 +281,9 @@ export default function Signup() {
 				/>
 				<h3
 					className={`z-0 justify-self-center font-semibold md:w-12 w-10 aspect-square rounded-full grid place-content-center ${
-						currentStep >= 3 ? "bg-primary text-txtWhite" : "bg-secondary"
+						currentStep >= 3
+							? "bg-primary-gradient text-txtWhite"
+							: "bg-secondary"
 					} transition-all duration-300 ease-in`}
 				>
 					3
@@ -294,7 +298,9 @@ export default function Signup() {
 				/>
 				<h3
 					className={`z-0 justify-self-center font-semibold md:w-12 w-10 aspect-square rounded-full grid place-content-center ${
-						currentStep >= 4 ? "bg-primary text-txtWhite" : "bg-secondary"
+						currentStep >= 4
+							? "bg-primary-gradient text-txtWhite"
+							: "bg-secondary"
 					} transition-all duration-300 ease-in`}
 				>
 					4
@@ -536,7 +542,7 @@ export default function Signup() {
 										{requestOTPClicked ? <LoadingIcon /> : "Tiếp theo"}
 									</Button>
 									<Button
-										className="btn-secondary gap-2 py-3"
+										className="btn-transparent border gap-2 py-3"
 										onClick={gotoStep1}
 										allowTab={currentStep === 2}
 									>
@@ -580,7 +586,7 @@ export default function Signup() {
 									</Button>
 								</div>
 								<Button
-									className="btn-secondary gap-2 py-3"
+									className="btn-transparent border gap-2 py-3"
 									allowTab={currentStep === 3}
 									onClick={goToStep2}
 								>
@@ -597,7 +603,7 @@ export default function Signup() {
 								before:absolute before:left-1/2 before:-translate-x-1/2 before:-translate-y-1/2 before:content-['Hoặc'] before:size-fit before:bg-background before:px-2"
 						/>
 						<div>
-							<Button className="btn-secondary mb-5 gap-3 py-3">
+							<Button className="btn-transparent border mb-5 gap-3 py-3">
 								<img className="size-6" src="./decor/google_icon.svg" alt="" />
 								Đăng ký với Google
 							</Button>

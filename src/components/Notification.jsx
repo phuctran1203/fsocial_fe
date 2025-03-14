@@ -4,9 +4,9 @@ import {
 	Check,
 	Bell,
 	CloseCollapseIcon,
-	CommentNoti,
+	CommentNotiIcon,
 	Glyph,
-	HeartNoti,
+	HeartNotiIcon,
 	TrashCanIcon,
 	XMarkIcon,
 } from "./Icon";
@@ -65,7 +65,7 @@ const Noti = ({
 
 	const notiMap = {
 		likePost: {
-			icon: <HeartNoti />,
+			icon: <HeartNotiIcon />,
 			content: (
 				<>
 					<span className="fs-sm font-semibold">{name}</span>
@@ -74,7 +74,7 @@ const Noti = ({
 			),
 		},
 		likeComment: {
-			icon: <HeartNoti />,
+			icon: <HeartNotiIcon />,
 
 			content: (
 				<>
@@ -84,7 +84,7 @@ const Noti = ({
 			),
 		},
 		COMMENT: {
-			icon: <CommentNoti />,
+			icon: <CommentNotiIcon />,
 			content: (
 				<>
 					<span className="fs-sm font-semibold">{name}</span>
@@ -107,7 +107,7 @@ const Noti = ({
 					<div className={`size-12 rounded-full overflow-hidden`}>
 						<Avatar className={`size-full`}>
 							<AvatarImage src={avatar} />
-							<AvatarFallback className="fs-sm">
+							<AvatarFallback className="fs-sm transition">
 								{combineIntoAvatarName(firstName, lastName)}
 							</AvatarFallback>
 						</Avatar>
@@ -124,7 +124,9 @@ const Noti = ({
 					<div className="flex items-center gap-2">
 						<span className={`fs-xs ${read && "opacity-60"} `}>{textTime}</span>
 
-						{!read && <span className="size-2 bg-primary rounded-full" />}
+						{!read && (
+							<span className="size-2 bg-primary-gradient rounded-full" />
+						)}
 					</div>
 				</div>
 			</Link>
@@ -227,8 +229,8 @@ export default function Notification() {
 				h-full relative bg-background 
 				${!isInMessage ? "lg:translate-x-0 lg:drop-shadow-none" : ""}
 				lg:translate-y-0
-				md:w-[340px]
-				sm:w-[310px] sm:pb-0
+				md:w-[360px]
+				sm:w-[340px] sm:pb-0
 				w-full pb-14
 				${
 					isVisible
@@ -255,7 +257,7 @@ export default function Notification() {
 					<div className="px-4 flex items-center gap-5">
 						<div className="relative">
 							<Bell active={true} />
-							<span className="absolute bottom-1/2 left-1/2 px-1 bg-primary rounded-full text-txtWhite text-[12px]">
+							<span className="absolute bottom-1/2 left-1/2 px-1 bg-primary font-bold rounded-full text-txtWhite text-[12px]">
 								99+
 							</span>
 						</div>

@@ -46,10 +46,10 @@ export default function EditPostModal({ id }) {
 	return (
 		<div className="relative flex-grow flex flex-col sm:w-[550px] sm:h-fit sm:max-h-[90dvh] h-[100dvh]">
 			<div className="flex-grow pt-3 space-y-2 overflow-y-auto scrollable-div">
-				<div className="flex space-x-2 px-3">
-					<Avatar className={`md:size-11 size-9 grid`}>
+				<div className="flex space-x-2 px-4">
+					<Avatar className={`size-9`}>
 						<AvatarImage src={post.avatar} />
-						<AvatarFallback className="font-semibold">
+						<AvatarFallback className="text-[12px]">
 							{combineIntoAvatarName(post.firtName, post.lastName)}
 						</AvatarFallback>
 					</Avatar>
@@ -66,7 +66,7 @@ export default function EditPostModal({ id }) {
 
 				<TextBox
 					texboxRef={textbox}
-					className="px-3"
+					className="px-4"
 					innerHTML={post.content.htmltext}
 					autoFocus={true}
 				/>

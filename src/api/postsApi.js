@@ -3,7 +3,10 @@ import API from "./axiosInstance";
 
 export const getPosts = async (userId, controller) => {
 	try {
-		const resp = await API.get(`/timeline/post?userId=${userId}`, controller && { signal: controller.signal });
+		const resp = await API.get(
+			`/timeline/post?userId=${userId}`,
+			controller && { signal: controller.signal }
+		);
 		const data = resp.data;
 		console.log("Resp getPosts: ", data);
 		return data;
@@ -33,8 +36,8 @@ export const likePost = async (postId) => {
 	}
 };
 
-export const createPost = (data) =>
-	API.post("/post/actions", data)
+export const createPost = (data, config = {}) =>
+	API.post("/post/actions", data, { ...config })
 		.then((resp) => {
 			const data = resp.data;
 			console.log("Resp createPost: ", data);

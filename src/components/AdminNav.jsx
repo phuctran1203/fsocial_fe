@@ -36,11 +36,7 @@ export default function AdminNav() {
 						key={index}
 						to={route.to}
 						className={`btn-transparent justify-start p-3 py-3.5 gap-3
-                            ${
-															path === route.to
-																? "bg-gray-3light font-medium"
-																: ""
-														}
+                            ${path === route.to && "bg-gray-3light font-medium"}
                             hover:bg-gray-3light`}
 					>
 						{route.icon}
@@ -50,16 +46,12 @@ export default function AdminNav() {
 				<Button
 					to="/admin/profile"
 					className={`btn-transparent justify-start p-3 py-3.5
-                        ${
-													path === "/profile"
-														? "bg-gray-3light font-medium"
-														: ""
-												}
+                        ${path === "/profile" && "bg-gray-3light font-medium"}
                         hover:bg-gray-3light`}
 				>
 					<Avatar className={`size-[26px]`}>
 						<AvatarImage src={"../temp/default_avatar.svg"} />
-						<AvatarFallback className="text-[12px] font-semibold">
+						<AvatarFallback className="text-[10px] font-semibold">
 							{combineIntoAvatarName(user.firstName, user.lastName)}
 						</AvatarFallback>
 					</Avatar>

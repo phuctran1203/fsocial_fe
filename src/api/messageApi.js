@@ -16,13 +16,17 @@ export async function getConversations() {
 	}
 }
 
-export async function getMessages(conversationId) {
+export async function getMessages(conversationId, controller) {
 	try {
-		const resp = await API.get(`/message/messages/${conversationId}`);
+		const resp = await API.get(
+			`/message/messages/${conversationId}`,
+			controller && { signal: controller.signal }
+		);
 		const data = resp.data;
 		console.log("Resp getMessages: ", data);
 		return data;
 	} catch (error) {
+		if (error.name === "CanceledError") return null;
 		console.error("Error at getMessages: ", error);
 		return error.response?.data || null;
 	}

@@ -167,7 +167,7 @@ export default function AdminComplaint() {
 							>
 								<PencilIcon />
 								{!item.status && (
-									<div className="absolute -top-1 left-full size-2 bg-primary rounded-full" />
+									<div className="absolute -top-1 left-full size-2 bg-primary-gradient rounded-full" />
 								)}
 							</button>
 						</td>

@@ -297,7 +297,10 @@ export default function Profile() {
 											>
 												<AvatarImage src={friend.avatar} />
 												<AvatarFallback>
-													{friend?.firstName?.charAt(0) ?? "?"}
+													{combineIntoAvatarName(
+														friend.firstName,
+														friend.lastName
+													)}
 												</AvatarFallback>
 											</Avatar>
 											{index + 1 ===
@@ -423,18 +426,30 @@ export default function Profile() {
 									))}
 								</div>
 								{/* owner followers */}
-								<div className="snap-start grid grid-cols-4 sm:gap-3 gap-2 min-h-1 h-fit overflow-y-auto w-full max-h-full scrollable-div">
+								<div className="snap-start grid grid-cols-5 sm:gap-3 gap-2 min-h-1 h-fit overflow-y-auto w-full max-h-full scrollable-div">
 									{followers &&
 										followers.map((friend) => (
 											<div key={friend.firstName}>
-												<div className="aspect-square overflow-hidden rounded-md">
-													<img
-														src={friend.avatar}
-														alt=""
-														className="size-full object-cover object-center"
-													/>
+												<div className="aspect-square">
+													<Avatar className="size-full rounded-md">
+														<AvatarImage
+															scr={friend.avatar}
+															className="rounded-none"
+														/>
+														<AvatarFallback className="rounded-none text-[32px]">
+															{combineIntoAvatarName(
+																friend.firstName,
+																friend.lastName
+															)}
+														</AvatarFallback>
+													</Avatar>
 												</div>
-												<p className="font-semibold">{friend.displayName}</p>
+												<p className="font-semibold">
+													{combineIntoDisplayName(
+														friend.firstName,
+														friend.lastName
+													)}
+												</p>
 											</div>
 										))}
 									{(!followers || followers.length === 0) && (

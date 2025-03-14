@@ -329,7 +329,10 @@ export default function UserForgotPassword() {
 									</Button>
 								</div>
 
-								<Button className="btn-secondary px-8 py-3" onClick={gotoStep1}>
+								<Button
+									className="btn-transparent border px-8 py-3"
+									onClick={gotoStep1}
+								>
 									<ArrowLeftIcon /> Quay lại
 								</Button>
 							</div>
