@@ -9,8 +9,8 @@ export const getTimeLabelIndexes = (messages) => {
 	let lastReceiver = null;
 
 	messages.forEach((msg, index) => {
-		const currentTimestamp = new Date(msg.dateTime).getTime();
-		const currentDate = new Date(msg.dateTime).toDateString();
+		const currentTimestamp = new Date(msg.createAt).getTime();
+		const currentDate = new Date(msg.createAt).toDateString();
 		const isNewDay = lastDate && currentDate !== lastDate;
 
 		if (currentDate !== today) {
@@ -24,7 +24,7 @@ export const getTimeLabelIndexes = (messages) => {
 			if (
 				!lastTimestamp ||
 				msg.receiverId !== lastReceiver ||
-				currentTimestamp - lastTimestamp > 30 * 1000
+				currentTimestamp - lastTimestamp > 60 * 1000
 			) {
 				indexes.push(index);
 				firstIndexInGroup = index; // Reset block mới
@@ -38,20 +38,3 @@ export const getTimeLabelIndexes = (messages) => {
 
 	return indexes;
 };
-
-// 🔹 **Ví dụ sử dụng**
-// const messages = [
-// 	{ senderId: 1, receiverId: 2, createdAt: "2024-03-08T10:00:00Z" },
-// 	{ senderId: 1, receiverId: 2, createdAt: "2024-03-08T10:00:05Z" },
-// 	{ senderId: 2, receiverId: 1, createdAt: "2024-03-08T10:00:20Z" },
-// 	{ senderId: 1, receiverId: 2, createdAt: "2024-03-09T12:00:00Z" },
-// 	{ senderId: 1, receiverId: 2, createdAt: "2024-03-10T12:00:00Z" },
-// 	{ senderId: 2, receiverId: 1, createdAt: "2024-03-10T12:00:15Z" },
-// 	{ senderId: 2, receiverId: 1, createdAt: "2024-03-10T12:00:25Z" },
-// 	{ senderId: 1, receiverId: 2, createdAt: "2024-03-11T10:00:00Z" },
-// 	{ senderId: 1, receiverId: 2, createdAt: "2024-03-11T10:00:08Z" },
-// 	{ senderId: 1, receiverId: 2, createdAt: "2024-03-11T10:00:20Z" },
-// 	{ senderId: 2, receiverId: 1, createdAt: "2024-03-11T10:00:30Z" },
-// ];
-
-// console.log(getTimeLabelIndexes(messages));

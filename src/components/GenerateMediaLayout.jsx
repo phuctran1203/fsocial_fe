@@ -28,8 +28,8 @@ const classLayout = (medias) => {
 export default function GenerateMediaLayout({ medias }) {
 	return (
 		<div className={`max-h-[960px] border-y transition ${classLayout(medias)}`}>
-			{medias.map((media) => (
-				<div className="overflow-hidden">
+			{medias.map((media, index) => (
+				<div key={index} className="overflow-hidden">
 					<ProcessMedia media={media} />
 				</div>
 			))}

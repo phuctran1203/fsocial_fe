@@ -227,8 +227,8 @@ export default function Notification() {
 				h-full relative bg-background 
 				${!isInMessage ? "lg:translate-x-0 lg:drop-shadow-none" : ""}
 				lg:translate-y-0
-				md:w-[340px]
-				sm:w-[310px] sm:pb-0
+				md:w-[360px]
+				sm:w-[340px] sm:pb-0
 				w-full pb-14
 				${
 					isVisible

@@ -75,6 +75,7 @@ export default function CreatePost() {
 
 		const respCreatePost = await createPost(formData);
 		if (!respCreatePost || respCreatePost.statusCode !== 100) {
+			toast.error("Đã có lỗi xảy ra khi cố gắng đăng tải bài viết của bạn");
 			setSubmitClicked(false);
 			return;
 		}
