@@ -14,16 +14,19 @@ import {
 	combineIntoAvatarName,
 	combineIntoDisplayName,
 } from "@/utils/combineName";
+import { HeartPostIcon } from "./Icon";
 
-function RenderComment(props) {
-	const {
-		comment,
-		selectCommentToReply,
-		handleShowReplyComment,
-		replies,
-		isReply,
-	} = props;
+function RenderComment({ ...props }) {
+	const { comment, selectCommentToReply, handleShowReplyComment, replies } =
+		props;
+	// if (comment.reply != undefined) {
+	// 	console.log("all props is: ", props);
+	// 	console.log("comment is: ", comment);
+	// 	console.log("replies is: ", replies);
+	// }
+
 	const [like, setLike] = useState(false);
+
 	const [countLikes, setCountLikes] = useState(comment.countLikes);
 
 	const handleClickLike = () => {
@@ -32,58 +35,43 @@ function RenderComment(props) {
 	};
 
 	return (
-		<div className={`${isReply && "ps-6"} flex flex-col space-y-2`}>
-			<div className="flex gap-3">
-				<Link to="">
-					<Avatar className={`size-9`}>
-						<AvatarImage src={comment.avatar} />
-						<AvatarFallback className="text-[11px]">
-							{combineIntoAvatarName(comment.firstName, comment.lastName)}
-						</AvatarFallback>
-					</Avatar>
-				</Link>
+		<div className="flex gap-3">
+			{/* avatar */}
+			<Link to="">
+				<Avatar className={`size-9`}>
+					<AvatarImage src={comment.avatar} />
+					<AvatarFallback className="text-[11px]">
+						{combineIntoAvatarName(comment.firstName, comment.lastName)}
+					</AvatarFallback>
+				</Avatar>
+			</Link>
 
+			<div>
 				<div className="space-y-1">
-					<div>
-						<Link
-							to=""
-							className="font-semibold text-gray fs-xs hover:underline hover:text-primary-text"
-						>
-							{combineIntoDisplayName(comment.firstName, comment.lastName)}
-						</Link>
-						<div
-							dangerouslySetInnerHTML={{ __html: comment.content.htmltext }}
-						></div>
-					</div>
-
+					{/* tên */}
+					<Link
+						to=""
+						className="font-semibold text-gray fs-xs hover:underline hover:text-primary-text"
+					>
+						{combineIntoDisplayName(comment.firstName, comment.lastName)}
+					</Link>
+					{/* nội dung cmt */}
+					<div dangerouslySetInnerHTML={{ __html: comment.content.htmltext }} />
+					{/* time, like, reply button */}
 					<div className="flex items-center gap-2 text-gray">
 						<span className="text-gray fs-sm">
 							{dateTimeToNotiTime(comment.createdAt).textTime}
 						</span>
-						<button className="flex items-center" onClick={handleClickLike}>
-							<svg
-								className="sm:h-[15px] h-[13px]"
-								width="25"
-								height="22"
-								viewBox="0 0 25 22"
-								fill="none"
-							>
-								<path
-									className={
-										like
-											? "fill-primary stroke-primary"
-											: "fill-gray stroke-gray"
-									}
-									d="M12.4877 4.16991L11.9102 4.7257C12.0613 4.88268 12.2698 4.97138 12.4877 4.97138C12.7056 4.97138 12.914 4.88268 13.0651 4.7257L12.4877 4.16991ZM9.73709 17.871C8.11742 16.5942 6.34638 15.3473 4.94138 13.7652C3.56385 12.214 2.60293 10.4041 2.60293 8.05592H1C1 10.9043 2.1867 13.0774 3.74285 14.8296C5.27152 16.5509 7.22019 17.9279 8.74474 19.1298L9.73709 17.871ZM2.60293 8.05592C2.60293 5.75745 3.9017 3.82997 5.67453 3.01961C7.39683 2.23234 9.71103 2.44083 11.9102 4.7257L13.0651 3.61412C10.4557 0.903024 7.42678 0.456202 5.00814 1.56176C2.64002 2.64423 1 5.15774 1 8.05592H2.60293ZM8.74474 19.1298C9.29212 19.5613 9.87974 20.0215 10.4752 20.3694C11.0706 20.7172 11.7499 21 12.4877 21V19.3971C12.1568 19.3971 11.7675 19.2681 11.284 18.9854C10.8006 18.703 10.2992 18.3141 9.73709 17.871L8.74474 19.1298ZM16.2306 19.1298C17.7551 17.9279 19.7038 16.5509 21.2325 14.8296C22.7886 13.0774 23.9753 10.9043 23.9753 8.05592H22.3724C22.3724 10.4041 21.4115 12.214 20.0339 13.7652C18.6289 15.3473 16.8579 16.5942 15.2383 17.871L16.2306 19.1298ZM23.9753 8.05592C23.9753 5.15774 22.3353 2.64423 19.9671 1.56176C17.5485 0.456202 14.5196 0.903024 11.9102 3.61412L13.0651 4.7257C15.2643 2.44083 17.5785 2.23234 19.3008 3.01961C21.0736 3.82997 22.3724 5.75745 22.3724 8.05592H23.9753ZM15.2383 17.871C14.6761 18.3141 14.1747 18.703 13.6914 18.9854C13.2078 19.2681 12.8185 19.3971 12.4877 19.3971V21C13.2254 21 13.9048 20.7172 14.5001 20.3694C15.0956 20.0215 15.6832 19.5613 16.2306 19.1298L15.2383 17.871Z"
-									strokeWidth={0.6}
-								/>
 
-								<path
-									className={like ? "fill-primary stroke-primary" : ""}
-									d="M12.4877 4.97138C12.2698 4.97138 12.0613 4.88268 11.9102 4.7257C9.71103 2.44083 7.39683 2.23234 5.67453 3.01961C3.9017 3.82997 2.60293 5.75745 2.60293 8.05592C2.60293 10.4041 3.56385 12.214 4.94138 13.7652C6.34638 15.3473 8.11742 16.5942 9.73709 17.871C10.2992 18.3141 10.8006 18.703 11.284 18.9854C11.7675 19.2681 12.1568 19.3971 12.4877 19.3971C12.8185 19.3971 13.2078 19.2681 13.6914 18.9854C14.1747 18.703 14.6761 18.3141 15.2383 17.871C16.8579 16.5942 18.6289 15.3473 20.0339 13.7652C21.4115 12.214 22.3724 10.4041 22.3724 8.05592C22.3724 5.75745 21.0736 3.82997 19.3008 3.01961C17.5785 2.23234 15.2643 2.44083 13.0651 4.7257C12.914 4.88268 12.7056 4.97138 12.4877 4.97138Z"
-									strokeWidth={1}
-								/>
-							</svg>
+						<button
+							className="flex items-center gap-1"
+							onClick={handleClickLike}
+						>
+							<HeartPostIcon
+								compareVar={like}
+								className="sm:h-[15px] h-[13px]"
+								fill="fill-gray"
+							/>
 							<span className={`fs-sm ${like && "text-primary"}`}>
 								{countLikes}
 							</span>
@@ -92,38 +80,34 @@ function RenderComment(props) {
 						<button
 							className="fs-sm hover:text-primary-text"
 							onClick={() => {
-								selectCommentToReply({
-									id: comment.id,
-									userId: comment.userId,
-									displayName: comment.displayName,
-								});
+								selectCommentToReply({ ...comment });
 							}}
 						>
 							Phản hồi
 						</button>
 					</div>
-
-					{comment.reply && !isReply && (
-						<button
-							className="fs-xs ps-2 font-semibold text-gray hover:underline"
-							onClick={handleShowReplyComment}
-						>
-							{replies?.reply.length} phản hồi
-						</button>
-					)}
-					{/* show list reply comment */}
-					<div>
-						{replies?.reply.map((reply) => (
-							<RenderComment
-								key={comment.id}
-								comment={reply}
-								selectCommentToReply={selectCommentToReply}
-								handleShowReplyComment={handleShowReplyComment}
-								isReply={true}
-							/>
-						))}
-					</div>
 				</div>
+
+				{comment.reply && (
+					<div className="mt-3 space-y-2">
+						{!replies ? (
+							<button
+								className="fs-xs ps-2 font-semibold text-gray hover:underline"
+								onClick={() => handleShowReplyComment(comment.commentId)}
+							>
+								{replies.reply.length} phản hồi
+							</button>
+						) : (
+							replies.reply.map((reply, index) => (
+								<RenderComment
+									key={index}
+									comment={reply}
+									selectCommentToReply={selectCommentToReply}
+								/>
+							))
+						)}
+					</div>
+				)}
 			</div>
 		</div>
 	);
@@ -148,8 +132,10 @@ export default function CommentModal({ id }) {
 
 	const [trigger, setTrigger] = useState(false); // trigger tự động focus texbox sau khi đã gửi comment
 
-	const selectCommentToReply = (props) => {
-		const { id, userId, displayName } = props;
+	const selectCommentToReply = (selectedComment) => {
+		console.log("selectedComment is: ", selectedComment);
+
+		const { id, userId, firstName, lastName } = selectedComment;
 
 		const exist = Array.from(textbox.current.childNodes).find(
 			(el) => el.dataset?.mention === userId
@@ -158,20 +144,15 @@ export default function CommentModal({ id }) {
 			console.log("đã có trong danh sách nhắc đến");
 			return;
 		}
-		setSelectReply(props);
-		console.log(
-			"cmt id: ",
-			id,
-			"userId: ",
-			userId,
-			"displayName: ",
-			displayName
-		);
-		textbox.current.innerHTML += `<a href="" class="text-primary font-semibold" contentEditable="false" data-mention="${userId}">${displayName}</a>&nbsp`;
+		setSelectReply(selectedComment);
+		textbox.current.innerHTML += `<a href="" class="text-primary font-semibold" contentEditable="false" data-mention="${userId}">${combineIntoDisplayName(
+			firstName,
+			lastName
+		)}</a>&nbsp`;
 		setTrigger(!trigger); // tự focus vào textbox sau khi click "Phản hồi trên comment"
 	};
 
-	const handleStopReply = () => setSelectReply(null);
+	const handleStopReply = () => setSelectReply({});
 
 	const handleSendComment = async () => {
 		const { innerText, innerHTML } = getTextboxData(textbox);
@@ -192,7 +173,7 @@ export default function CommentModal({ id }) {
 		// formData.append("media", file.files[0]);
 
 		let respSendCmt = null;
-		if (selectReply?.id) {
+		if (selectReply.id) {
 			//id là id của comment được chọn để phản hồi
 			formData.append("commentId", selectReply.id);
 			respSendCmt = await replyComment(formData);
@@ -214,39 +195,61 @@ export default function CommentModal({ id }) {
 			firstName: user.firstName,
 			lastName: user.lastName,
 		};
-		// nếu đang reply sẽ đẩy comment mới vào reply
-		if (selectReply?.id) {
+		// đang reply cmt được select
+		if (selectReply.id) {
+			// cmt cấp 1 có id không có commentId
+			// cmt cấp 2 có id có commentId = id cmt cấp 1
 			let processNewReplies;
 			const exist = commentsReply.find(
-				(commentReply) => commentReply.commentId === selectReply.id
+				(commentReply) => commentReply.id === selectReply.id
 			);
+			// nếu là cmt cấp 1 và đã có trong state
 			if (exist) {
-				processNewReplies = [...commentsReply].map((commentReply) =>
-					commentReply.commentId === selectReply.id
-						? {
-								commentId: selectReply.id,
-								reply: [newCmt, ...commentReply.reply],
-						  }
+				processNewReplies = commentsReply.map((commentReply) =>
+					commentReply.id === selectReply.id
+						? { ...commentReply, reply: [...commentReply.reply, newCmt] }
 						: commentReply
 				);
+			} else if (selectReply.commentId) {
+				// nếu đang reply cmt cấp 2
+				const exist = commentsReply.find(
+					(commentReply) => commentReply.id === selectReply.commentId
+				);
+				// commentId của cmt cấp 2 (tức id cmt cấp 1) có tồn tại trong state
+				// hiểu ý ở đây là đang reply cmt cấp 2 nằm trong 1 cmt cấp 1
+				// mặc định newCmt sẽ nằm cùng cấp với cmt cấp 2 bên trong cmt cấp 1
+				if (exist) {
+					processNewReplies = commentsReply.map((commentReply) =>
+						commentReply.id === selectReply.commentId
+							? { ...commentReply, reply: [...commentReply.reply, newCmt] }
+							: commentReply
+					);
+				}
 			} else {
+				// chưa có cmt cấp 1 này, đẩy reply mới newCmt vào
 				processNewReplies = [
-					{ commentId: selectReply.id, reply: [newCmt] },
 					...commentsReply,
+					{ id: selectReply.id, reply: [newCmt] },
 				];
 			}
+			console.log("sau khi process các reply comment: ", processNewReplies);
 			setCommentsReply(processNewReplies);
+			setComments(
+				comments.map((comment) =>
+					comment.id === selectReply.id ? { ...comment, reply: true } : comment
+				)
+			);
 		} else {
 			// không phải reply sẽ đẩy data mới vào list comment
 			setComments((prev) => [{ ...newCmt }, ...prev]);
 		}
-
+		handleStopReply();
 		updatePost(id, { countComments: post.countComments + 1 });
 		setTrigger(!trigger);
 		setSubmitCmtClicked(false);
 	};
 
-	const handleShowReplyComment = (commendId) => {};
+	const handleShowReplyComment = (commentId) => {};
 
 	const textBoxOnKeyDown = (e) => {
 		if (window.innerWidth <= 640) return;
@@ -257,6 +260,7 @@ export default function CommentModal({ id }) {
 
 	const getComment = async () => {
 		const respGetComment = await getComments(post.id);
+		if (!respGetComment || respGetComment.statusCode !== 207) return;
 		setComments(respGetComment.data);
 	};
 
@@ -271,16 +275,13 @@ export default function CommentModal({ id }) {
 
 				<div className="space-y-3 pt-3 pb-14 px-5 flex-grow">
 					{comments.length > 0 ? (
-						comments.map((comment) => (
+						comments.map((comment, index) => (
 							<RenderComment
-								key={comment.id}
+								key={index}
 								comment={comment}
 								selectCommentToReply={selectCommentToReply}
 								handleShowReplyComment={handleShowReplyComment}
-								replies={commentsReply.find(
-									(item) => item.commentId === comment.id
-								)}
-								isReply={false}
+								replies={commentsReply.find((item) => item.id === comment.id)}
 							/>
 						))
 					) : (
@@ -292,12 +293,17 @@ export default function CommentModal({ id }) {
 			<div className="sticky bottom-0">
 				<div
 					className={`absolute w-full -z-10 bg-background top-0 border-t py-2 px-4 flex items-center justify-between
-					${selectReply?.id ? "-translate-y-full" : "translate-y-0"}
+					${selectReply.id ? "-translate-y-full" : "translate-y-0"}
 					transition`}
 				>
 					<p>
 						Đang phản hồi{" "}
-						<span className="font-semibold">{selectReply?.displayName}</span>
+						<span className="font-semibold">
+							{combineIntoDisplayName(
+								selectReply.firstName,
+								selectReply.lastName
+							)}
+						</span>
 					</p>
 					<div onClick={handleStopReply} className="cursor-pointer">
 						<XMarkIcon />

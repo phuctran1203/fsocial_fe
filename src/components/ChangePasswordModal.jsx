@@ -55,7 +55,7 @@ export default function ChangePasswordModal() {
 	]);
 
 	return (
-		<div className="relative flex-grow flex flex-col bg-background sm:w-[450px] sm:h-fit w-screen h-[100dvh]">
+		<div className="relative flex-grow flex flex-col bg-background sm:w-[500px] sm:h-fit w-screen h-[100dvh]">
 			<div className="flex-grow space-y-5 px-7 pb-7">
 				<div>
 					<h4>Đổi mật khẩu</h4>

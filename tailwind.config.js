@@ -7,6 +7,10 @@ export default {
 			container: {
 				center: true,
 			},
+			// fun
+			backgroundImage: {
+				"primary-gradient": "var(--primary-gradient-clr)",
+			},
 			colors: {
 				logo: "var(--logo-clr)",
 				primary: {

@@ -11,7 +11,7 @@ export default function Popup() {
 	return (
 		<div
 			className={`z-10 fixed inset-0 sm:py-2 bg-black flex items-center justify-center ${
-				isOpen ? "bg-opacity-30 visible" : "bg-opacity-0 invisible"
+				isOpen ? "bg-opacity-35 visible" : "bg-opacity-0 invisible"
 			}
             transition`}
 			onClick={() => hidePopup()}

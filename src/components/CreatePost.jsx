@@ -96,10 +96,10 @@ export default function CreatePost() {
 	return (
 		<div className="relative flex-grow flex flex-col sm:w-[550px] w-screen sm:h-fit sm:max-h-[90dvh] h-[100dvh]">
 			<div className="overflow-y-auto flex-grow scrollable-div space-y-2">
-				<div className="flex space-x-2 px-3 pt-3">
-					<Avatar className={`md:size-11 size-9 grid`}>
+				<div className="flex space-x-2 px-4 pt-3">
+					<Avatar className={`size-9 grid`}>
 						<AvatarImage src={user.avatar} />
-						<AvatarFallback>
+						<AvatarFallback className="text-[12px]">
 							{combineIntoAvatarName(user.firstName, user.lastName)}
 						</AvatarFallback>
 					</Avatar>
@@ -115,7 +115,7 @@ export default function CreatePost() {
 					texboxRef={textbox}
 					autoFocus={true}
 					placeholder="Nói gì đó về bài viết của bạn"
-					className="px-3"
+					className="px-4"
 				/>
 
 				<label

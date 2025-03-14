@@ -157,7 +157,7 @@ export default function Nav() {
 					>
 						<div className="relative">
 							<Bell active={isVisibleNoti} />
-							<div className="absolute size-2.5 -top-[1px] right-[1px]  bg-primary rounded-full " />
+							<div className="absolute size-2.5 -top-[1px] right-[1px]  bg-primary-gradient rounded-full " />
 						</div>
 						<span
 							className={`${!isInMessage ? "sm:inline" : "lg:inline"} hidden`}

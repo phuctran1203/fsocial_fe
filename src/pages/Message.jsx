@@ -237,11 +237,6 @@ export default function Message() {
 				break;
 			}
 		}
-		// nếu message mới nhất < 1 phút mặc định hiển thị message time dưới nó
-		// const latestMsg = messages.at(-1);
-		// const msgTime = new Date(latestMsg?.createAt);
-		// const currentTime = new Date();
-		// if (currentTime - msgTime < 60 * 1000) setIndexMsgShow(messages.length - 1);
 		// handle chia block tin nhắn
 		setTimeLabelIndexes(getTimeLabelIndexes(messages));
 		console.log("Group label time indexes: ", getTimeLabelIndexes(messages));
@@ -378,7 +373,7 @@ export default function Message() {
 									</span>
 									{/* dấu chấm đánh dấu chưa đọc */}
 									{conver.lastMessage && !conver.lastMessage.read && (
-										<span className="size-2 bg-primary rounded-full" />
+										<span className="size-2 bg-primary-gradient rounded-full" />
 									)}
 								</div>
 								{conver.lastMessage && (
@@ -538,7 +533,9 @@ export default function Message() {
 												className={`
 												px-3 py-1 ms-auto rounded-2xl w-fit md:max-w-[60%] max-w-[80%] text-txtWhite 
 												${
-													theme === "light" ? "bg-primary" : "bg-gray-3light"
+													theme === "light"
+														? "bg-primary-gradient"
+														: "bg-gray-3light"
 												} cursor-pointer transition`}
 												dangerouslySetInnerHTML={{
 													__html: message.content,
@@ -627,7 +624,7 @@ export default function Message() {
 							/>
 							<button
 								onClick={handleSendMsg}
-								className="bg-primary py-1.5 px-5 rounded-full"
+								className="bg-primary-gradient py-1.5 px-5 rounded-full"
 							>
 								<SendIcon color="stroke-txtWhite" />
 							</button>

@@ -55,14 +55,21 @@ $fs-5xl: clamp-font-size(6);
 		// logo
 		--logo-clr: var(--primary-clr);
 		// primary clr
-		--primary-clr: #e76e23;
+		--primary-clr: hsl(23, 90%, 52%);
 		--primary-hover-clr: hsl(23, 80%, 47%);
 		--primary-active-clr: hsl(23, 80%, 44%);
 		--primary-ghost-clr: hsl(22, 70%, 95%);
+		--primary-gradient-start: hsl(31, 100%, 50%);
+		--primary-gradient-end: hsl(19, 100%, 50%);
+		--primary-gradient-clr: linear-gradient(
+			to bottom right,
+			var(--primary-gradient-start),
+			var(--primary-gradient-end)
+		);
 		// secondary clr
-		--secondary-clr: #f2f2f2;
-		--secondary-hover-clr: #e8e8e8;
-		--secondary-active-clr: #d9d9d9;
+		--secondary-clr: hsl(0, 0%, 91%);
+		--secondary-hover-clr: hsl(0, 0%, 86%);
+		--secondary-active-clr: hsl(0, 0%, 82%);
 		// background color
 		--lower-background-clr: hsl(220, 16%, 96%);
 		--background-clr: #ffffff;

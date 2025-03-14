@@ -1,7 +1,13 @@
 import React, { useEffect, useState } from "react";
 import { Field } from "../components/Field";
 import { useLoginStore } from "../store/loginStore";
-import { EyeIcon, EyeSplashIcon, LoadingIcon, UserIcon, XMarkIcon } from "../components/Icon";
+import {
+	EyeIcon,
+	EyeSplashIcon,
+	LoadingIcon,
+	UserIcon,
+	XMarkIcon,
+} from "../components/Icon";
 import Button from "../components/Button";
 import { Link, useNavigate } from "react-router-dom";
 import { login } from "../api/loginApi";
@@ -83,7 +89,11 @@ export default function Login() {
 			<div className="h-fit w-[440px] rounded-lg bg-background sm:border sm:shadow-lg sm:px-8 sm:py-10 p-6">
 				<div className="mb-4">
 					<h2>
-						Chào mừng đến với <span className="font-semibold text-2xl text-primary">FSocial</span> 👋
+						Chào mừng đến với{" "}
+						<span className="font-bold text-2xl text-primary-gradient">
+							FSocial
+						</span>
+						👋
 					</h2>
 
 					<span>Nền tảng mạng xã hội giới trẻ mới</span>
@@ -112,8 +122,12 @@ export default function Login() {
 						errorMessage="Không được để trống"
 					>
 						<div onClick={() => setIsShowPassword(!isShowPassword)}>
-							<EyeIcon className={`w-full ${isShowPassword ? "hidden" : "block"}`} />
-							<EyeSplashIcon className={`w-full ${!isShowPassword ? "hidden" : "block"}`} />
+							<EyeIcon
+								className={`w-full ${isShowPassword ? "hidden" : "block"}`}
+							/>
+							<EyeSplashIcon
+								className={`w-full ${!isShowPassword ? "hidden" : "block"}`}
+							/>
 						</div>
 					</Field>
 				</div>
@@ -126,7 +140,10 @@ export default function Login() {
 						</label> */}
 					</div>
 					<div>
-						<Link to="/forgot-password" className="order-1s underline fs-sm font-semibold">
+						<Link
+							to="/forgot-password"
+							className="order-1s underline fs-sm font-semibold"
+						>
 							Quên mật khẩu?
 						</Link>
 					</div>
@@ -134,8 +151,12 @@ export default function Login() {
 				<div className="mb-4">
 					{!submitClicked && <p className="text-red-600">{loginErr}</p>}
 					<Button
-						className={`btn-primary py-3 ${(isDisable || submitClicked) && "disable-btn"}`}
-						onClick={() => (isDisable || submitClicked ? "" : handleSubmitLogin())}
+						className={`btn-primary py-3 ${
+							(isDisable || submitClicked) && "disable-btn"
+						}`}
+						onClick={() =>
+							isDisable || submitClicked ? "" : handleSubmitLogin()
+						}
 					>
 						{submitClicked ? <LoadingIcon /> : "Đăng nhập"}
 					</Button>
@@ -146,7 +167,7 @@ export default function Login() {
 					<div className="border-t border-gray-light flex-grow"></div>
 				</div>
 				<div className="mb-4">
-					<Button className="btn-secondary mb-5 gap-3 py-3">
+					<Button className="btn-transparent border mb-5 gap-3 py-3">
 						<img className="size-6" src="./decor/google_icon.svg" alt="" />
 						Đăng nhập với Google
 					</Button>
@@ -154,7 +175,10 @@ export default function Login() {
 				<div className="flex justify-center items-center">
 					<span className="text-gray">
 						Chưa có tài khoản?{" "}
-						<Link to="/signup" className="underline cursor-pointer font-semibold text-primary-text">
+						<Link
+							to="/signup"
+							className="underline cursor-pointer font-semibold text-primary-text"
+						>
 							Tạo tài khoản mới
 						</Link>
 					</span>
@@ -162,17 +186,28 @@ export default function Login() {
 			</div>
 
 			<div className="md:w-[550px] px-6 mb-28">
-				<h1 className="mb-2 md:text-5xl text-4xl text-primary hidden sm:block">FSocial</h1>
+				<h1 className="mb-2 md:text-5xl text-4xl text-primary-gradient hidden sm:block">
+					FSocial
+				</h1>
 				<div className="mb-3">
 					<h1>Đăng nhập gần đây</h1>
-					<p className="text-gray">Chọn ảnh tài khoản hoặc ấn dấu “+” để thêm tài khoản mới</p>
+					<p className="text-gray">
+						Chọn ảnh tài khoản hoặc ấn dấu “+” để thêm tài khoản mới
+					</p>
 				</div>
 
 				<div className="grid gap-4 md:grid-cols-3 grid-cols-2">
 					{list.map((user, index) => (
-						<div key={index} className="group relative max-w-52 border rounded cursor-pointer overflow-hidden">
+						<div
+							key={index}
+							className="group relative max-w-52 border rounded cursor-pointer overflow-hidden"
+						>
 							<div className="aspect-square border-b">
-								<img src={user.avatar} alt={user.name} className="size-full object-cover" />
+								<img
+									src={user.avatar}
+									alt={user.name}
+									className="size-full object-cover"
+								/>
 							</div>
 
 							<p className="text-center py-2.5 font-semibold">{user.name}</p>
@@ -188,7 +223,7 @@ export default function Login() {
 
 					<div className="overflow-hidden max-w-52 border rounded cursor-pointer">
 						<div className=" aspect-square grid place-content-center border-b">
-							<div className="bg-primary lg:size-12 size-10 rounded-full">
+							<div className="bg-primary-gradient lg:size-12 size-10 rounded-full">
 								<svg fill="none" viewBox="0 0 24 24">
 									<path
 										className="stroke-txtWhite"
@@ -201,7 +236,9 @@ export default function Login() {
 							</div>
 						</div>
 
-						<p className="text-center py-2.5 text-primary font-semibold">Thêm tài khoản</p>
+						<p className="text-center py-2.5 text-primary-text font-semibold">
+							Thêm tài khoản
+						</p>
 					</div>
 				</div>
 			</div>
