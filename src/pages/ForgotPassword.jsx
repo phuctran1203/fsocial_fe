@@ -2,7 +2,7 @@ import React, { useEffect, useRef, useState } from "react";
 import { Field } from "../components/Field";
 import { useForgotPasswordStore } from "../store/forgotPwStore";
 import Button from "../components/Button";
-import EnterOTPCode from "../components/EnterOTPCode";
+// import EnterOTPCode from "../components/EnterOTPCode";
 import { useNavigate } from "react-router-dom";
 import {
 	ArrowLeftIcon,
@@ -12,7 +12,7 @@ import {
 } from "../components/Icon";
 import { requestOTP, validOTP, changePassword } from "../api/forgotPasswordApi";
 import { getCookie } from "@/utils/cookie";
-import InputOTP4Digit from "@/components/inputOTP4Digit";
+import InputOTP4Digit from "@/components/InputOTP4Digit";
 
 export default function ForgotPassword() {
 	const navigate = useNavigate();
