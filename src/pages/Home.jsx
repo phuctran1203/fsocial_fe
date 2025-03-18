@@ -1,12 +1,12 @@
 import React, { useEffect, useRef } from "react";
 import { getPosts } from "../api/postsApi";
-import { postsStore } from "../store/postsStore";
+import { useHomePostsStore } from "../store/postsStore";
 import "../index.scss";
 import RenderPosts from "@/components/RenderPosts";
 import { ownerAccountStore } from "@/store/ownerAccountStore";
 
 export default function Home() {
-	const setPosts = postsStore((state) => state.setPosts);
+	const setPosts = useHomePostsStore((state) => state.setPosts);
 	const user = ownerAccountStore((state) => state.user);
 	// const abortControllerRef = useRef(null);
 
@@ -17,7 +17,8 @@ export default function Home() {
 		// const controller = new AbortController();
 		// abortControllerRef.current = controller;
 		const resp = await getPosts(user.userId);
-		setPosts(resp?.data || []);
+		if (!resp || resp.statusCode !== 200) return;
+		setPosts(resp.data); //testing skeleton
 	};
 
 	useEffect(() => {
@@ -36,7 +37,10 @@ export default function Home() {
 					sm:mt-0
 					space-y-1.5 pb-12"
 				>
-					<RenderPosts className="sm:rounded shadow-y" />
+					<RenderPosts
+						className="sm:rounded shadow-y"
+						store={useHomePostsStore}
+					/>
 				</div>
 			</div>
 		</div>

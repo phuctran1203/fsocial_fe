@@ -9,9 +9,11 @@ import { ownerAccountStore } from "@/store/ownerAccountStore";
 import Popup from "@/components/Popup";
 import { getCookie } from "@/utils/cookie";
 import { jwtDecode } from "jwt-decode";
+import { useNotificationSocket } from "@/hooks/webSocket";
 
 export default function UserLayout() {
 	const setUser = ownerAccountStore((state) => state.setUser);
+	const { createClient, startSubscribe } = useNotificationSocket();
 
 	const getUserDetail = async () => {
 		const resp = await getOwnerProfile();
@@ -19,7 +21,8 @@ export default function UserLayout() {
 		const accessToken = getCookie("access-token");
 		let userId = jwtDecode(accessToken).sub;
 		setUser({ userId, ...resp.data });
-		// console.log(ownerAccountStore.getState().user);
+		createClient();
+		startSubscribe(userId);
 	};
 
 	useEffect(() => {

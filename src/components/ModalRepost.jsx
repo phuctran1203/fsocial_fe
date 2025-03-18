@@ -1,23 +1,21 @@
 import React, { useRef, useState } from "react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { dateTimeToPostTime } from "@/utils/convertDateTime";
 import {
 	combineIntoAvatarName,
 	combineIntoDisplayName,
 } from "@/utils/combineName";
 import { usePopupStore } from "@/store/popupStore";
-import { postsStore } from "@/store/postsStore";
 import { TextBox } from "./Field";
 import Button from "./Button";
 import { LoadingIcon } from "./Icon";
 import { ownerAccountStore } from "@/store/ownerAccountStore";
 import Post from "./Post";
 
-export default function ModalRepost({ id }) {
+export default function ModalRepost({ id, store }) {
 	const user = ownerAccountStore((state) => state.user);
 	const hidePopup = usePopupStore((state) => state.hidePopup);
 	const textbox = useRef(null);
-	const post = postsStore.getState().findPost(id);
+	const post = store.getState().findPost(id);
 	const [submitClicked, setSubmitClicked] = useState(false);
 	const handleRepost = async () => {
 		setSubmitClicked(true);
@@ -52,6 +50,7 @@ export default function ModalRepost({ id }) {
 					isChildren={true}
 					showReact={false}
 					className="border-y rounded-md"
+					store={store}
 				/>
 			</div>
 

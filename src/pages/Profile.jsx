@@ -12,7 +12,7 @@ import {
 } from "@/components/Icon";
 import Button from "@/components/Button";
 import { useLocation } from "react-router-dom";
-import { postsStore } from "@/store/postsStore";
+import { useProfilePostsStore } from "@/store/postsStore";
 import { getPosts } from "@/api/postsApi";
 import RenderPosts from "@/components/RenderPosts";
 import {
@@ -85,7 +85,7 @@ export default function Profile() {
 
 	const [currentTab, setCurrentTab] = useState(null);
 
-	const setPosts = postsStore((state) => state.setPosts);
+	const setPosts = useProfilePostsStore((state) => state.setPosts);
 
 	const showPosts = async () => {
 		const resp = await getPosts(user.userId);
@@ -379,7 +379,10 @@ export default function Profile() {
 							>
 								{/* owner posts */}
 								<div className="pt-0.5 snap-start mx-auto md:space-y-4 space-y-1.5 md:pb-0 overflow-y-auto w-full max-h-full scrollable-div">
-									<RenderPosts className="sm:rounded shadow-y border-x" />
+									<RenderPosts
+										className="sm:rounded shadow-y border-x"
+										store={useProfilePostsStore}
+									/>
 								</div>
 								{/* owner pictures */}
 								<div className="snap-start grid grid-cols-3 gap-[1px] h-fit overflow-y-auto w-full max-h-full scrollable-div">
@@ -453,7 +456,7 @@ export default function Profile() {
 											</div>
 										))}
 									{(!followers || followers.length === 0) && (
-										<p className="text-center col-span-4">
+										<p className="text-center col-span-5">
 											Không có người theo dõi
 										</p>
 									)}
@@ -461,7 +464,10 @@ export default function Profile() {
 								{/* owner posts reacted */}
 								{isOwner && (
 									<div className="pt-0.5 snap-start mx-auto md:space-y-4 space-y-1.5 md:pb-0 overflow-y-auto w-full max-h-full scrollable-div">
-										<RenderPosts className="sm:rounded border-x shadow-y" />
+										<RenderPosts
+											className="sm:rounded border-x shadow-y"
+											store={useProfilePostsStore}
+										/>
 									</div>
 								)}
 							</div>

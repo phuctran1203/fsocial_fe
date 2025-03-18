@@ -2,7 +2,6 @@ import React, { useRef, useState } from "react";
 import { TextBox } from "./Field";
 import { usePopupStore } from "@/store/popupStore";
 import { LoadingIcon } from "./Icon";
-import { postsStore } from "@/store/postsStore";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { dateTimeToPostTime } from "@/utils/convertDateTime";
 import Button from "./Button";
@@ -13,14 +12,14 @@ import {
 	combineIntoDisplayName,
 } from "@/utils/combineName";
 
-export default function EditPostModal({ id }) {
+export default function EditPostModal({ id, store }) {
 	const hidePopup = usePopupStore((state) => state.hidePopup);
 
 	const textbox = useRef(null);
 
-	const post = postsStore.getState().findPost(id);
+	const post = store.getState().findPost(id);
 
-	const replacePost = postsStore((state) => state.replacePost);
+	const replacePost = store((state) => state.replacePost);
 
 	const [submitClicked, setSubmitClicked] = useState(false);
 

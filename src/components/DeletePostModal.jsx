@@ -4,12 +4,11 @@ import { usePopupStore } from "@/store/popupStore";
 import Button from "./Button";
 import { toast } from "sonner";
 import { deletePost } from "@/api/postsApi";
-import { postsStore } from "@/store/postsStore";
 
-export default function DeletePostModal({ id }) {
+export default function DeletePostModal({ id, store }) {
 	const hidePopup = usePopupStore((state) => state.hidePopup);
 
-	const deletePostInStore = postsStore((state) => state.deletePost);
+	const deletePostInStore = store((state) => state.deletePost);
 
 	const closePopup = () => {
 		hidePopup();
@@ -33,11 +32,16 @@ export default function DeletePostModal({ id }) {
 	return (
 		<div className="sm:w-[500px] w-[90vw]">
 			<div className="flex justify-center my-4">
-				<img src="./decor/delete_post_decor.svg" alt="Delete Illustration" className="w-36 h-36" />
+				<img
+					src="./decor/delete_post_decor.svg"
+					alt="Delete Illustration"
+					className="w-36 h-36"
+				/>
 			</div>
 
 			<h5 className="font-normal text-center">
-				Sau khi xóa, bài viết sẽ <span className="text-primary font-semibold">không thể</span> khôi phục.
+				Sau khi xóa, bài viết sẽ{" "}
+				<span className="text-primary font-semibold">không thể</span> khôi phục.
 				<br /> Bạn vẫn xác nhận xóa?
 			</h5>
 
@@ -46,7 +50,12 @@ export default function DeletePostModal({ id }) {
 					Hủy bỏ xóa
 				</Button>
 
-				<Button className={`btn-secondary py-3 gap-2 ${deleteClicked && "disable-btn"}`} onClick={handleDelete}>
+				<Button
+					className={`btn-secondary py-3 gap-2 ${
+						deleteClicked && "disable-btn"
+					}`}
+					onClick={handleDelete}
+				>
 					{deleteClicked ? (
 						<LoadingIcon stroke="stroke-gray-light" />
 					) : (
