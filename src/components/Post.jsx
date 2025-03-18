@@ -1,7 +1,6 @@
 import { Link } from "react-router-dom";
 import { ComplaintIcon, Glyph, TrashCanIcon, PencilIcon } from "./Icon";
 import { usePopupStore } from "../store/popupStore";
-import { postsStore } from "../store/postsStore";
 import { dateTimeToPostTime } from "../utils/convertDateTime";
 import {
 	Popover,
@@ -33,6 +32,7 @@ export default function Post({
 	isChildren,
 	showReact = true,
 	className = "",
+	store,
 }) {
 	const { showPopup } = usePopupStore();
 
@@ -42,13 +42,13 @@ export default function Post({
 
 	const showCommentPopup = () => {
 		showPopup(
-			`Bài viết của ${combineIntoDisplayName(post.firtName, post.lastName)}`,
-			<CommentModal id={post.id} />
+			`Bài viết của ${combineIntoDisplayName(post.firstName, post.lastName)}`,
+			<CommentModal id={post.id} store={store} />
 		);
 	};
 
 	const showRepostPopup = () => {
-		showPopup(null, <ModalRepost id={post.id} />);
+		showPopup(null, <ModalRepost id={post.id} store={store} />);
 	};
 
 	const handlePopupReport = () => {
@@ -58,19 +58,22 @@ export default function Post({
 
 	const handlePopupEdit = () => {
 		setPopoverOpen(false);
-		showPopup("Chỉnh sửa bài viết", <EditPostModal id={post.id} />);
+		showPopup(
+			"Chỉnh sửa bài viết",
+			<EditPostModal id={post.id} store={store} />
+		);
 	};
 
 	const handlePopupDelete = () => {
 		setPopoverOpen(false);
-		showPopup("Xóa bài viết", <DeletePostModal id={post.id} />);
+		showPopup("Xóa bài viết", <DeletePostModal id={post.id} store={store} />);
 	};
 
 	const likes = post.countLikes;
 
 	const liked = post.like;
 
-	const updatePost = postsStore((state) => state.updatePost);
+	const updatePost = store((state) => state.updatePost);
 
 	const handleLike = async () => {
 		updatePost(post.id, {
@@ -88,13 +91,13 @@ export default function Post({
 						<Avatar className={`size-9`}>
 							<AvatarImage src={post.avatar} />
 							<AvatarFallback className="text-[11px] transition">
-								{combineIntoAvatarName(post.firtName, post.lastName)}
+								{combineIntoAvatarName(post.firstName, post.lastName)}
 							</AvatarFallback>
 						</Avatar>
 					</Link>
 					<div className="flex flex-col justify-center">
 						<Link to={`/profile?id=${post.userId}`} className="font-semibold">
-							{combineIntoDisplayName(post.firtName, post.lastName)}
+							{combineIntoDisplayName(post.firstName, post.lastName)}
 						</Link>
 						<span className="text-gray fs-xs">
 							{dateTimeToPostTime(post.createDatetime)}

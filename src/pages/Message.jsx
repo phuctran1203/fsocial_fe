@@ -10,7 +10,7 @@ import {
 } from "../components/Icon";
 import { dateTimeToMessageTime } from "../utils/convertDateTime";
 import { TextBox } from "../components/Field";
-import useWebSocket from "@/hooks/useWebSocket";
+import { useMessageSocket } from "@/hooks/webSocket";
 import { ownerAccountStore } from "@/store/ownerAccountStore";
 import {
 	createConversation,
@@ -34,14 +34,16 @@ import {
 	combineIntoAvatarName,
 	combineIntoDisplayName,
 } from "@/utils/combineName";
+import { Skeleton } from "@/components/ui/skeleton";
 
 export default function Message() {
 	const user = ownerAccountStore((state) => state.user);
+	// message socket
 	const { messages, setMessages, sendMessage, conversation, setConversation } =
-		useWebSocket(user.userId);
+		useMessageSocket();
 	const theme = themeStore((state) => state.theme);
 	// chỉ định content hiển thị ở bên phải tương ứng button bên trái cột danh sách hội thoại
-	const [contentActive, setContentActive] = useState(-1);
+	const [contentActive, setContentActive] = useState(0);
 	// tạo cuộc hội thoại mới
 	const [friendsList, setFriendsList] = useState(null);
 	// Ẩn, hiện popup danh sách bạn bè tìm được
@@ -97,10 +99,13 @@ export default function Message() {
 	};
 
 	// Load tất cả các cuộc hội thoại
-	const [conversations, setConversations] = useState([]);
+	const [conversations, setConversations] = useState(null);
 
 	const handleGetAllConversation = async () => {
 		const resp = await getConversations();
+		if (!resp || resp.statusCode !== 200) {
+			return;
+		}
 		const data = resp.data;
 		setConversations(data);
 	};
@@ -255,11 +260,11 @@ export default function Message() {
 	};
 	const handleScrollMessages = () => {
 		// Tổng chiều cao toàn bộ nội dung trong scroll <= chiều cao phần scroll đang hiển thị
-		if (
-			containerMessagesRef.current.scrollHeight <=
-			containerMessagesRef.current.clientHeight
-		)
-			return;
+		// if (
+		// 	containerMessagesRef.current.scrollHeight <=
+		// 	containerMessagesRef.current.clientHeight
+		// )
+		// 	return;
 		// cuộn lên không quá 800 || conversationId cũ khác conversationId hiện tại || tin nhắn mới là của bản thân
 		// tự scroll đến đáy
 		if (
@@ -351,12 +356,25 @@ export default function Message() {
 				</label>
 				{/* list conversations */}
 				<div className="h-full px-2 flex-grow overflow-auto">
-					{conversations.map((conver, index) => (
+					{!conversations &&
+						[0, 1, 2, 3, 4, 5, 6, 7, 8].map((i) => (
+							<div key={i} className="px-3 py-2.5 h-16 flex items-center gap-3">
+								<Skeleton className="size-11 rounded-full" />
+								<div className="flex-grow space-y-2">
+									<Skeleton className="w-1/2 h-4 rounded-sm" />
+									<Skeleton className="h-4 rounded-sm" />
+								</div>
+							</div>
+						))}
+					{conversations?.length === 0 && (
+						<p className="px-3 py-2.5">Bắt đầu tạo cuộc trò chuyện mới nào</p>
+					)}
+					{conversations?.map((conver, index) => (
 						<div
 							key={index}
 							className={`
-							px-3 py-2.5 rounded-md flex items-center gap-3 hover:bg-gray-2light transition cursor-pointer
-							${conver.id === conversation?.id && "bg-gray-3light"}`}
+								px-3 py-2.5 rounded-md flex items-center gap-3 hover:bg-gray-2light transition cursor-pointer
+								${conver.id === conversation?.id && "bg-gray-3light"}`}
 							onClick={() => handleChooseConversation(conver)}
 						>
 							<Avatar className={`size-11`}>

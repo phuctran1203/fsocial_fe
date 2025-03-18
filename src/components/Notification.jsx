@@ -20,6 +20,7 @@ import { getNotification } from "@/api/notificationApi";
 import { ownerAccountStore } from "@/store/ownerAccountStore";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { combineIntoAvatarName } from "@/utils/combineName";
+import { Skeleton } from "./ui/skeleton";
 
 const Noti = ({
 	id,
@@ -171,13 +172,19 @@ export default function Notification() {
 	const isInMessage = location.pathname === "/message";
 	const user = ownerAccountStore((state) => state.user);
 
-	const [notification, setNotification] = useState([]);
+	const [notification, setNotification] = useState(null);
 
-	const today = notification.filter((noti) => noti.labelType === 0);
+	const today = !notification
+		? []
+		: notification.filter((noti) => noti.labelType === 0);
 
-	const last7days = notification.filter((noti) => noti.labelType === 1);
+	const last7days = !notification
+		? []
+		: notification.filter((noti) => noti.labelType === 1);
 
-	const old = notification.filter((noti) => noti.labelType === 2);
+	const old = !notification
+		? []
+		: notification.filter((noti) => noti.labelType === 2);
 
 	const { isVisible, setIsVisible } = popupNotificationtStore();
 
@@ -269,6 +276,22 @@ export default function Notification() {
 							!isInMessage ? "" : "scrollable-div"
 						}`}
 					>
+						{!notification &&
+							[0, 2, 3, 4, 5, 6, 7, 8].map((i) => (
+								<div key={i} className="px-4 flex items-center gap-2 mb-5">
+									<Skeleton className="size-12 rounded-full" />
+									<div className="flex-grow space-y-1">
+										<Skeleton className="w-1/2 h-4 rounded-sm" />
+										<Skeleton className="h-4 rounded-sm" />
+										<Skeleton className="w-1/4 h-4 rounded-sm" />
+									</div>
+								</div>
+							))}
+
+						{notification?.length === 0 && (
+							<p className="p-4">Không có thông báo</p>
+						)}
+
 						{today.length > 0 && (
 							<div className="sm:space-y-0 space-y-1">
 								<h6 className="px-4">Hôm nay</h6>

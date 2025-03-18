@@ -2,17 +2,20 @@ import React, { useState, useEffect, useRef } from "react";
 import Button from "../components/Button";
 import { LoadingIcon, SearchIcon } from "../components/Icon";
 import { searchUsers, searchPosts } from "../api/searchApi";
-import { postsStore } from "../store/postsStore";
+import { useSearchPostsStore } from "../store/postsStore";
 import RenderPosts from "@/components/RenderPosts";
+import { Skeleton } from "@/components/ui/skeleton";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { combineIntoAvatarName } from "@/utils/combineName";
 
 export default function Search() {
 	const [query, setQuery] = useState("");
 
 	const [tab, setTab] = useState("all");
 
-	const [users, setUsers] = useState([]);
+	const [users, setUsers] = useState(null);
 
-	const setPosts = postsStore((state) => state.setPosts);
+	const setPosts = useSearchPostsStore((state) => state.setPosts);
 
 	const handleSendKeyword = async () => {
 		setSearchAction(true);
@@ -92,20 +95,40 @@ export default function Search() {
 						Bài viết
 					</button>
 				</div>
-				{tab === "all" || tab === "users" ? (
+
+				{(tab === "all" || tab === "users") && (
 					<div className="mx-3 xl:mx-0">
 						<h5 className="font-medium">Người dùng</h5>
-						{users.map((user) => (
+						{!users &&
+							[0, 1, 2, 3, 4].map((i) => (
+								<div key={i} className="py-2 flex items-center gap-3">
+									<Skeleton className="size-12 rounded-full" />
+									<div className="space-y-1 flex-grow">
+										<Skeleton className="w-32 h-4 rounded-sm" />
+										<Skeleton className="w-24 h-4 rounded-sm" />
+									</div>
+								</div>
+							))}
+
+						{users?.length === 0 && (
+							<p className="text-center text-gray">
+								Không tìm thấy người dùng nào
+							</p>
+						)}
+
+						{users?.map((user) => (
 							<div
 								key={user.userId}
 								className="flex items-center justify-between border-b py-3 transition"
 							>
 								<div className="flex items-center space-x-3">
-									<img
-										src={user.avatar || "./temp/default_avatar.svg"}
-										alt="avatar"
-										className="size-12 rounded-full"
-									/>
+									<Avatar className="size-12">
+										<AvatarImage src={user.avatar} />
+										<AvatarFallback>
+											{combineIntoAvatarName(user.firstName, user.lastName)}
+										</AvatarFallback>
+									</Avatar>
+
 									<div>
 										<p className="font-semibold">{user.displayName}</p>
 										{user.followers > 0 && (
@@ -121,13 +144,18 @@ export default function Search() {
 							</div>
 						))}
 					</div>
-				) : null}
-				{tab === "all" || tab === "posts" ? (
+				)}
+
+				{(tab === "all" || tab === "posts") && (
 					<div className="sm:space-y-3 space-y-2">
 						<h5 className="font-medium lg:px-0 px-3">Bài viết liên quan</h5>
-						<RenderPosts className="sm:rounded shadow-y" />
+						<RenderPosts
+							className="sm:rounded shadow-y"
+							store={useSearchPostsStore}
+							emptyMessage="Không tìm thấy bài viết nào"
+						/>
 					</div>
-				) : null}
+				)}
 			</div>
 		</div>
 	);

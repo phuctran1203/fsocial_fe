@@ -12,7 +12,7 @@ export async function getConversations() {
 		return data;
 	} catch (error) {
 		console.error("Error at getConversations: ", error);
-		return error.response?.data || [];
+		return error.response?.data || null;
 	}
 }
 

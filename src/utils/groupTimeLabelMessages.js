@@ -5,8 +5,7 @@ export const getTimeLabelIndexes = (messages) => {
 	let today = new Date().toDateString();
 	let lastDate = null;
 	let firstIndexInGroup = 0;
-	let lastTimestamp = null;
-	let lastReceiver = null;
+	let firstTimestampInGroup = null; // Lưu timestamp của tin nhắn đầu tiên trong block
 
 	messages.forEach((msg, index) => {
 		const currentTimestamp = new Date(msg.createAt).getTime();
@@ -14,25 +13,24 @@ export const getTimeLabelIndexes = (messages) => {
 		const isNewDay = lastDate && currentDate !== lastDate;
 
 		if (currentDate !== today) {
-			// Nếu là ngày mới hoặc ngày đầu tiên trong danh sách
+			// Nếu là ngày mới hoặc tin nhắn đầu tiên
 			if (isNewDay || index === 0) {
 				indexes.push(index);
+				firstIndexInGroup = index;
+				firstTimestampInGroup = currentTimestamp; // Cập nhật timestamp đầu block
 			}
-			firstIndexInGroup = index; // Reset block mới
 		} else {
-			// Nếu là tin nhắn của hôm nay
+			// Nếu là hôm nay, so sánh với timestamp của tin nhắn đầu tiên trong block
 			if (
-				!lastTimestamp ||
-				msg.receiverId !== lastReceiver ||
-				currentTimestamp - lastTimestamp > 60 * 1000
+				index === 0 || // Tin nhắn đầu tiên luôn là block mới
+				currentTimestamp - firstTimestampInGroup > 60 * 1000 // Khoảng cách > 1 phút
 			) {
 				indexes.push(index);
-				firstIndexInGroup = index; // Reset block mới
+				firstIndexInGroup = index;
+				firstTimestampInGroup = currentTimestamp; // Cập nhật timestamp đầu block
 			}
 		}
 
-		lastTimestamp = currentTimestamp;
-		lastReceiver = msg.receiverId;
 		lastDate = currentDate;
 	});
 

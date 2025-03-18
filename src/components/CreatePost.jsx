@@ -5,7 +5,7 @@ import { usePopupStore } from "../store/popupStore";
 import { TextBox } from "./Field";
 import { ownerAccountStore } from "../store/ownerAccountStore";
 import { createPost } from "../api/postsApi";
-import { postsStore } from "../store/postsStore";
+import { useHomePostsStore } from "../store/postsStore";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { toast } from "sonner";
 import {
@@ -16,7 +16,7 @@ import {
 export default function CreatePost() {
 	const hidePopup = usePopupStore((state) => state.hidePopup);
 
-	const insertPost = postsStore((state) => state.insertPost);
+	const insertPost = useHomePostsStore((state) => state.insertPost);
 
 	const user = ownerAccountStore((state) => state.user);
 
@@ -82,7 +82,7 @@ export default function CreatePost() {
 
 		const postCreated = {
 			...respCreatePost.data,
-			firtName: user.firstName,
+			firstName: user.firstName,
 			lastName: user.lastName,
 			avatar: user.avatar,
 		};

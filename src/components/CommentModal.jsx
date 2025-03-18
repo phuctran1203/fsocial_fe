@@ -2,7 +2,7 @@ import React, { useEffect, useRef, useState } from "react";
 import { LoadingIcon, SendIcon, XMarkIcon } from "./Icon";
 import Post from "./Post";
 import { getComments, sendComment, replyComment } from "../api/commentsApi";
-import { postsStore } from "../store/postsStore";
+
 import { ownerAccountStore } from "../store/ownerAccountStore";
 import { TextBox } from "./Field";
 import { dateTimeToNotiTime } from "../utils/convertDateTime";
@@ -113,12 +113,12 @@ function RenderComment({ ...props }) {
 	);
 }
 
-export default function CommentModal({ id }) {
+export default function CommentModal({ id, store }) {
 	const user = ownerAccountStore((state) => state.user);
 
 	const textbox = useRef(null);
 
-	const { posts, updatePost } = postsStore();
+	const { posts, updatePost } = store();
 
 	const post = posts?.find((p) => p.id == id);
 
@@ -271,7 +271,12 @@ export default function CommentModal({ id }) {
 	return (
 		<div className="relative flex-grow flex flex-col sm:w-[560px] w-screen sm:h-[90dvh] h-[100dvh]">
 			<div className="overflow-y-auto scrollable-div flex-grow flex flex-col">
-				<Post post={post} isChildren={true} className="border-b " />
+				<Post
+					post={post}
+					isChildren={true}
+					className="border-b "
+					store={store}
+				/>
 
 				<div className="space-y-3 pt-3 pb-14 px-5 flex-grow">
 					{comments.length > 0 ? (
