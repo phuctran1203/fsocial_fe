@@ -1,0 +1,37 @@
+@layer components {
+	.btn-primary {
+		@apply flex justify-center items-center w-full rounded outline-none focus-visible:ring-2 focus-visible:ring-offset-2
+		bg-primary-gradient text-txtWhite bg-[length:100%_100%] hover:bg-[length:400%_400%] focus-visible:ring-primary active:bg-primary-active
+		transition duration-200;
+	}
+
+	.btn-secondary {
+		@apply flex justify-center items-center w-full rounded outline-none transition focus-visible:ring-2 focus-visible:ring-offset-2
+    bg-secondary text-primary-text hover:bg-secondary-hover focus-visible:ring-secondary active:bg-secondary-active;
+	}
+
+	.btn-transparent {
+		@apply flex justify-center items-center w-full rounded outline-none transition focus-visible:ring-2 focus-visible:ring-offset-2
+    text-primary-text hover:bg-gray-3light focus-visible:ring-secondary active:bg-gray-2light;
+	}
+
+	.btn-ghost {
+		@apply flex justify-center items-center w-full rounded outline-none transition focus-visible:ring-2 focus-visible:ring-offset-2
+    bg-primary-ghost text-primary hover:bg-primary hover:text-txtWhite;
+	}
+	.disable-btn {
+		@apply pointer-events-none opacity-80;
+	}
+
+	.text-primary-gradient {
+		@apply text-transparent bg-primary-gradient bg-clip-text;
+	}
+
+	.fill-primary-gradient {
+		fill: linear-gradient(
+			to bottom right,
+			var(--primary-gradient-start),
+			var(--primary-gradient-end)
+		);
+	}
+}

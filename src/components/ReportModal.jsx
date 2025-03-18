@@ -3,32 +3,41 @@ import Button from "./Button";
 import { toast } from "sonner";
 import { usePopupStore } from "@/store/popupStore";
 import { LoadingIcon } from "./Icon";
+import { getTermOfService } from "@/api/termOfServiceApi";
+import { complaint } from "@/api/complaintApi";
+import { ownerAccountStore } from "@/store/ownerAccountStore";
 
 export default function ReportModal({ id }) {
 	const hidePopup = usePopupStore((state) => state.hidePopup);
-
+	const user = ownerAccountStore.getState().user;
 	const [selectedReason, setSelectedReason] = useState("Có dấu hiệu lừa đảo");
 	const [reportOptions, setReportOptions] = useState([]);
 
-	const reportOptionsJson = [
-		{
-			id: 1,
-			reason: "Có dấu hiệu lừa đảo",
-		},
-		{
-			id: 2,
-			reason: "Chứa nội dung/video/hình ảnh nhạy cảm",
-		},
-		{
-			id: 3,
-			reason: "Hành vi công kích, ngôn từ mất kiểm soát",
-		},
-	];
+	const fetchTermOfService = async () => {
+		try {
+			const response = await getTermOfService();
+			return response.data;
+		} catch (error) {
+			console.error("Error fetching terms of service:", error);
+			return [];
+		}
+	};
 
 	const [submitClicked, setSubmitClicked] = useState(false);
 
 	const submitReport = async () => {
 		setSubmitClicked(true);
+
+		//complaint
+		const data = {
+			postId: id,
+			userId: user.userId,
+			complaintType: "Bài viết",
+			termOfServiceId: selectedReason,
+		};
+		console.log(data);
+
+		const res = await complaint(data);
 
 		setTimeout(() => {
 			toast.success("Đã gửi báo cáo");
@@ -37,7 +46,12 @@ export default function ReportModal({ id }) {
 	};
 
 	useEffect(() => {
-		setReportOptions(reportOptionsJson);
+		const loadReportOptions = async () => {
+			const data = await fetchTermOfService();
+			setReportOptions(data);
+		};
+
+		loadReportOptions();
 	}, []);
 
 	return (
@@ -51,17 +65,20 @@ export default function ReportModal({ id }) {
 						<input
 							type="radio"
 							name="reportReason"
-							value={option.reason}
-							checked={selectedReason === option.reason}
-							onChange={() => setSelectedReason(option.reason)}
+							value={option.name}
+							checked={selectedReason === option.id}
+							onChange={() => setSelectedReason(option.id)}
 						/>
-						<span>{option.reason}</span>
+						<span>{option.name}</span>
 					</label>
 				))}
 			</div>
 
 			<div className="sticky bottom-0 p-3 bg-background">
-				<Button className={`btn-primary py-2.5 ${submitClicked && "disable-btn"}`} onClick={submitReport}>
+				<Button
+					className={`btn-primary py-2.5 ${submitClicked && "disable-btn"}`}
+					onClick={submitReport}
+				>
 					{submitClicked ? <LoadingIcon /> : "Báo cáo"}
 				</Button>
 			</div>

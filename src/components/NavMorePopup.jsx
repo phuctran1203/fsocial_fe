@@ -1,12 +1,25 @@
 import React, { useState } from "react";
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { LogoutIcon, KeyIcon, SunIcon, SwitchIcon, MoonIcon, CheckIcon } from "./Icon";
+import {
+	Popover,
+	PopoverContent,
+	PopoverTrigger,
+} from "@/components/ui/popover";
+import {
+	LogoutIcon,
+	KeyIcon,
+	SunIcon,
+	SwitchIcon,
+	MoonIcon,
+	CheckIcon,
+} from "./Icon";
 import styles from "./Nav.module.scss";
 import { useNavigate } from "react-router-dom";
 import { deleteCookie } from "@/utils/cookie";
 import { themeStore } from "@/store/themeStore";
+import { usePopupStore } from "@/store/popupStore";
+import ChangePasswordModal from "./ChangePasswordModal";
 
-export default function NavMorePopup({ inMobile }) {
+export default function NavMorePopup({ inMobile, setPopoverOpen }) {
 	const { theme, setTheme } = themeStore();
 
 	const handleSetMode = (modePicked) => {
@@ -22,11 +35,22 @@ export default function NavMorePopup({ inMobile }) {
 		navigate("/login");
 	};
 
+	const { showPopup } = usePopupStore();
+
+	const handlePopupChangePassword = () => {
+		setPopoverOpen(false);
+		showPopup(null, <ChangePasswordModal />);
+	};
+
 	return (
 		<>
 			<Popover onOpenChange={setSwitchThemeOpen}>
-				<PopoverTrigger className={`group ${styles.navMore} ${switchThemeOpen && "bg-gray-3light"}`}>
-					<SunIcon />
+				<PopoverTrigger
+					className={`group ${styles.navMore} ${
+						switchThemeOpen && "bg-gray-3light"
+					}`}
+				>
+					{theme === "light" ? <SunIcon /> : <MoonIcon />}
 					<span>Chế độ hiển thị</span>
 					<svg
 						className={`ms-auto me-1 sm:group-hover:opacity-100 ${
@@ -49,7 +73,9 @@ export default function NavMorePopup({ inMobile }) {
 					className="bg-background p-2 sm:w-44 space-y-2 transition"
 				>
 					<button
-						className={`${styles.navMore} !gap-2 border ${theme == "light" && "shadow-md"}`}
+						className={`${styles.navMore} !gap-2 border ${
+							theme == "light" && "shadow-md"
+						}`}
 						onClick={() => handleSetMode("light")}
 					>
 						<SunIcon />
@@ -58,7 +84,9 @@ export default function NavMorePopup({ inMobile }) {
 					</button>
 
 					<button
-						className={`${styles.navMore} !gap-2 border ${theme == "dark" && "bg-gray-2light"}`}
+						className={`${styles.navMore} !gap-2 border ${
+							theme == "dark" && "bg-gray-2light"
+						}`}
 						onClick={() => handleSetMode("dark")}
 					>
 						<MoonIcon />
@@ -68,7 +96,7 @@ export default function NavMorePopup({ inMobile }) {
 				</PopoverContent>
 			</Popover>
 
-			<button className={styles.navMore}>
+			<button className={styles.navMore} onClick={handlePopupChangePassword}>
 				<KeyIcon />
 				<span>Đổi mật khẩu</span>
 			</button>

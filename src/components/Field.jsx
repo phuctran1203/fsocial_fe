@@ -1,3 +1,4 @@
+import { cn } from "@/lib/utils";
 import { useEffect, useState } from "react";
 
 export function Field({
@@ -67,7 +68,9 @@ export function Field({
 					onChange={handleChange}
 					onFocus={form[id].isTouched ? () => {} : handleFocusField}
 				/>
-				<span className="absolute right-3 top-1/2 -translate-y-1/2 w-4">{children}</span>
+				<span className="absolute right-3 top-1/2 -translate-y-1/2 w-4">
+					{children}
+				</span>
 				<label
 					htmlFor={id}
 					className={`
@@ -84,7 +87,11 @@ export function Field({
 					{label}
 				</label>
 			</div>
-			<span className={`fs-xs text-red-600 ${!form[id].isTouched || form[id].isValid ? "hidden" : "block"}`}>
+			<span
+				className={`fs-xs text-red-600 ${
+					!form[id].isTouched || form[id].isValid ? "hidden" : "block"
+				}`}
+			>
 				*{errorMessage}
 			</span>
 		</div>
@@ -122,17 +129,25 @@ export function Select({
 			>
 				{Object.keys(options).map((key) => {
 					return (
-						<option key={key} value={key}>
+						<option key={key} value={key} className="bg-background">
 							{options[key]}
 						</option>
 					);
 				})}
 			</select>
-			<label htmlFor={id} className="absolute bg-background px-2 top-0 left-2 -translate-y-1/2 rounded-sm">
+			<label
+				htmlFor={id}
+				className="absolute bg-background px-2 top-0 left-2 -translate-y-1/2 rounded-sm"
+			>
 				{label}
 			</label>
 			<span className="absolute right-2 top-1/2 -translate-y-1/2 w-4">
-				<svg className="w-full aspect-square" viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg">
+				<svg
+					className="w-full aspect-square"
+					viewBox="0 0 28 28"
+					fill="none"
+					xmlns="http://www.w3.org/2000/svg"
+				>
 					<path
 						className="fill-gray-light ring-gray-light group-hover:fill-gray transition-all duration-100"
 						d="M15.2357 22.2359C14.5521 22.9195 13.442 22.9195 12.7584 22.2359L2.2584 11.7359C1.5748 11.0524 1.5748 9.9422 2.2584 9.25861C2.94199 8.57501 4.05215 8.57501 4.73574 9.25861L13.9998 18.5227L23.2639 9.26407C23.9475 8.58048 25.0576 8.58048 25.7412 9.26407C26.4248 9.94767 26.4248 11.0578 25.7412 11.7414L15.2412 22.2414L15.2357 22.2359Z"
@@ -178,10 +193,12 @@ export function TextBox({
 	return (
 		<div
 			ref={texboxRef}
-			className={`
+			className={cn(
+				`
 			relative w-full outline-none overflow-auto scroll-pb-2
-			before:absolute before:ps-0.5 empty:before:content-[attr(data-placeholder)] before:text-gray before:pointer-events-none 
-			${className}`}
+			before:absolute before:ps-0.5 empty:before:content-[attr(data-placeholder)] before:text-gray before:pointer-events-none transition`,
+				className
+			)}
 			contentEditable={contentEditable}
 			data-placeholder={placeholder}
 			onKeyDown={onKeyDown}

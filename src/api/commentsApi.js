@@ -4,12 +4,12 @@ export const getComments = (postId) =>
 	API.get(`/timeline/comment?postId=${postId}`)
 		.then((resp) => {
 			const data = resp.data;
-			console.log("Resp getComments: ", resp);
+			console.log("Resp getComments: ", data);
 			return data;
 		})
 		.catch((error) => {
 			console.error(`Error at getComments for id ${postId}: `, error);
-			return error.response.data;
+			return error.response?.data || null;
 		});
 
 export const sendComment = (data) =>
@@ -21,7 +21,7 @@ export const sendComment = (data) =>
 		})
 		.catch((error) => {
 			console.error(`Error at sendComment: `, error);
-			return error.response.data;
+			return error.response || null;
 		});
 
 export const replyComment = (data) =>

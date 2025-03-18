@@ -1,19 +1,44 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Link, useLocation } from "react-router-dom";
-import { Check, Bell, CloseCollapseIcon, CommentNoti, Glyph, HeartNoti, TrashCanIcon, XMarkIcon } from "./Icon";
+import {
+	Check,
+	Bell,
+	CloseCollapseIcon,
+	CommentNotiIcon,
+	Glyph,
+	HeartNotiIcon,
+	TrashCanIcon,
+	XMarkIcon,
+} from "./Icon";
 import { dateTimeToNotiTime } from "../utils/convertDateTime";
-import { popupNotificationtStore, popupExpandNoti3DotStore } from "../store/popupStore";
+import {
+	popupNotificationtStore,
+	popupExpandNoti3DotStore,
+} from "../store/popupStore";
 import Button from "./Button";
+import { getNotification } from "@/api/notificationApi";
+import { ownerAccountStore } from "@/store/ownerAccountStore";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { combineIntoAvatarName } from "@/utils/combineName";
+import { Skeleton } from "./ui/skeleton";
 
-const Noti = (props) => {
-	const { id, type, image, name, read, textTime, index } = props;
-
+const Noti = ({
+	id,
+	type,
+	name,
+	firstName,
+	lastName,
+	read,
+	textTime,
+	avatar,
+	setNotification,
+}) => {
 	const { idNotiShowing, setIdNotiShowing } = popupExpandNoti3DotStore();
 
 	const setVisible = popupNotificationtStore((state) => state.setIsVisible);
 
 	const open = () => {
-		setIdNotiShowing(index);
+		setIdNotiShowing(id);
 	};
 
 	const close = () => {
@@ -22,11 +47,15 @@ const Noti = (props) => {
 
 	const deleteNoti = () => {
 		//call delete
+		setNotification((prev) => prev.filter((noti) => noti.id !== id));
 		close();
 	};
 
 	const markAsRead = () => {
 		//call mark this noti as read
+		setNotification((prev) =>
+			prev.map((noti) => (noti.id === id ? { ...noti, read: !read } : noti))
+		);
 		close();
 	};
 
@@ -37,45 +66,68 @@ const Noti = (props) => {
 
 	const notiMap = {
 		likePost: {
-			icon: <HeartNoti />,
-			content: "đã thả tim bài viết của bạn",
+			icon: <HeartNotiIcon />,
+			content: (
+				<>
+					<span className="fs-sm font-semibold">{name}</span>
+					<span>đã thả tim bài viết của bạn</span>
+				</>
+			),
 		},
 		likeComment: {
-			icon: <HeartNoti />,
-			content: "đã tha tim bình luận của bạn",
+			icon: <HeartNotiIcon />,
+
+			content: (
+				<>
+					<span className="fs-sm font-semibold">{name}</span>
+					<span>đã thả tim bình luận của bạn</span>
+				</>
+			),
 		},
-		commentPost: {
-			icon: <CommentNoti />,
-			content: "đã bình luận về bài viết của bạn",
+		COMMENT: {
+			icon: <CommentNotiIcon />,
+			content: (
+				<>
+					<span className="fs-sm font-semibold">{name}</span>
+					<span>đã bình luận về bài viết của bạn</span>
+				</>
+			),
 		},
 	};
 
 	return (
 		<div
-			key={index}
 			className={`
 			relative overflow-hidden ps-4 py-2 rounded-md flex justify-between
-			${idNotiShowing != null && idNotiShowing === index ? "" : "hover:bg-gray-3light active:bg-gray-2light"} 
+			${idNotiShowing === id ? "" : "hover:bg-gray-3light active:bg-gray-2light"} 
 			transition`}
 		>
 			{/* direct đến thông báo */}
 			<Link to="" className="flex items-center gap-2" onClick={notiClicked}>
 				<div className={`relative ${read && "opacity-60"}`}>
 					<div className={`size-12 rounded-full overflow-hidden`}>
-						<img className="size-full object-center object-cover" src={`./temp/${image}`} alt="" />
+						<Avatar className={`size-full`}>
+							<AvatarImage src={avatar} />
+							<AvatarFallback className="fs-sm transition">
+								{combineIntoAvatarName(firstName, lastName)}
+							</AvatarFallback>
+						</Avatar>
 					</div>
-					<div className="absolute size-fit -top-1 -left-0.5">{notiMap[type].icon}</div>
+					<div className="absolute size-fit -top-1 -left-0.5">
+						{notiMap[type].icon}
+					</div>
 				</div>
 
 				<div>
 					<p className={`fs-sm ${read && "opacity-60"}`}>
-						<span className="fs-sm font-semibold">{name} </span>
 						{notiMap[type].content}
 					</p>
 					<div className="flex items-center gap-2">
 						<span className={`fs-xs ${read && "opacity-60"} `}>{textTime}</span>
 
-						{!read && <span className="size-2 bg-primary rounded-full" />}
+						{!read && (
+							<span className="size-2 bg-primary-gradient rounded-full" />
+						)}
 					</div>
 				</div>
 			</Link>
@@ -86,16 +138,28 @@ const Noti = (props) => {
 			</button>
 			<div
 				className={`flex absolute top-0 h-full left-full bg-secondary ${
-					idNotiShowing != null && idNotiShowing === index && "-translate-x-full"
+					idNotiShowing === id && "-translate-x-full"
 				} transition`}
 			>
-				<Button className="btn-secondary !rounded-none px-3 border-r" onClick={deleteNoti}>
+				<Button
+					className="btn-secondary !rounded-none px-3 border-r"
+					onClick={deleteNoti}
+					allowTab={idNotiShowing === id}
+				>
 					<TrashCanIcon />
 				</Button>
-				<Button className="btn-secondary !rounded-none px-3 border-r" onClick={markAsRead}>
+				<Button
+					className="btn-secondary !rounded-none px-3 border-r"
+					onClick={markAsRead}
+					allowTab={idNotiShowing === id}
+				>
 					<Check />
 				</Button>
-				<Button className="btn-secondary !rounded-none px-3" onClick={close}>
+				<Button
+					className="btn-secondary !rounded-none px-3.5"
+					allowTab={idNotiShowing === id}
+					onClick={close}
+				>
 					<XMarkIcon />
 				</Button>
 			</div>
@@ -103,46 +167,54 @@ const Noti = (props) => {
 	);
 };
 
-const data = [
-	{ id: 1, type: "commentPost", image: "user_2.png", name: "Phương Nam", time: "2025-02-09 16:32:19", read: false },
-	{ id: 2, type: "commentPost", image: "user_2.png", name: "Phương Nam", time: "2025-02-08 16:32:19", read: false },
-	{ id: 3, type: "commentPost", image: "user_2.png", name: "Phương Nam", time: "2025-02-07 15:22:19", read: false },
-	{ id: 4, type: "likePost", image: "user_2.png", name: "Phương Nam", time: "2025-02-06 10:22:19", read: true },
-	{ id: 5, type: "likePost", image: "user_2.png", name: "Phương Nam", time: "2025-02-02 10:22:19", read: true },
-	{ id: 5, type: "likePost", image: "user_2.png", name: "Phương Nam", time: "2025-02-02 10:22:19", read: true },
-	{ id: 6, type: "commentPost", image: "user_2.png", name: "Phương Nam", time: "2025-01-10 10:22:19", read: false },
-	{ id: 7, type: "likePost", image: "user_2.png", name: "Phương Nam", time: "2024-09-07 10:22:19", read: true },
-	{ id: 8, type: "commentPost", image: "user_2.png", name: "Phương Nam", time: "2024-02-07 10:22:19", read: true },
-	{ id: 9, type: "likePost", image: "user_2.png", name: "Phương Nam", time: "2024-02-07 10:22:19", read: true },
-];
-
 export default function Notification() {
 	const location = useLocation();
 	const isInMessage = location.pathname === "/message";
+	const user = ownerAccountStore((state) => state.user);
 
-	const processData = data.map((noti) => {
-		const { textTime, labelType } = dateTimeToNotiTime(noti.time);
-		return {
-			...noti,
-			textTime,
-			labelType,
-		};
-	});
+	const [notification, setNotification] = useState(null);
 
-	const today = processData.filter((noti) => noti.labelType === 0);
+	const today = !notification
+		? []
+		: notification.filter((noti) => noti.labelType === 0);
 
-	const last7days = processData.filter((noti) => noti.labelType === 1);
+	const last7days = !notification
+		? []
+		: notification.filter((noti) => noti.labelType === 1);
 
-	const old = processData.filter((noti) => noti.labelType === 2);
+	const old = !notification
+		? []
+		: notification.filter((noti) => noti.labelType === 2);
 
 	const { isVisible, setIsVisible } = popupNotificationtStore();
+
+	const handleGetNotification = async () => {
+		const resp = await getNotification(user.userId);
+		if (!resp || resp.statusCode !== 200) return;
+		const data = resp.data;
+		const processData = data.map((noti) => {
+			const { textTime, labelType } = dateTimeToNotiTime(noti.createdAt);
+			return {
+				...noti,
+				textTime,
+				labelType,
+				setNotification,
+			};
+		});
+
+		setNotification(processData);
+	};
+
+	useEffect(() => {
+		if (!user?.userId) return;
+		handleGetNotification();
+	}, [user?.userId]);
 
 	return (
 		<div
 			className={` 
-			z-0 bg-black h-screen overflow-hidden
-			lg:border-l-[1px]
-			lg:block ${
+			z-0 bg-black h-screen overflow-hidden flex-shrink-0
+			lg:border-l-[1px] lg:block ${
 				!isInMessage
 					? `
 				lg:relative lg:left-auto lg:min-w-fit lg:max-w-fit lg:visible
@@ -164,10 +236,14 @@ export default function Notification() {
 				h-full relative bg-background 
 				${!isInMessage ? "lg:translate-x-0 lg:drop-shadow-none" : ""}
 				lg:translate-y-0
-				md:min-w-[340px] md:max-w-[340px]
-				sm:min-w-[310px] sm:max-w-[310px] sm:pb-0
+				md:w-[360px]
+				sm:w-[340px] sm:pb-0
 				w-full pb-14
-				${isVisible ? "drop-shadow-[1px_0px_1px_var(--drop-shadow)]" : "sm:-translate-x-full sm:translate-y-0 translate-y-full"}
+				${
+					isVisible
+						? "drop-shadow-[1px_0px_1px_var(--drop-shadow)]"
+						: "sm:-translate-x-full sm:translate-y-0 translate-y-full"
+				}
 				transition`}
 			>
 				<CloseCollapseIcon
@@ -188,32 +264,58 @@ export default function Notification() {
 					<div className="px-4 flex items-center gap-5">
 						<div className="relative">
 							<Bell active={true} />
-							<span className="absolute bottom-1/2 left-1/2 px-1 bg-primary rounded-full text-txtWhite text-[12px]">
+							<span className="absolute bottom-1/2 left-1/2 px-1 bg-primary font-bold rounded-full text-txtWhite text-[12px]">
 								99+
 							</span>
 						</div>
 						<h5>Thông báo</h5>
 					</div>
 
-					<div className={`flex-grow overflow-y-auto sm:pe-4 ${!isInMessage ? "" : "scrollable-div"}`}>
+					<div
+						className={`flex-grow overflow-y-auto sm:pe-4 ${
+							!isInMessage ? "" : "scrollable-div"
+						}`}
+					>
+						{!notification &&
+							[0, 2, 3, 4, 5, 6, 7, 8].map((i) => (
+								<div key={i} className="px-4 flex items-center gap-2 mb-5">
+									<Skeleton className="size-12 rounded-full" />
+									<div className="flex-grow space-y-1">
+										<Skeleton className="w-1/2 h-4 rounded-sm" />
+										<Skeleton className="h-4 rounded-sm" />
+										<Skeleton className="w-1/4 h-4 rounded-sm" />
+									</div>
+								</div>
+							))}
+
+						{notification?.length === 0 && (
+							<p className="p-4">Không có thông báo</p>
+						)}
+
 						{today.length > 0 && (
 							<div className="sm:space-y-0 space-y-1">
 								<h6 className="px-4">Hôm nay</h6>
-								{today.map((noti, index) => Noti({ ...noti, index: index }))}
+								{today.map((noti) => (
+									<Noti key={noti.id} {...noti} />
+								))}
 							</div>
 						)}
 
 						{last7days.length > 0 && (
 							<div className="sm:space-y-0 space-y-1">
 								<h6 className="px-4">7 ngày trước</h6>
-								{last7days.map((noti, index) => Noti({ ...noti, index: index + today.length }))}
+								{last7days.map((noti) => (
+									<Noti key={noti.id} {...noti} />
+								))}
 							</div>
 						)}
 
 						{old.length > 0 && (
 							<div className="sm:space-y-0 space-y-1">
 								<h6 className="px-4">Trước đó</h6>
-								{old.map((noti, index) => Noti({ ...noti, index: index + today.length + last7days.length }))}
+								{old.map((noti) => (
+									<Noti key={noti.id} {...noti} />
+								))}
 							</div>
 						)}
 					</div>

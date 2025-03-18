@@ -1,200 +1,329 @@
 import React, { useState, useEffect, useRef } from "react";
-import { ArrowLeftIcon, Glyph, SearchIcon, SendIcon, SmileIcon } from "../components/Icon";
-import { dateTimeToNotiTime } from "../utils/convertDateTime";
+import {
+	ArrowLeftIcon,
+	Glyph,
+	LoadingIcon,
+	PlusIcon,
+	SearchIcon,
+	SendIcon,
+	SmileIcon,
+} from "../components/Icon";
+import { dateTimeToMessageTime } from "../utils/convertDateTime";
 import { TextBox } from "../components/Field";
-
-const listUsers = [
-	{
-		userId: "1",
-		displayName: "Phúc Thịnh",
-		latestMessage: "Chào bạn!",
-		avatar: "./temp/user_2.png",
-		time: "2025-02-10 10:00:00",
-		read: true,
-	},
-	{
-		userId: "2",
-		displayName: "Phương Nam",
-		latestMessage: "Lấy dùm tui cái laptop nha 🤧",
-		avatar: "./temp/user_3.png",
-		time: "2025-02-10 10:00:00",
-		read: true,
-	},
-	{
-		userId: "3",
-		displayName: "Đức Khải",
-		latestMessage: "",
-		avatar: "./temp/user_4.png",
-		time: "",
-		read: false,
-	},
-	{
-		userId: "4",
-		displayName: "Cang Ngô",
-		latestMessage: "",
-		avatar: "./temp/user_5.png",
-		time: "",
-		read: false,
-	},
-	{
-		userId: "5",
-		displayName: "Tấn Đạt",
-		latestMessage: "Biết ông lích không?",
-		avatar: "./temp/user_6.png",
-		time: "2025-02-10 10:00:00",
-		read: false,
-	},
-];
-
-const message = [
-	{
-		idMessage: "4h7ad2",
-		data: {
-			userId: 1,
-			sendToId: 0,
-			message: "",
-		},
-	},
-];
+import { useMessageSocket } from "@/hooks/webSocket";
+import { ownerAccountStore } from "@/store/ownerAccountStore";
+import {
+	createConversation,
+	getConversations,
+	getMessages,
+} from "@/api/messageApi";
+import { getTextboxData } from "@/utils/processTextboxData";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import EmojiPicker from "emoji-picker-react";
+import {
+	Popover,
+	PopoverContent,
+	PopoverTrigger,
+} from "@/components/ui/popover";
+import { themeStore } from "@/store/themeStore";
+import Button from "@/components/Button";
+import { getTimeLabelIndexes } from "@/utils/groupTimeLabelMessages";
+import { getFollowing } from "@/api/profileApi";
+import { ScrollArea } from "@/components/ui/scroll-area";
+import {
+	combineIntoAvatarName,
+	combineIntoDisplayName,
+} from "@/utils/combineName";
+import { Skeleton } from "@/components/ui/skeleton";
 
 export default function Message() {
-	const textbox = useRef(null);
+	const user = ownerAccountStore((state) => state.user);
+	// message socket
+	const { messages, setMessages, sendMessage, conversation, setConversation } =
+		useMessageSocket();
+	const theme = themeStore((state) => state.theme);
+	// chỉ định content hiển thị ở bên phải tương ứng button bên trái cột danh sách hội thoại
+	const [contentActive, setContentActive] = useState(0);
+	// tạo cuộc hội thoại mới
+	const [friendsList, setFriendsList] = useState(null);
+	// Ẩn, hiện popup danh sách bạn bè tìm được
+	const [showScrollFriends, setShowScrollFriends] = useState(false);
 
-	const [selectedUser, setSelectedUser] = useState(null);
+	const timeoutSearchRef = useRef(null);
 
-	const [messages, setMessages] = useState(null);
+	const handleOpenCreateConversation = () => {
+		setContentActive(1);
+	};
 
-	const messagesEndRef = useRef(null);
+	const handleSearch = (value) => {
+		if (timeoutSearchRef.current) {
+			clearTimeout(timeoutSearchRef.current);
+		}
+		console.log(value);
+		if (!showScrollFriends) setShowScrollFriends(true);
+		timeoutSearchRef.current = setTimeout(async () => {
+			// call api lấy list người owner account đang follow
+			const resp = await getFollowing();
+			if (!resp || resp.statusCode !== 200) return;
+			setFriendsList(resp.data);
+		}, 500);
+	};
 
-	const [trigger, setTrigger] = useState(true);
-
-	const handleUserClick = (userId) => {
+	const handleSelectFriend = (friend) => {
+		const converExist = conversations.find(
+			(conver) => conver.receiverId === friend.userId
+		);
+		if (converExist) {
+			handleChooseConversation(converExist);
+			setContentActive(2);
+			setTrigger(!trigger);
+			return;
+		}
+		// Clear message của người khác nếu có
+		setMessages([]);
+		console.log("Friend được chọn để tạo hội thoại mới: ", friend);
+		const userId = friend.userId;
+		delete friend.userId;
+		setConversation({ ...friend, receiverId: userId });
+		setContentActive(2);
 		setTrigger(!trigger);
-		setSelectedUser(userId);
-		//call API lấy tin nhắn về
 	};
 
+	const handleCreateConversation = async () => {
+		console.log("will create new conversation from this data: ", conversation);
+		const resp = await createConversation(conversation.receiverId);
+		if (!resp || resp.statusCode !== 200) return null;
+		const data = await resp.data;
+		console.log("id crated is: ", data.id);
+		return data.id;
+	};
+
+	// Load tất cả các cuộc hội thoại
+	const [conversations, setConversations] = useState(null);
+
+	const handleGetAllConversation = async () => {
+		const resp = await getConversations();
+		if (!resp || resp.statusCode !== 200) {
+			return;
+		}
+		const data = resp.data;
+		setConversations(data);
+	};
+
+	const updateConversations = (baseConversation) => {
+		setConversations((prevConversations) => {
+			const existConversation = conversations.find(
+				(conver) => conver.id === baseConversation.id
+			);
+			if (existConversation) {
+				existConversation.lastMessage = baseConversation.lastMessage;
+				return [
+					existConversation,
+					...prevConversations.filter(
+						(conver) => conver.id !== existConversation.id
+					),
+				];
+			}
+			return [baseConversation, ...prevConversations];
+		});
+	};
+
+	useEffect(() => {
+		if (!user?.userId) return;
+		// get all conversation
+		handleGetAllConversation();
+	}, [user?.userId]);
+
+	// click chọn đoạn hội thoại
+	const controllerGetmsgs = useRef(null);
+	const handleChooseConversation = async (selectedConver) => {
+		if (
+			conversation &&
+			conversation.id === selectedConver.id &&
+			contentActive === 2
+		)
+			return;
+		if (selectedConver.lastMessage) selectedConver.lastMessage.read = true;
+		setConversation(selectedConver);
+		console.log("selectedConver is: ", selectedConver);
+		setContentActive(2);
+		setTrigger(!trigger);
+		if (controllerGetmsgs.current) controllerGetmsgs.current.abort();
+		controllerGetmsgs.current = new AbortController();
+		const resp = await getMessages(
+			selectedConver.id,
+			controllerGetmsgs.current
+		);
+		if (!resp || resp.statusCode !== 200) {
+			setMessages([]);
+			return;
+		}
+		setMessages(resp.data.reverse());
+	};
+
+	// Quay lại danh sách cuộc hội thoại (chỉ có ở mobile)
 	const handleGoBack = () => {
+		setContentActive(0);
+		setConversation(null);
 		setRealHeight(window.innerHeight);
-		setSelectedUser(null);
 	};
 
-	const [submitMsgClicked, setSubmitMsgClicked] = useState(false);
-
+	// ở desktop, chỉ ấn enter sẽ tự gửi, xuống dòng phải đè shiftKey + enter
 	const textBoxOnKeyDown = (e) => {
 		if (window.innerWidth <= 640) return;
 		if (e.key === "Enter" && !e.shiftKey) {
-			sendMessage();
+			handleSendMsg();
 		}
 	};
 
-	const sendMessage = () => {
-		if (textbox.current.innerText.trim() == "") {
-			setTimeout(() => {
-				textbox.current.innerHTML = "";
-			}, 1);
+	// trigger auto focus lại textbox
+	const [trigger, setTrigger] = useState(true);
+	// messsage chuẩn bị gửi lưu ở đây
+	const textbox = useRef(null);
+
+	// gửi tin nhắn
+	const handleSendMsg = async () => {
+		const { innerText, innerHTML } = getTextboxData(textbox);
+		if (!innerText || !innerHTML) {
+			setTrigger(!trigger);
 			return;
 		}
-		setSubmitMsgClicked(true);
 
-		console.log("message sent");
+		// tạo data message mới update trước lên UI
+		const date = new Date();
+		const createAt = date.toISOString().replace("Z", "+00:00");
+		const baseMessage = {
+			content: innerHTML,
+			conversationId: conversation.id,
+			createAt: createAt,
+			read: true,
+			receiverId: conversation.receiverId,
+		};
+		// base conversation
+		const baseConversation = {
+			...conversation,
+			lastMessage: {
+				content: innerHTML,
+				createAt: createAt,
+				read: true,
+			},
+		};
+		// Update UI
+		setMessages((prev) => [...prev, baseMessage]);
+		// check conversationId đã tồn tại không
+		if (!conversation.id) {
+			console.log("Chưa có conversation Id!!!");
+			const id = await handleCreateConversation();
+			console.log("id conversation response: ", id);
+			setConversation((prev) => ({ ...prev, id }));
+			sendMessage(innerHTML, id);
+			updateConversations({ ...baseConversation, id });
+		} else {
+			sendMessage(innerHTML);
+			updateConversations({ ...baseConversation, id: conversation.id });
+		}
 
+		// reset textbox
 		setTimeout(() => {
 			textbox.current.innerHTML = "";
-			textbox.current.focus();
-			setSubmitMsgClicked(false);
+			setTrigger(!trigger);
 		}, 1);
 	};
+	// Vị trí avatar người nhận sẽ nhảy đến
+	const [avatarReceiverPosition, setAvatarReceiverPosition] = useState(null);
+	// vị trí các nhãn thời gian của từng block tin nhắn
+	const [timeLabelIndexes, setTimeLabelIndexes] = useState([]);
 
+	useEffect(() => {
+		// tìm tin nhắn mới nhất người gửi đã gửi
+		for (let i = messages.length - 1; i >= 0; i--) {
+			if (messages[i].receiverId !== conversation.receiverId) {
+				setAvatarReceiverPosition(i);
+				break;
+			}
+		}
+		// handle chia block tin nhắn
+		setTimeLabelIndexes(getTimeLabelIndexes(messages));
+		console.log("Group label time indexes: ", getTimeLabelIndexes(messages));
+		if (conversation) handleScrollMessages();
+	}, [messages]);
+
+	// container chứa tin nhắn
+	const containerMessagesRef = useRef(null);
+	const oldConverId = useRef("");
+	const observer = useRef();
+	const callBackAPI = (entries) => {
+		if (entries[0].isIntersecting) {
+			observer.current.unobserve(entries[0].target);
+			console.log("scroll đến element thứ 1, trigger call API lấy message cũ");
+		}
+	};
+	const handleScrollMessages = () => {
+		// Tổng chiều cao toàn bộ nội dung trong scroll <= chiều cao phần scroll đang hiển thị
+		// if (
+		// 	containerMessagesRef.current.scrollHeight <=
+		// 	containerMessagesRef.current.clientHeight
+		// )
+		// 	return;
+		// cuộn lên không quá 800 || conversationId cũ khác conversationId hiện tại || tin nhắn mới là của bản thân
+		// tự scroll đến đáy
+		if (
+			containerMessagesRef.current.scrollHeight -
+				containerMessagesRef.current.scrollTop <
+				800 ||
+			oldConverId.current !== conversation.id ||
+			messages.at(-1).receiverId !== user.userId
+		) {
+			setTimeout(() => {
+				console.log("okay scroll");
+				containerMessagesRef.current.scrollTo({
+					top: containerMessagesRef.current.scrollHeight,
+				});
+				oldConverId.current = conversation.id;
+				// intersectionObserver call API lấy tiếp tin nhắn cũ
+				if (observer.current) observer.current.disconnect();
+				observer.current = new IntersectionObserver(callBackAPI, {
+					root: containerMessagesRef.current,
+				});
+				observer.current.observe(containerMessagesRef.current.childNodes[1]);
+			}, 1);
+		}
+	};
+
+	// kiểm soát message đang show message time
+	const [indexMsgShow, setIndexMsgShow] = useState(-1);
+	const showTimeLabel = (index) => {
+		if (index === indexMsgShow) {
+			setIndexMsgShow(-1);
+			return;
+		}
+		setIndexMsgShow(index);
+	};
+
+	// handle show hide emoji picker
+	const handleEmojiClick = (emojiObject) => {
+		textbox.current.innerHTML += emojiObject.emoji;
+	};
+
+	// handle căn chỉnh chiều cao khi bàn phím ảo mở lên trên mobile
 	const [realHeight, setRealHeight] = useState(window.visualViewport.height);
 
 	useEffect(() => {
 		const handleRezise = () => {
 			const height = window.visualViewport.height;
-
-			if (textbox.current) textbox.current.innerText = height;
 			setRealHeight(height);
 		};
 		window.addEventListener("resize", handleRezise);
 		return () => window.removeEventListener("resize", handleRezise);
 	}, []);
 
-	useEffect(() => {
-		let touchStartY = 0; // Lưu vị trí bắt đầu của touch
-
-		const handleTouchStart = (e) => {
-			touchStartY = e.touches[0].clientY;
-		};
-
-		const preventScroll = (e) => {
-			const element = e.target;
-
-			if (element.id === "allow-scroll") {
-				const atTop = element.scrollTop === 0;
-				const atBottom = Math.abs(element.scrollTop + element.clientHeight - element.scrollHeight) < 50; // Fix điều kiện kịch đáy
-
-				let isScrollingUp = false;
-				let isScrollingDown = false;
-
-				// Kiểm tra hướng scroll theo loại sự kiện
-				if (e.type === "wheel") {
-					isScrollingUp = e.deltaY < 0;
-					isScrollingDown = e.deltaY > 0;
-				} else if (e.type === "touchmove") {
-					const touchEndY = e.touches[0].clientY;
-					isScrollingUp = touchEndY > touchStartY; // Vuốt xuống => scroll lên
-					isScrollingDown = touchEndY < touchStartY; // Vuốt lên => scroll xuống
-				}
-
-				// Log để kiểm tra giá trị
-				console.log("scrollTop:", element.scrollTop);
-				console.log("clientHeight:", element.clientHeight);
-				console.log("scrollHeight:", element.scrollHeight);
-				console.log("atBottom:", atBottom);
-
-				// Nếu đang ở đỉnh mà muốn cuộn lên → Chặn
-				if (atTop && isScrollingUp) {
-					console.log("⚠️ Kịch đỉnh - Chặn scroll lên");
-					e.preventDefault();
-				}
-				// Nếu đang ở đáy mà muốn cuộn xuống → Chặn
-				else if (atBottom && isScrollingDown) {
-					console.log("⚠️ Kịch đáy - Chặn scroll xuống");
-					e.preventDefault();
-				}
-				// Nếu đang ở giữa thì không chặn
-				else {
-					return;
-				}
-			}
-
-			// Chặn scroll mặc định nếu không phải "allow-scroll"
-			e.preventDefault();
-		};
-
-		if (window.visualViewport.height < window.innerHeight) {
-			window.addEventListener("wheel", preventScroll, { passive: false });
-			window.addEventListener("touchstart", handleTouchStart, { passive: true });
-			window.addEventListener("touchmove", preventScroll, { passive: false });
-		} else {
-			window.removeEventListener("wheel", preventScroll);
-			window.removeEventListener("touchstart", handleTouchStart);
-			window.removeEventListener("touchmove", preventScroll);
-		}
-
-		return () => {
-			window.removeEventListener("wheel", preventScroll);
-			window.removeEventListener("touchstart", handleTouchStart);
-			window.removeEventListener("touchmove", preventScroll);
-		};
-	}, []);
-
 	return (
 		<div
 			style={{ height: realHeight }}
-			className={`${
-				selectedUser && "sm:relative fixed top-0 sm:z-0 z-10"
-			} flex-grow sm:flex bg-background overflow-hidden transition`}
+			className={`
+			${[1, 2].includes(contentActive) && "sm:relative fixed top-0 sm:z-0 z-10"} 
+			${![1, 2].includes(contentActive) && "overflow-hidden"}
+			flex-grow sm:flex bg-background transition`}
 		>
 			{/* Danh sách hội thoại */}
 			<div
@@ -203,7 +332,15 @@ export default function Message() {
 				sm:w-2/5 sm:min-w-[300px] sm:max-w-[350px] sm:gap-4 sm:border-r
 				w-screen gap-2 transition"
 			>
-				<h2 className="px-4">Tin nhắn</h2>
+				<div className="px-4 flex items-center justify-between">
+					<h2 className="">Tin nhắn</h2>
+					<Button
+						className="btn-transparent !w-fit p-1"
+						onClick={handleOpenCreateConversation}
+					>
+						<PlusIcon />
+					</Button>
+				</div>
 				{/* search bar */}
 				<label
 					htmlFor="search-message"
@@ -217,26 +354,60 @@ export default function Message() {
 						className="w-full outline-none bg-transparent"
 					/>
 				</label>
-				{/* list user's messages */}
+				{/* list conversations */}
 				<div className="h-full px-2 flex-grow overflow-auto">
-					{listUsers.map((user) => (
-						<div
-							key={user.userId}
-							className="px-3 py-2.5 rounded-md flex items-center gap-3 hover:bg-gray-3light ct-transition cursor-pointer"
-							onClick={() => handleUserClick(user.userId)}
-						>
-							<div className="max-w-12 aspect-square rounded-full overflow-hidden">
-								<img src={user.avatar} className="size-full object-cover" alt="" />
-							</div>
-							<div>
-								<div className="flex items-center gap-3">
-									<span className="font-semibold">{user.displayName}</span>
-									{user.latestMessage !== "" && !user.read && <span className="size-2 bg-primary rounded-full" />}
+					{!conversations &&
+						[0, 1, 2, 3, 4, 5, 6, 7, 8].map((i) => (
+							<div key={i} className="px-3 py-2.5 h-16 flex items-center gap-3">
+								<Skeleton className="size-11 rounded-full" />
+								<div className="flex-grow space-y-2">
+									<Skeleton className="w-1/2 h-4 rounded-sm" />
+									<Skeleton className="h-4 rounded-sm" />
 								</div>
-								{user.latestMessage !== "" && (
-									<div className="flex gap-1">
-										<p className={`line-clamp-1 ${!user.read && "font-semibold"}`}>{user.latestMessage}</p>
-										<span className="text-[--gray-clr] text-nowrap">{dateTimeToNotiTime(user.time).textTime}</span>
+							</div>
+						))}
+					{conversations?.length === 0 && (
+						<p className="px-3 py-2.5">Bắt đầu tạo cuộc trò chuyện mới nào</p>
+					)}
+					{conversations?.map((conver, index) => (
+						<div
+							key={index}
+							className={`
+								px-3 py-2.5 rounded-md flex items-center gap-3 hover:bg-gray-2light transition cursor-pointer
+								${conver.id === conversation?.id && "bg-gray-3light"}`}
+							onClick={() => handleChooseConversation(conver)}
+						>
+							<Avatar className={`size-11`}>
+								<AvatarImage src={conver.avatar} />
+								<AvatarFallback className="fs-xs">
+									{combineIntoAvatarName(conver.firstName, conver.lastName)}
+								</AvatarFallback>
+							</Avatar>
+
+							<div className="flex-grow min-w-0">
+								<div className="flex items-center gap-2">
+									<span className="font-semibold">
+										{combineIntoDisplayName(conver.firstName, conver.lastName)}
+									</span>
+									{/* dấu chấm đánh dấu chưa đọc */}
+									{conver.lastMessage && !conver.lastMessage.read && (
+										<span className="size-2 bg-primary-gradient rounded-full" />
+									)}
+								</div>
+								{conver.lastMessage && (
+									<div className="flex gap-2 items-end justify-between">
+										<div
+											className={`line-clamp-1 text-gray ${
+												!conver.lastMessage.read &&
+												"font-semibold text-primary-text"
+											}`}
+											dangerouslySetInnerHTML={{
+												__html: conver.lastMessage.content,
+											}}
+										></div>
+										<span className="text-gray fs-xs text-nowrap">
+											{dateTimeToMessageTime(conver.lastMessage.createAt)}
+										</span>
 									</div>
 								)}
 							</div>
@@ -245,94 +416,237 @@ export default function Message() {
 				</div>
 			</div>
 
-			{/* Cửa sổ tin nhắn */}
+			{/* content */}
 			<div
-				style={{ height: realHeight }}
-				className={` sm:flex-grow flex flex-col bg-background ${
-					selectedUser && "sm:translate-y-0 -translate-y-full"
+				className={`size-full bg-background ${
+					[1, 2].includes(contentActive) && "sm:translate-y-0 -translate-y-full"
 				} transition`}
 			>
-				{/* header info */}
-				<div className={`py-3 px-4 border-b flex items-center justify-between ${!selectedUser && "hidden"} `}>
-					<div className="flex items-center">
-						<button onClick={handleGoBack}>
-							<ArrowLeftIcon className={"sm:hidden me-3"} />
-						</button>
-						<img src="./temp/default_avatar.svg" className="size-9 me-2" alt="" />
-						<p className="font-semibold">Phúc Trần</p>
-					</div>
-					<Glyph />
-				</div>
-
-				{!selectedUser ? (
-					<div className="size-full grid place-content-center">Cùng bắt đầu trò chuyện với người theo dõi của bạn</div>
-				) : (
-					<div className="overflow-auto px-5" id="allow-scroll">
-						Lorem ipsum dolor sit amet consectetur adipisicing elit. Error quibusdam alias voluptatibus quisquam
-						sapiente accusamus similique culpa beatae amet recusandae ab nobis obcaecati repudiandae possimus vero,
-						exercitationem quo repellat rerum! Suscipit ut eligendi exercitationem vitae beatae? Rem ratione maxime
-						similique blanditiis, expedita fuga qui enim autem doloremque ab dicta deserunt id quasi maiores illum,
-						nulla nemo quae debitis? Ex, alias! Dolores assumenda labore consequatur natus animi possimus in deserunt
-						optio sunt, odio repellat a nesciunt voluptatum cumque, blanditiis fugit nemo tempore alias autem.
-						Laboriosam provident modi ipsum doloribus facere voluptatum. Est ab, quasi et porro voluptatem, omnis at
-						libero dolore maiores laborum, provident exercitationem reprehenderit? Eligendi voluptatem, atque tempora,
-						quisquam corrupti voluptate quos quia dolorum ea, porro perspiciatis ut aspernatur? Ullam aut, repudiandae,
-						impedit delectus cumque error ducimus illum eum deserunt obcaecati officia. Veritatis laboriosam inventore
-						et veniam laudantium? Vitae vel reprehenderit placeat aliquam esse vero dolor reiciendis tenetur et. Nostrum
-						aut magni officiis illum recusandae quod deserunt, laborum sint quisquam doloremque, tempora odio modi
-						provident repellat adipisci inventore explicabo aspernatur natus! Voluptatibus numquam error quibusdam
-						aspernatur reiciendis esse aperiam. Maiores amet harum ab itaque alias mollitia at sapiente dolorem
-						molestias, placeat asperiores similique dolorum! Id sed quaerat repudiandae vel facilis temporibus ullam
-						tempore enim commodi error velit, laboriosam debitis? Rerum eos porro autem laudantium est inventore
-						officiis illum nihil vel dolorum? Non, repellendus maxime ullam accusantium corporis hic quam voluptatum cum
-						fuga illum eos dolore quos repellat at? Iste? Corporis, asperiores molestiae nam aperiam sequi obcaecati
-						neque cum sint magni similique dolorem repudiandae perferendis commodi dolorum praesentium labore impedit!
-						Aut, ut? Amet quo labore alias optio ipsum cumque accusantium. Porro expedita quos maiores ipsam commodi,
-						unde ullam natus! Aperiam non nihil suscipit incidunt iusto sit quod consequuntur reiciendis explicabo ea
-						nesciunt, dicta laborum vel eligendi tempora veritatis officia esse! Beatae, quia nisi! Excepturi voluptate
-						cupiditate impedit facere deleniti, ad sed atque sunt facilis totam tenetur non eius! Consequuntur ut itaque
-						natus adipisci deserunt, quis optio tempora eos at ipsa! Dignissimos eaque natus sunt consequuntur incidunt?
-						Placeat illo consequatur id neque quidem facilis saepe earum doloremque repudiandae similique, vero
-						reiciendis minus in laborum esse distinctio rem doloribus reprehenderit molestias ex? Ratione illum fugit
-						non eos saepe. Incidunt, non quis explicabo sunt exercitationem placeat possimus natus provident fugit.
-						Perspiciatis nemo cumque, error eligendi illo ipsa itaque corporis iste, doloribus, fugit impedit. Eum
-						fugiat labore ea magnam nihil ex quia dolores neque tempora, dolorem hic eos dolore expedita illo natus cum
-						exercitationem, repudiandae deleniti atque laborum, voluptatibus repellat. Facere deleniti repellendus
-						totam. Alias, aliquam sint perspiciatis eum dolorem accusamus aperiam dolorum laborum porro vel temporibus,
-						neque tenetur totam veritatis. Quaerat nulla, molestias ipsam quia aliquid similique vel asperiores esse aut
-						reiciendis voluptates. Expedita reprehenderit tempora aliquid ipsam ea sunt qui dolores alias consectetur
-						et? Optio libero necessitatibus voluptate fugiat quaerat natus distinctio est veniam laborum numquam odio,
-						voluptatum a. Aut, saepe esse. Tempora hic assumenda expedita, recusandae illo ratione est distinctio odit
-						facilis veniam itaque vel dicta commodi, obcaecati beatae, delectus corrupti vero velit sequi. Rerum
-						mollitia nulla libero aliquid laudantium nostrum? Debitis officia culpa architecto fugit? Repudiandae
-						adipisci illum natus reiciendis quasi suscipit enim itaque neque sint necessitatibus, cum exercitationem?
-						Nobis mollitia voluptatem animi dolorum dolor! Suscipit deleniti autem aut facere. Laboriosam pariatur
-						quidem repellendus assumenda corrupti commodi laudantium obcaecati cupiditate dolorum dolor consectetur
-						atque minima ducimus veritatis incidunt placeat voluptas doloribus, exercitationem molestias. Minus nemo
-						ducimus labore natus perferendis provident. Quos provident perferendis, totam ipsum autem tenetur hic natus
-						deserunt quo a illum enim assumenda praesentium rem, sapiente sunt illo odit? Unde repellendus eos,
-						laudantium alias optio hic facilis molestias?
+				{/* chưa click vào conversation nào */}
+				{contentActive === 0 && (
+					<div className="size-full place-content-center sm:grid hidden">
+						Cùng bắt đầu trò chuyện với người theo dõi của bạn
 					</div>
 				)}
 
-				{/* Thanh nhập tin nhắn */}
-				{selectedUser && (
-					<div className="bg-background border-t sm:px-6 px-4 sm:py-4 py-3 flex items-end gap-3">
-						<div className="md:py-2 py-1.5">
-							<SmileIcon className="size-6" />
+				{/* tạo conversation */}
+				{contentActive === 1 && (
+					<div className="size-full">
+						{/* head */}
+						<div className="relative h-14 px-5 border-b space-x-2 flex items-center">
+							<button onClick={handleGoBack}>
+								<ArrowLeftIcon className={"sm:hidden me-3"} />
+							</button>
+							<label htmlFor="new-to">Đến:</label>
+							<input
+								id="new-to"
+								autoFocus
+								className="bg-transparent outline-none w-full"
+								autoComplete="off"
+								placeholder="Nhập tên người dùng"
+								onInput={(e) => handleSearch(e.target.value)}
+								onFocus={(e) => handleSearch(e.target.value)}
+								onBlur={() => setShowScrollFriends(false)}
+							/>
+							<div
+								className={`absolute top-full left-12 mt-2 bg-background border rounded-lg p-2 ${
+									showScrollFriends
+										? "visible opacity-100"
+										: "invisible opacity-0"
+								} transition`}
+							>
+								<ScrollArea className="max-h-72 w-56">
+									{!friendsList && (
+										<div className="p-2 flex justify-center">
+											<LoadingIcon />
+										</div>
+									)}
+									{friendsList && friendsList.length === 0 && (
+										<p className="text-center p-2">
+											Hãy theo dõi ai đó để bắt đầu cuộc trò chuyện mới nhé
+										</p>
+									)}
+									{friendsList &&
+										friendsList.map((friend) => (
+											<Button
+												key={friend.userId}
+												className="btn-transparent p-2 !justify-start"
+												onClick={() => handleSelectFriend(friend)}
+											>
+												<Avatar className={`size-9 me-2`}>
+													<AvatarImage src={friend.avatar} />
+													<AvatarFallback className="fs-xs">
+														{friend.firstName.charAt(0) ?? "?"}
+													</AvatarFallback>
+												</Avatar>
+												<p className="font-semibold">
+													{combineIntoDisplayName(
+														friend.firstName,
+														friend.lastName
+													)}
+												</p>
+											</Button>
+										))}
+								</ScrollArea>
+							</div>
 						</div>
-						<TextBox
-							texboxRef={textbox}
-							placeholder="Soạn tin nhắn"
-							className="sm:py-2 py-1.5 max-h-[120px] bg-gray-3light border rounded-3xl px-5 flex-grow scrollable-div"
-							contentEditable={!submitMsgClicked}
-							onKeyDown={textBoxOnKeyDown}
-							autoFocus={true}
-							trigger={trigger}
-						/>
-						<button onClick={sendMessage} className="bg-primary sm:py-2 py-1.5 px-5 rounded-full">
-							<SendIcon color="stroke-txtWhite" />
-						</button>
+					</div>
+				)}
+
+				{/* đang nhắn tin */}
+				{contentActive === 2 && (
+					<div
+						style={{ height: realHeight }}
+						className="flex flex-col size-full"
+					>
+						{/* header thông tin */}
+						<div
+							className={`py-3 px-5 border-b flex items-center justify-between`}
+						>
+							<div className="flex items-center">
+								<button onClick={handleGoBack}>
+									<ArrowLeftIcon className={"sm:hidden me-3"} />
+								</button>
+								<Avatar className={`size-9 me-2`}>
+									<AvatarImage src={conversation.avatar} />
+									<AvatarFallback className="text-xs">
+										{combineIntoAvatarName(
+											conversation.firstName,
+											conversation.lastName
+										)}
+									</AvatarFallback>
+								</Avatar>
+								<p className="font-semibold">
+									{combineIntoDisplayName(
+										conversation.firstName,
+										conversation.lastName
+									)}
+								</p>
+							</div>
+							<Glyph />
+						</div>
+						{/* tin nhắn */}
+						<div
+							ref={containerMessagesRef}
+							className="overflow-y-auto px-3 pb-2 flex-grow space-y-0.5"
+						>
+							{messages.map((message, index) => (
+								<div key={index}>
+									{/* label time for messages block */}
+									{timeLabelIndexes.includes(index) && (
+										<p
+											className={`fs-xs pt-3 pb-1.5 text-gray text-center transition`}
+										>
+											{dateTimeToMessageTime(message.createAt)}
+										</p>
+									)}
+									{message.receiverId !== user.userId ? (
+										// when is owner-account's message
+										<div
+											className={`relative ${
+												index === indexMsgShow && "pb-5"
+											} transition`}
+										>
+											<div
+												className={`
+												px-3 py-1 ms-auto rounded-2xl w-fit md:max-w-[60%] max-w-[80%] text-txtWhite 
+												${
+													theme === "light"
+														? "bg-primary-gradient"
+														: "bg-gray-3light"
+												} cursor-pointer transition`}
+												dangerouslySetInnerHTML={{
+													__html: message.content,
+												}}
+												onClick={() => showTimeLabel(index)}
+											/>
+											<p
+												className={`fs-xs -z-10 text-gray absolute bottom-0 right-1 ${
+													index === indexMsgShow ? "opacity-100" : "opacity-0"
+												} transition`}
+											>
+												{dateTimeToMessageTime(message.createAt)}
+											</p>
+										</div>
+									) : (
+										// when is not owner-account's message
+										<div
+											className={`relative ${
+												index === indexMsgShow && "pb-5"
+											} transition`}
+										>
+											<div className="flex gap-1 items-end">
+												{avatarReceiverPosition === index ? (
+													<Avatar className={`size-6`}>
+														<AvatarImage src={conversation.avatar} />
+														<AvatarFallback className="text-[6px]">
+															{combineIntoAvatarName(
+																conversation.firstName,
+																conversation.lastName
+															)}
+														</AvatarFallback>
+													</Avatar>
+												) : (
+													<div className="size-6" />
+												)}
+												<div
+													className={`px-3 py-1 rounded-2xl w-fit md:max-w-[60%] max-w-[80%] ${
+														theme === "light"
+															? "bg-secondary"
+															: "bg-background ring-1 ring-gray-3light ring-inset"
+													} cursor-pointer transition`}
+													dangerouslySetInnerHTML={{
+														__html: message.content,
+													}}
+													onClick={() => showTimeLabel(index)}
+												/>
+											</div>
+											<p
+												className={`fs-xs -z-10 text-gray absolute bottom-0 left-8 ${
+													index === indexMsgShow ? "opacity-100" : "opacity-0"
+												} transition`}
+											>
+												{dateTimeToMessageTime(message.createAt)}
+											</p>
+										</div>
+									)}
+								</div>
+							))}
+						</div>
+						{/* Thanh nhập tin nhắn */}
+						<div className="relative bg-background border-t sm:px-6 px-4 sm:py-4 py-3 flex items-end gap-3 transition">
+							<Popover>
+								<PopoverTrigger className="md:py-2 py-1.5">
+									<SmileIcon className="size-6" />
+									<PopoverContent
+										side="bottom"
+										align="start"
+										sideOffset={30}
+										className="bg-background w-fit p-2 rounded-2xl"
+										onClick={(e) => e.stopPropagation()}
+									>
+										<EmojiPicker
+											onEmojiClick={handleEmojiClick}
+											theme={theme}
+										/>
+									</PopoverContent>
+								</PopoverTrigger>
+							</Popover>
+							<TextBox
+								texboxRef={textbox}
+								placeholder="Soạn tin nhắn"
+								className="py-1.5 max-h-[120px] bg-gray-3light border rounded-3xl px-4 flex-grow scrollable-div"
+								onKeyDown={textBoxOnKeyDown}
+								autoFocus={true}
+								trigger={trigger}
+							/>
+							<button
+								onClick={handleSendMsg}
+								className="bg-primary-gradient py-1.5 px-5 rounded-full"
+							>
+								<SendIcon color="stroke-txtWhite" />
+							</button>
+						</div>
 					</div>
 				)}
 			</div>

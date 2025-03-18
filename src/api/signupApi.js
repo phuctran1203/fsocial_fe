@@ -9,7 +9,7 @@ export const checkDuplicate = (data) =>
 		})
 		.catch((error) => {
 			console.error("Error at checkDuplicate: ", error);
-			return error.response?.data || {};
+			return error.response?.data || null;
 		});
 
 export const requestOTP = (data) =>
@@ -44,6 +44,6 @@ export const sendingCreateAccount = (data) =>
 			return data;
 		})
 		.catch((error) => {
-			console.error("Error at validOTP: ", error);
+			console.error("Error at sendingCreateAccount: ", error);
 			return error.response?.data || {};
 		});

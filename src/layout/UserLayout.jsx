@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useRef } from "react";
 import { Outlet } from "react-router-dom";
 import Nav from "../components/Nav";
 import Notification from "../components/Notification";
@@ -7,15 +7,22 @@ import { Toaster } from "sonner";
 import { getOwnerProfile } from "@/api/profileApi";
 import { ownerAccountStore } from "@/store/ownerAccountStore";
 import Popup from "@/components/Popup";
+import { getCookie } from "@/utils/cookie";
+import { jwtDecode } from "jwt-decode";
+import { useNotificationSocket } from "@/hooks/webSocket";
 
 export default function UserLayout() {
 	const setUser = ownerAccountStore((state) => state.setUser);
+	const { createClient, startSubscribe } = useNotificationSocket();
 
 	const getUserDetail = async () => {
 		const resp = await getOwnerProfile();
-		// if (resp.statusCode === 200) {
-		setUser(resp);
-		// }
+		if (!resp) return;
+		const accessToken = getCookie("access-token");
+		let userId = jwtDecode(accessToken).sub;
+		setUser({ userId, ...resp.data });
+		createClient();
+		startSubscribe(userId);
 	};
 
 	useEffect(() => {

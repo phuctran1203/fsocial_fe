@@ -7,6 +7,10 @@ export default {
 			container: {
 				center: true,
 			},
+			// fun
+			backgroundImage: {
+				"primary-gradient": "var(--primary-gradient-clr)",
+			},
 			colors: {
 				logo: "var(--logo-clr)",
 				primary: {
@@ -37,18 +41,23 @@ export default {
 					"3light": "var(--gray-3light-clr)",
 				},
 				txtWhite: "var(--text-white)",
+				chart: {
+					orange: "var(--orange-chart-clr)",
+					blue: "var(--blue-chart-clr)",
+					green: "var(--green-chart-clr)",
+				},
 
-				// foreground: "hsl(var(--foreground))",
+				foreground: "hsl(var(--foreground))",
 				// card: {
-				// 	DEFAULT: "hsl(var(--card))",
-				// 	foreground: "hsl(var(--card-foreground))",
+				//   DEFAULT: "hsl(var(--card))",
+				//   foreground: "hsl(var(--card-foreground))",
 				// },
 				// popover: {
-				// 	DEFAULT: "hsl(var(--popover))",
-				// 	foreground: "hsl(var(--popover-foreground))",
+				//   DEFAULT: "hsl(var(--popover))",
+				//   foreground: "hsl(var(--popover-foreground))",
 				// },
 				muted: {
-					DEFAULT: "var(--gray-3light-clr)",
+					DEFAULT: "var(--muted-clr)",
 					foreground: "hsl(var(--muted-foreground))",
 				},
 				// accent: {
@@ -61,7 +70,7 @@ export default {
 				// },
 				// border: "hsl(var(--border))",
 				// input: "hsl(var(--input))",
-				// ring: "hsl(var(--ring))",
+				ring: "hsl(var(--ring))",
 				// chart: {
 				// 	1: "hsl(var(--chart-1))",
 				// 	2: "hsl(var(--chart-2))",
@@ -79,6 +88,7 @@ export default {
 				hover: "var(--border-hover-clr)",
 			},
 			boxShadow: {
+				DEFAULT: "0px 0 3px 0 var(--shadow-clr)",
 				r: "1px 0 2px var(--shadow-clr)",
 				l: "-1px 0 2px var(--shadow-clr)",
 				t: "0 -1px 2px var(--shadow-clr)",
@@ -99,6 +109,16 @@ export default {
 			// 	md: "calc(var(--radius) - 2px)",
 			// 	sm: "calc(var(--radius) - 4px)",
 			// },
+
+			keyframes: {
+				"caret-blink": {
+					"0%,70%,100%": { opacity: "1" },
+					"20%,50%": { opacity: "0" },
+				},
+			},
+			animation: {
+				"caret-blink": "caret-blink 1.25s ease-out infinite",
+			},
 		},
 	},
 	plugins: [require("tailwindcss-animate")],

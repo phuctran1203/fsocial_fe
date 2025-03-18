@@ -2,21 +2,24 @@ import React, { useRef, useState } from "react";
 import { TextBox } from "./Field";
 import { usePopupStore } from "@/store/popupStore";
 import { LoadingIcon } from "./Icon";
-import { postsStore } from "@/store/postsStore";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { dateTimeToPostTime } from "@/utils/convertDateTime";
 import Button from "./Button";
 import { toast } from "sonner";
 import { updatePost } from "@/api/postsApi";
+import {
+	combineIntoAvatarName,
+	combineIntoDisplayName,
+} from "@/utils/combineName";
 
-export default function EditPostModal({ id }) {
+export default function EditPostModal({ id, store }) {
 	const hidePopup = usePopupStore((state) => state.hidePopup);
 
 	const textbox = useRef(null);
 
-	const post = postsStore.getState().findPost(id);
+	const post = store.getState().findPost(id);
 
-	const replacePost = postsStore((state) => state.replacePost);
+	const replacePost = store((state) => state.replacePost);
 
 	const [submitClicked, setSubmitClicked] = useState(false);
 
@@ -42,29 +45,47 @@ export default function EditPostModal({ id }) {
 	return (
 		<div className="relative flex-grow flex flex-col sm:w-[550px] sm:h-fit sm:max-h-[90dvh] h-[100dvh]">
 			<div className="flex-grow pt-3 space-y-2 overflow-y-auto scrollable-div">
-				<div className="flex space-x-2 px-3">
-					<Avatar className={`md:size-11 size-9 grid`}>
+				<div className="flex space-x-2 px-4">
+					<Avatar className={`size-9`}>
 						<AvatarImage src={post.avatar} />
-						<AvatarFallback className="font-semibold">{post.displayName.charAt(0) ?? "?"}</AvatarFallback>
+						<AvatarFallback className="text-[12px]">
+							{combineIntoAvatarName(post.firtName, post.lastName)}
+						</AvatarFallback>
 					</Avatar>
 
 					<div className="flex flex-col justify-center">
-						<span className="font-semibold">{post.displayName}</span>
-						<span className="text-gray fs-xs">{dateTimeToPostTime(post.createdAt)}</span>
+						<span className="font-semibold">
+							{combineIntoDisplayName(post.firtName, post.lastName)}
+						</span>
+						<span className="text-gray fs-xs">
+							{dateTimeToPostTime(post.createDatetime)}
+						</span>
 					</div>
 				</div>
 
-				<TextBox texboxRef={textbox} className="px-3" innerHTML={post.content.htmltext} autoFocus={true} />
+				<TextBox
+					texboxRef={textbox}
+					className="px-4"
+					innerHTML={post.content.htmltext}
+					autoFocus={true}
+				/>
 				{/* assets post */}
 				{post.content.media.length > 0 && (
 					<div className="max-h-[200vh] border-y overflow-hidden transition">
-						<img src={`${post.content.media[0]}`} alt="Bài đăng" className="w-full" />
+						<img
+							src={`${post.content.media[0]}`}
+							alt="Bài đăng"
+							className="w-full"
+						/>
 					</div>
 				)}
 			</div>
 
 			<div className="sticky bottom-0 p-3 bg-background">
-				<Button className={`btn-primary py-2.5 ${submitClicked && "disable-btn"}`} onClick={handleUpdate}>
+				<Button
+					className={`btn-primary py-2.5 ${submitClicked && "disable-btn"}`}
+					onClick={handleUpdate}
+				>
 					{submitClicked ? <LoadingIcon /> : "Cập nhật"}
 				</Button>
 			</div>
