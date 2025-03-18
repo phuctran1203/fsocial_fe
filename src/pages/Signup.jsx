@@ -20,7 +20,7 @@ import {
 } from "../api/signupApi";
 import { getCookie } from "@/utils/cookie";
 import { removeVietnameseAccents } from "@/utils/removeSpecialWord";
-import InputOTP4Digit from "@/components/inputOTP4Digit";
+import InputOTP4Digit from "@/components/InputOTP4Digit";
 
 export default function Signup() {
 	const navigate = useNavigate();
