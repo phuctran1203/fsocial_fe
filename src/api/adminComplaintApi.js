@@ -2,7 +2,7 @@ import API from "./axiosInstance";
 
 export const getComplaint = async () => {
 	try {
-		const resp = await API.get(`/complaint`, dataObj);
+		const resp = await API.get(`/complaint`);
 		const data = resp.data;
 		console.log("Resp complaint: ", data);
 		return data;
@@ -14,7 +14,7 @@ export const getComplaint = async () => {
 
 export const getPostComplaint = async () => {
 	try {
-		const resp = await API.get(`/complaint/post`, dataObj);
+		const resp = await API.get(`/complaint/post`);
 		const data = resp.data;
 		console.log("Resp post complaint: ", data);
 		return data;
@@ -26,7 +26,7 @@ export const getPostComplaint = async () => {
 
 export const getUserComplaint = async () => {
 	try {
-		const resp = await API.get(`/complaint/user`, dataObj);
+		const resp = await API.get(`/complaint/user`);
 		const data = resp.data;
 		console.log("Resp user complaint: ", data);
 		return data;
@@ -36,9 +36,15 @@ export const getUserComplaint = async () => {
 	}
 };
 
-export const postComplaint = async (id) => {
+export const postComplaint = async (userId, postId) => {
+    const dataObj = {
+		userId: userId,
+		postId: postId,
+	};
+	console.log("data prepared: ", dataObj);
+
 	try {
-		const resp = await API.post(`/post/complaint/id=${id}`, dataObj);
+		const resp = await API.post(`/post/complaint`, dataObj);
 		const data = resp.data;
 		console.log("Resp postComplaint: ", data);
 		return data;
@@ -50,7 +56,7 @@ export const postComplaint = async (id) => {
 
 export const searchComplaint = async (keyword) => {
 	try {
-		const resp = await API.get(`/complaint/find?find_name=${keyword}`, dataObj);
+		const resp = await API.get(`/complaint/find?find_name=${keyword}`);
 		const data = resp.data;
 		console.log("Resp search: ", data);
 		return data;
