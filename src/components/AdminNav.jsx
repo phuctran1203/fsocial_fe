@@ -12,13 +12,17 @@ import {
 } from "@/components/ui/popover";
 import { themeStore } from "@/store/themeStore";
 import styles from "./Nav.module.scss";
-import { combineIntoAvatarName } from "@/utils/combineName";
+import {
+	combineIntoAvatarName,
+	combineIntoDisplayName,
+} from "@/utils/combineName";
+import { adminStore } from "@/store/adminStore";
 
 export default function AdminNav() {
 	const location = useLocation();
 	const path = location.pathname;
 	const navRoute = adminNavRout;
-	const user = ownerAccountStore((state) => state.user);
+	const form = adminStore((state) => state.form);
 	const { theme, setTheme } = themeStore();
 	const handleSetMode = (modePicked) => {
 		setTheme(modePicked);
@@ -45,16 +49,17 @@ export default function AdminNav() {
 				))}
 				<Button
 					to="/admin/profile"
-					className={`btn-transparent justify-start p-3 py-3.5
+					className={`btn-transparent justify-start p-3 py-3.5 gap-3
                         ${path === "/profile" && "bg-gray-3light font-medium"}
                         hover:bg-gray-3light`}
 				>
 					<Avatar className={`size-[26px]`}>
 						<AvatarImage src={"../temp/default_avatar.svg"} />
 						<AvatarFallback className="text-[10px] font-semibold">
-							{combineIntoAvatarName(user.firstName, user.lastName)}
+							{combineIntoAvatarName(form.ten.value, form.ho.value)}
 						</AvatarFallback>
 					</Avatar>
+					<span>{combineIntoDisplayName(form.ten.value, form.ho.value)}</span>
 				</Button>
 			</div>
 			<div>

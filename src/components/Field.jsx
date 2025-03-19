@@ -82,7 +82,7 @@ export function Field({
 							? "peer-hover:text-primary-text peer-focus:text-primary-text peer-placeholder-shown:text-gray"
 							: "text-red-600 peer-hover:text-red-600 peer-focus:text-red-600"
 					}
-					transition-all duration-100`}
+					transition`}
 				>
 					{label}
 				</label>
@@ -106,6 +106,7 @@ export function Select({
 	store,
 	options = { key1: "sample1", key2: "sample2" },
 	allowTab = true,
+	disable = false,
 }) {
 	const { form, updateField } = store();
 	const handleChange = (e) => {
@@ -115,16 +116,24 @@ export function Select({
 		updateField(id, { value });
 	};
 	return (
-		<div className={`relative ${className} group`}>
+		<div
+			className={`relative ${className} group ${
+				disable && "pointer-events-none opacity-60"
+			}`}
+		>
 			<select
 				name={name}
 				id={id}
-				className="
+				className={`
 					bg-transparent md:p-3 p-3.5 w-full ring-1 ring-gray-light ring-inset outline-none rounded appearance-none cursor-pointer 
-					group-hover:ring-gray focus:ring-gray focus:shadow-md
-					transition-all duration-100"
+					${
+						!disable
+							? "group-hover:ring-gray focus:ring-gray focus:shadow-md"
+							: "pointer-events-none"
+					}
+					transition-all duration-100 `}
 				tabIndex={allowTab ? 0 : -1}
-				onChange={handleChange}
+				onChange={disable ? () => {} : handleChange}
 				value={form[id].value}
 			>
 				{Object.keys(options).map((key) => {
