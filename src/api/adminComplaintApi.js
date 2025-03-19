@@ -12,9 +12,33 @@ export const getComplaint = async () => {
 	}
 };
 
-export const postComplaint = async (postId) => {
+export const getPostComplaint = async () => {
 	try {
-		const resp = await API.post(`/post/complaint`, dataObj);
+		const resp = await API.get(`/complaint/post`, dataObj);
+		const data = resp.data;
+		console.log("Resp post complaint: ", data);
+		return data;
+	} catch (error) {
+		console.error("Error at post complaint:", error);
+		return error.response?.data || null;
+	}
+};
+
+export const getUserComplaint = async () => {
+	try {
+		const resp = await API.get(`/complaint/user`, dataObj);
+		const data = resp.data;
+		console.log("Resp user complaint: ", data);
+		return data;
+	} catch (error) {
+		console.error("Error at user complaint:", error);
+		return error.response?.data || null;
+	}
+};
+
+export const postComplaint = async (id) => {
+	try {
+		const resp = await API.post(`/post/complaint/postId=${id}`, dataObj);
 		const data = resp.data;
 		console.log("Resp postComplaint: ", data);
 		return data;
