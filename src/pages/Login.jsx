@@ -13,7 +13,6 @@ import { Link, useNavigate } from "react-router-dom";
 import { login } from "../api/loginApi";
 import { getCookie, setCookie } from "@/utils/cookie";
 import { ownerAccountStore } from "@/store/ownerAccountStore";
-import { jwtDecode } from "jwt-decode";
 
 const list = [
 	{
