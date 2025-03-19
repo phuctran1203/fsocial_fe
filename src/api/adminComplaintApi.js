@@ -38,7 +38,7 @@ export const getUserComplaint = async () => {
 
 export const postComplaint = async (id) => {
 	try {
-		const resp = await API.post(`/post/complaint/postId=${id}`, dataObj);
+		const resp = await API.post(`/post/complaint/id=${id}`, dataObj);
 		const data = resp.data;
 		console.log("Resp postComplaint: ", data);
 		return data;
