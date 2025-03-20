@@ -21,7 +21,7 @@ export const sendComment = (data) =>
 		})
 		.catch((error) => {
 			console.error(`Error at sendComment: `, error);
-			return error.response || null;
+			return error.response?.data || null;
 		});
 
 export const replyComment = (data) =>
@@ -34,4 +34,19 @@ export const replyComment = (data) =>
 		.catch((error) => {
 			console.error(`Error at sendComment: `, error);
 			return error.response.data;
+		});
+
+export const getRepliesComment = (commentId) =>
+	API.get(`/timeline/comment/reply?comment_id=${commentId}`)
+		.then((resp) => {
+			const data = resp.data;
+			console.log("Resp getRepliesComment: ", data);
+			return data;
+		})
+		.catch((error) => {
+			console.error(
+				`Error at getRepliesComment for commentId ${commentId}: `,
+				error
+			);
+			return error.response?.data || null;
 		});

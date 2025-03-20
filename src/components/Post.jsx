@@ -48,7 +48,10 @@ export default function Post({
 	};
 
 	const showRepostPopup = () => {
-		showPopup(null, <ModalRepost id={post.id} store={store} />);
+		showPopup(
+			null,
+			<ModalRepost id={post.originPostId || post.id} store={store} />
+		);
 	};
 
 	const handlePopupReport = () => {
@@ -73,7 +76,7 @@ export default function Post({
 
 	const liked = post.like;
 
-	const updatePost = store((state) => state.updatePost);
+	const updatePost = store ? store((state) => state.updatePost) : () => {};
 
 	const handleLike = async () => {
 		updatePost(post.id, {
@@ -153,9 +156,12 @@ export default function Post({
 					dangerouslySetInnerHTML={{ __html: post.content.htmltext }}
 				/>
 				{/* assets post */}
-				{post.content.media.length > 0 && (
-					<GenerateMediaLayout medias={post.content.media} />
-				)}
+
+				<GenerateMediaLayout
+					medias={
+						post.content.media || (post.originPostId ? [post.originPostId] : [])
+					}
+				/>
 			</div>
 
 			{showReact && (

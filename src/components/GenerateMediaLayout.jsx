@@ -1,19 +1,17 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
+import Post from "./Post";
+import { getPost } from "@/api/postsApi";
+import { ownerAccountStore } from "@/store/ownerAccountStore";
 
 export const regexVideo = /\/video\//;
 
 export const regexImage = /\/image\//;
 
-const ProcessMedia = ({ media }) => {
-	if (regexImage.test(media))
-		return (
-			<img src={media} alt="Bài đăng" className="size-full object-cover" />
-		);
-	if (regexVideo.test(media))
-		return <video src={media} controls className="size-full object-cover" />;
-};
-
 const classLayout = (medias) => {
+	if (medias.length === 1) {
+		return "";
+	}
+	// if(typeof(medias) )
 	if (medias.length === 2) {
 		return "flex";
 	}
@@ -26,13 +24,56 @@ const classLayout = (medias) => {
 };
 
 export default function GenerateMediaLayout({ medias }) {
+	const [post, setPost] = useState(null);
+
+	const handleGetPost = async (postId) => {
+		const user = ownerAccountStore.getState().user;
+		const resp = await getPost(user.userId, postId);
+		if (!resp || resp.statusCode !== 200) return;
+		setPost(resp.data);
+	};
+
+	const isPost = (medias) =>
+		medias.length === 1 &&
+		!regexImage.test(medias[0]) &&
+		!regexVideo.test(medias[0]);
+
+	useEffect(() => {
+		isPost(medias) && handleGetPost(medias[0]);
+	}, []);
+
 	return (
-		<div className={`max-h-[960px] border-y transition ${classLayout(medias)}`}>
-			{medias.map((media, index) => (
-				<div key={index} className="overflow-hidden">
-					<ProcessMedia media={media} />
-				</div>
-			))}
-		</div>
+		medias.length > 0 && (
+			<div
+				className={`max-h-[960px] overflow-hidden border-y transition ${classLayout(
+					medias
+				)}`}
+			>
+				{medias.map((media, index) => (
+					<div key={index} className="overflow-hidden">
+						{regexImage.test(media) && (
+							<img
+								src={media}
+								alt="Bài đăng"
+								className="size-full object-cover"
+							/>
+						)}
+						{regexVideo.test(media) && (
+							<video src={media} controls className="size-full object-cover" />
+						)}
+						{post && (
+							<Post
+								post={post}
+								isChildren={true}
+								showReact={false}
+								className="rounded-lg shadow-t"
+							/>
+						)}
+
+						{/* <ProcessMedia media={media} /> */}
+					</div>
+				))}
+			</div>
+		)
 	);
 }

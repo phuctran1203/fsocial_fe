@@ -26,6 +26,11 @@ import {
 	combineIntoAvatarName,
 	combineIntoDisplayName,
 } from "@/utils/combineName";
+import {
+	Popover,
+	PopoverContent,
+	PopoverTrigger,
+} from "@/components/ui/popover";
 
 const listFriends = [
 	{
@@ -317,9 +322,15 @@ export default function Profile() {
 						</div>
 
 						<div className="self-center flex gap-4 ">
-							<Button className="btn-secondary px-3 h-10">
-								<Glyph />
-							</Button>
+							<Popover>
+								<PopoverTrigger>
+									<Button className="btn-secondary px-3 h-10">
+										<Glyph />
+									</Button>
+								</PopoverTrigger>
+								<PopoverContent>an</PopoverContent>
+							</Popover>
+
 							{!isOwner && !accountInfo.relationship && (
 								<Button
 									className="btn-primary px-8 text-nowrap h-10"
@@ -328,6 +339,7 @@ export default function Profile() {
 									Theo dõi
 								</Button>
 							)}
+
 							{!isOwner && accountInfo.relationship && (
 								<Button
 									className="btn-secondary px-8 text-nowrap h-10"
