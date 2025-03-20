@@ -35,12 +35,24 @@ import {
 	combineIntoDisplayName,
 } from "@/utils/combineName";
 import { Skeleton } from "@/components/ui/skeleton";
+import useMessageStore from "@/store/messageStore";
 
 export default function Message() {
 	const user = ownerAccountStore((state) => state.user);
 	// message socket
-	const { messages, setMessages, sendMessage, conversation, setConversation } =
-		useMessageSocket();
+	// const { messages, setMessages, sendMessage, conversation, setConversation } =
+	// 	useMessageSocket();
+
+	const {
+		messages,
+		setMessages,
+		sendMessage,
+		conversation,
+		setConversation,
+		connectWebSocket,
+		stompClient,
+	} = useMessageStore();
+
 	const theme = themeStore((state) => state.theme);
 	// chỉ định content hiển thị ở bên phải tương ứng button bên trái cột danh sách hội thoại
 	const [contentActive, setContentActive] = useState(0);
@@ -130,11 +142,13 @@ export default function Message() {
 
 	useEffect(() => {
 		if (!user?.userId) return;
+		connectWebSocket();
 		// get all conversation
 		handleGetAllConversation();
 	}, [user?.userId]);
 
 	// click chọn đoạn hội thoại
+	const subscription = useRef(null);
 	const controllerGetmsgs = useRef(null);
 	const handleChooseConversation = async (selectedConver) => {
 		if (
@@ -146,6 +160,18 @@ export default function Message() {
 		if (selectedConver.lastMessage) selectedConver.lastMessage.read = true;
 		setConversation(selectedConver);
 		console.log("selectedConver is: ", selectedConver);
+
+		if (subscription.current) subscription.current.unsubscribe();
+		subscription.current = stompClient.subscribe(
+			`/queue/private-${selectedConver.id}`,
+			(message) => {
+				const receivedMessage = JSON.parse(message.body);
+				console.log("received trigger: ", receivedMessage);
+				if (receivedMessage.receiverId !== user.userId) return;
+				setMessages([...useMessageStore.getState().messages, receivedMessage]);
+			}
+		);
+
 		setContentActive(2);
 		setTrigger(!trigger);
 		if (controllerGetmsgs.current) controllerGetmsgs.current.abort();
@@ -158,7 +184,7 @@ export default function Message() {
 			setMessages([]);
 			return;
 		}
-		setMessages(resp.data.reverse());
+		setMessages(resp.data.listMessages.reverse());
 	};
 
 	// Quay lại danh sách cuộc hội thoại (chỉ có ở mobile)
@@ -172,7 +198,7 @@ export default function Message() {
 	const textBoxOnKeyDown = (e) => {
 		if (window.innerWidth <= 640) return;
 		if (e.key === "Enter" && !e.shiftKey) {
-			handleSendMsg();
+			handleSendMessage();
 		}
 	};
 
@@ -182,7 +208,7 @@ export default function Message() {
 	const textbox = useRef(null);
 
 	// gửi tin nhắn
-	const handleSendMsg = async () => {
+	const handleSendMessage = async () => {
 		const { innerText, innerHTML } = getTextboxData(textbox);
 		if (!innerText || !innerHTML) {
 			setTrigger(!trigger);
@@ -209,13 +235,14 @@ export default function Message() {
 			},
 		};
 		// Update UI
-		setMessages((prev) => [...prev, baseMessage]);
+		console.log("total messages: ", [...messages, baseMessage]);
+		setMessages([...messages, baseMessage]);
 		// check conversationId đã tồn tại không
 		if (!conversation.id) {
 			console.log("Chưa có conversation Id!!!");
 			const id = await handleCreateConversation();
 			console.log("id conversation response: ", id);
-			setConversation((prev) => ({ ...prev, id }));
+			setConversation({ ...conversation, id });
 			sendMessage(innerHTML, id);
 			updateConversations({ ...baseConversation, id });
 		} else {
@@ -641,7 +668,7 @@ export default function Message() {
 								trigger={trigger}
 							/>
 							<button
-								onClick={handleSendMsg}
+								onClick={handleSendMessage}
 								className="bg-primary-gradient py-1.5 px-5 rounded-full"
 							>
 								<SendIcon color="stroke-txtWhite" />

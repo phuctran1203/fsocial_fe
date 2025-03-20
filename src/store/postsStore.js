@@ -28,7 +28,7 @@ class PostsStore {
 	// thêm 1 post mới vào đầu
 	insertPost = (post) => {
 		this.set((state) => ({
-			posts: [post, ...state.posts],
+			posts: [post, ...[state.posts || {}]],
 		}));
 	};
 	// tìm post
@@ -107,6 +107,19 @@ export const useProfilePostsStore = create((set, get) => {
 		insertPost: store.insertPost,
 
 		findPost: (id) => store.findPost(id, get),
+
+		deletePost: store.deletePost,
+	};
+});
+
+export const useSinglePostStore = create((set) => {
+	const store = new PostsStore(set);
+	return {
+		posts: null,
+
+		updatePost: store.updatePost,
+
+		setPosts: store.setPosts,
 
 		deletePost: store.deletePost,
 	};

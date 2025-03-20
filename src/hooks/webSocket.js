@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { Client } from "@stomp/stompjs";
 import { ownerAccountStore } from "@/store/ownerAccountStore";
+import { useNotificationsStore } from "@/store/notificationStore";
 
 export const useMessageSocket = () => {
 	const user = ownerAccountStore((state) => state.user);
@@ -99,6 +100,8 @@ export const useConversationsSocket = () => {
 };
 
 export const useNotificationSocket = () => {
+	const insertNotifications =
+		useNotificationsStore.getState().insertNotifications;
 	const subscribeNotification = (userId) => {
 		const client = new Client({
 			brokerURL: "ws://localhost:8087/notification/ws",
@@ -108,6 +111,7 @@ export const useNotificationSocket = () => {
 				client.subscribe(`/topic/notifications-${userId}`, (message) => {
 					const receivedMessage = JSON.parse(message.body);
 					console.log("received trigger: ", receivedMessage);
+					insertNotifications(receivedMessage);
 				});
 			},
 		});
