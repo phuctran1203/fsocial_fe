@@ -293,7 +293,7 @@ export default function CommentModal({ id, store }) {
 	const getComment = async () => {
 		const respGetComment = await getComments(post.id);
 		if (!respGetComment || respGetComment.statusCode !== 207) return;
-		setComments(respGetComment.data);
+		setComments(respGetComment.data.reverse());
 	};
 
 	useEffect(() => {

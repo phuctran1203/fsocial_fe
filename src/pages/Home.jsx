@@ -8,14 +8,8 @@ import { ownerAccountStore } from "@/store/ownerAccountStore";
 export default function Home() {
 	const setPosts = useHomePostsStore((state) => state.setPosts);
 	const user = ownerAccountStore((state) => state.user);
-	// const abortControllerRef = useRef(null);
 
 	const fetchPosts = async () => {
-		// if (abortControllerRef.current) {
-		// 	abortControllerRef.current.abort();
-		// }
-		// const controller = new AbortController();
-		// abortControllerRef.current = controller;
 		const resp = await getPosts(user.userId);
 		if (!resp || resp.statusCode !== 200) return;
 		setPosts(resp.data); //testing skeleton
