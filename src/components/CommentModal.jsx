@@ -1,12 +1,17 @@
 import React, { useEffect, useRef, useState } from "react";
 import { LoadingIcon, SendIcon, XMarkIcon } from "./Icon";
 import Post from "./Post";
-import { getComments, sendComment, replyComment } from "../api/commentsApi";
+import {
+	getComments,
+	sendComment,
+	replyComment,
+	getRepliesComment,
+} from "../api/commentsApi";
 
 import { ownerAccountStore } from "../store/ownerAccountStore";
 import { TextBox } from "./Field";
 import { dateTimeToNotiTime } from "../utils/convertDateTime";
-import { Link } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { getTextboxData } from "@/utils/processTextboxData";
@@ -15,15 +20,20 @@ import {
 	combineIntoDisplayName,
 } from "@/utils/combineName";
 import { HeartPostIcon } from "./Icon";
+import { usePopupStore } from "@/store/popupStore";
+import Button from "./Button";
 
 function RenderComment({ ...props }) {
 	const { comment, selectCommentToReply, handleShowReplyComment, replies } =
 		props;
 	// if (comment.reply != undefined) {
-	// 	console.log("all props is: ", props);
-	// 	console.log("comment is: ", comment);
-	// 	console.log("replies is: ", replies);
+	// console.log("all props is: ", props);
+	// console.log("comment is: ", comment);
+	// console.log("replies is: ", replies);
 	// }
+	const navigate = useNavigate();
+
+	const hidePopup = usePopupStore((state) => state.hidePopup);
 
 	const [like, setLike] = useState(false);
 
@@ -34,33 +44,40 @@ function RenderComment({ ...props }) {
 		setCountLikes(like ? countLikes - 1 : countLikes + 1);
 	};
 
+	const handleDirectToProfile = () => {
+		hidePopup();
+		navigate(`/profile?id=${comment.userId}`);
+	};
+
 	return (
 		<div className="flex gap-3">
 			{/* avatar */}
-			<Link to="">
-				<Avatar className={`size-9`}>
-					<AvatarImage src={comment.avatar} />
-					<AvatarFallback className="text-[11px]">
-						{combineIntoAvatarName(comment.firstName, comment.lastName)}
-					</AvatarFallback>
-				</Avatar>
-			</Link>
+
+			<Avatar
+				className={`size-9 cursor-pointer`}
+				onClick={handleDirectToProfile}
+			>
+				<AvatarImage src={comment.avatar} />
+				<AvatarFallback className="text-[11px]">
+					{combineIntoAvatarName(comment.firstName, comment.lastName)}
+				</AvatarFallback>
+			</Avatar>
 
 			<div>
 				<div className="space-y-1">
 					{/* tên */}
-					<Link
-						to=""
+					<Button
+						onClick={handleDirectToProfile}
 						className="font-semibold text-gray fs-xs hover:underline hover:text-primary-text"
 					>
 						{combineIntoDisplayName(comment.firstName, comment.lastName)}
-					</Link>
+					</Button>
 					{/* nội dung cmt */}
 					<div dangerouslySetInnerHTML={{ __html: comment.content.htmltext }} />
 					{/* time, like, reply button */}
 					<div className="flex items-center gap-2 text-gray">
 						<span className="text-gray fs-sm">
-							{dateTimeToNotiTime(comment.createdAt).textTime}
+							{dateTimeToNotiTime(comment.created_datetime).textTime}
 						</span>
 
 						<button
@@ -93,15 +110,15 @@ function RenderComment({ ...props }) {
 						{!replies ? (
 							<button
 								className="fs-xs ps-2 font-semibold text-gray hover:underline"
-								onClick={() => handleShowReplyComment(comment.commentId)}
+								onClick={() => handleShowReplyComment(comment.id)}
 							>
-								{replies.reply.length} phản hồi
+								Xem phản hồi
 							</button>
 						) : (
-							replies.reply.map((reply, index) => (
+							replies.reply.map((cmtReply, index) => (
 								<RenderComment
 									key={index}
-									comment={reply}
+									comment={cmtReply}
 									selectCommentToReply={selectCommentToReply}
 								/>
 							))
@@ -175,7 +192,7 @@ export default function CommentModal({ id, store }) {
 		let respSendCmt = null;
 		if (selectReply.id) {
 			//id là id của comment được chọn để phản hồi
-			formData.append("commentId", selectReply.id);
+			formData.append("commentId", selectReply.commentId || selectReply.id);
 			respSendCmt = await replyComment(formData);
 		} else {
 			formData.append("postId", id);
@@ -249,7 +266,22 @@ export default function CommentModal({ id, store }) {
 		setSubmitCmtClicked(false);
 	};
 
-	const handleShowReplyComment = (commentId) => {};
+	const handleShowReplyComment = async (commentId) => {
+		const resp = await getRepliesComment(commentId);
+		if (!resp || resp.statusCode !== 200) {
+			toast.error("Lấy phản hồi bình luận thất bại");
+			return;
+		}
+		const repliesCmt = {
+			id: commentId,
+			reply: resp.data,
+		};
+		// mặc định chưa show replies của cmt này -> cmt này chưa có trong list replies
+		const newReplies = [...commentsReply, repliesCmt];
+		console.log("newReplies after resp get Replies is: ", newReplies);
+
+		setCommentsReply(newReplies);
+	};
 
 	const textBoxOnKeyDown = (e) => {
 		if (window.innerWidth <= 640) return;

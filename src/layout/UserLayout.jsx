@@ -13,7 +13,7 @@ import { useNotificationSocket } from "@/hooks/webSocket";
 
 export default function UserLayout() {
 	const setUser = ownerAccountStore((state) => state.setUser);
-	const { createClient, startSubscribe } = useNotificationSocket();
+	const { subscribeNotification } = useNotificationSocket();
 
 	const getUserDetail = async () => {
 		const resp = await getOwnerProfile();
@@ -21,8 +21,7 @@ export default function UserLayout() {
 		const accessToken = getCookie("access-token");
 		let userId = jwtDecode(accessToken).sub;
 		setUser({ userId, ...resp.data });
-		createClient();
-		startSubscribe(userId);
+		subscribeNotification(userId);
 	};
 
 	useEffect(() => {

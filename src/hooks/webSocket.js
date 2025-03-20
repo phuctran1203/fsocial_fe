@@ -13,7 +13,7 @@ export const useMessageSocket = () => {
 
 		const client = new Client({
 			brokerURL: "ws://localhost:8082/message/ws",
-			reconnectDelay: 5000,
+			reconnectDelay: 10000,
 			onConnect: () => {
 				console.log("🔗 Kết nối WebSocket message!");
 			},
@@ -79,7 +79,7 @@ export const useConversationsSocket = () => {
 	useEffect(() => {
 		const client = new Client({
 			brokerURL: "ws://localhost:8082/conversations",
-			reconnectDelay: 5000,
+			reconnectDelay: 10000,
 			onConnect: () => {
 				console.log("🔗 Kết nối WebSocket conversations!");
 			},
@@ -99,25 +99,20 @@ export const useConversationsSocket = () => {
 };
 
 export const useNotificationSocket = () => {
-	const [client, setClient] = useState(null);
-	const createClient = () => {
-		// useEffect(() => {
+	const subscribeNotification = (userId) => {
 		const client = new Client({
 			brokerURL: "ws://localhost:8087/notification/ws",
 			reconnectDelay: 5000,
 			onConnect: () => {
 				console.log("🔗 Kết nối WebSocket notification!");
+				client.subscribe(`/topic/notifications-${userId}`, (message) => {
+					const receivedMessage = JSON.parse(message.body);
+					console.log("received trigger: ", receivedMessage);
+				});
 			},
 		});
 		client.activate();
-		setClient(client);
-	};
-	const startSubscribe = (userId) => {
-		client.subscribe(`/topic/notifications-${userId}`, (message) => {
-			const receivedMessage = JSON.parse(message.body);
-			console.log("received trigger: ", receivedMessage);
-		});
 	};
 
-	return { createClient, startSubscribe };
+	return { subscribeNotification };
 };

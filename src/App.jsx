@@ -21,6 +21,7 @@ import AdminPolicySettings from "./pages/AdminPolicySettings";
 import AdminReports from "./pages/AdminReports";
 import AdminProfile from "./pages/AdminProfile";
 import UserForgotPassword from "./pages/UserForgotPassword";
+import SinglePost from "./pages/SinglePost";
 
 function App() {
 	const theme = themeStore((state) => state.theme);
@@ -51,6 +52,7 @@ function App() {
 						path="/user-forgot-password"
 						element={<UserForgotPassword />}
 					/>
+					<Route path="/post" element={<SinglePost />} />
 				</Route>
 
 				<Route path="/admin" element={<AdminLayout />}>

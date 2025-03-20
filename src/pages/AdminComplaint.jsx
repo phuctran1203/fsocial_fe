@@ -1,4 +1,4 @@
-import { getComplaint } from "@/api/complaintApi";
+import { getComplaint, readingComplaint } from "@/api/complaintApi";
 import Button from "@/components/Button";
 import ButtonGroup from "@/components/ButtonGroup";
 import { TrashCanIcon, CalendarIcon, PencilIcon } from "@/components/Icon";
@@ -53,6 +53,12 @@ export default function AdminComplaint() {
 		setSearchValue(value);
 	};
 
+	const handleReadingComplaint = async(id) => {
+		const res = await readingComplaint(id)
+		console.log("reading success: ", res.data);
+		return res.data
+	}
+
 	const handleSelected = (value) => {
 		const currentSelected = buttonItems[value];
 		console.log(currentSelected.toLowerCase());
@@ -73,9 +79,11 @@ export default function AdminComplaint() {
 	};
 
 	const handleReadComplaint = (id) => {
+		const res = handleReadingComplaint(id)
 		setData(
 			filteredData.map((item) => {
-				if (item.id === id) item.status = true;
+				if (item.id === id) item.readding = true;
+				
 				return {
 					...item,
 				};
@@ -129,7 +137,7 @@ export default function AdminComplaint() {
 					<tr
 						key={index}
 						className={`hover:bg-secondary border-t ${
-							item.status && "bg-secondary"
+							item.readding && "bg-secondary"
 						}`}
 					>
 						<td align="center" className="ps-2 pe-4 py-5 fs-xs text-gray">
@@ -166,7 +174,7 @@ export default function AdminComplaint() {
 								onClick={() => handleReadComplaint(item.id)}
 							>
 								<PencilIcon />
-								{!item.status && (
+								{!item.readding && (
 									<div className="absolute -top-1 left-full size-2 bg-primary-gradient rounded-full" />
 								)}
 							</button>
