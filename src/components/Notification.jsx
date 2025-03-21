@@ -66,16 +66,17 @@ const Noti = (props) => {
 	};
 
 	const notiMap = {
-		likePost: {
+		LIKE: {
 			icon: <HeartNotiIcon />,
 			content: <span className="fs-sm">đã thả tim bài viết của bạn</span>,
 		},
+
 		likeComment: {
 			icon: <HeartNotiIcon />,
-
 			content: <span className="fs-sm">đã thả tim bình luận của bạn</span>,
 		},
-		COMMEN: {
+
+		COMMENT: {
 			icon: <CommentNotiIcon />,
 			content: <span className="fs-sm">đã bình luận về bài viết của bạn</span>,
 		},
