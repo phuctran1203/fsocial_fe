@@ -40,17 +40,15 @@ import useMessageStore from "@/store/messageStore";
 export default function Message() {
 	const user = ownerAccountStore((state) => state.user);
 	// message socket
-	// const { messages, setMessages, sendMessage, conversation, setConversation } =
-	// 	useMessageSocket();
-
 	const {
 		messages,
 		setMessages,
 		sendMessage,
 		conversation,
 		setConversation,
-		connectWebSocket,
 		stompClient,
+		newMessage,
+		setNewMessage,
 	} = useMessageStore();
 
 	const theme = themeStore((state) => state.theme);
@@ -58,6 +56,8 @@ export default function Message() {
 	const [contentActive, setContentActive] = useState(0);
 	// tạo cuộc hội thoại mới
 	const [friendsList, setFriendsList] = useState(null);
+
+	// HANDLE TẠO CUỘC TRÒ CHUYỆN MỚI
 	// Ẩn, hiện popup danh sách bạn bè tìm được
 	const [showScrollFriends, setShowScrollFriends] = useState(false);
 
@@ -110,7 +110,7 @@ export default function Message() {
 		return data.id;
 	};
 
-	// Load tất cả các cuộc hội thoại
+	// LOAD TẤT CẢ CUỘC TRÒ CHUYỆN
 	const [conversations, setConversations] = useState(null);
 
 	const handleGetAllConversation = async () => {
@@ -122,6 +122,15 @@ export default function Message() {
 		setConversations(data);
 	};
 
+	useEffect(() => {
+		if (!user?.userId) return;
+		// get all conversation
+		handleGetAllConversation();
+		// reset newMessage global nếu có - message page mount -> bỏ circle new message ở navbar
+		setNewMessage(null);
+	}, [user?.userId]);
+
+	// Cập nhật conversations
 	const updateConversations = (baseConversation) => {
 		setConversations((prevConversations) => {
 			const existConversation = conversations.find(
@@ -140,14 +149,24 @@ export default function Message() {
 		});
 	};
 
+	// update lại giao diện list conversations khi có tin nhắn từ người khác đến,
 	useEffect(() => {
-		if (!user?.userId) return;
-		connectWebSocket();
-		// get all conversation
-		handleGetAllConversation();
-	}, [user?.userId]);
+		// User đang mở cuộc trò chuyện trùng với global message trigger
+		if (
+			!newMessage ||
+			!conversation ||
+			newMessage.conversationId === conversation.id
+		)
+			return;
+		const baseConversation = {
+			id: newMessage.conversationId,
+			lastMessage: newMessage,
+		};
+		updateConversations(baseConversation);
+		setNewMessage(null);
+	}, [newMessage]);
 
-	// click chọn đoạn hội thoại
+	// HANDLE CHỌN CUỘC TRÒ CHUYỆN VÀ NHẮN TIN
 	const subscription = useRef(null);
 	const controllerGetmsgs = useRef(null);
 	const handleChooseConversation = async (selectedConver) => {
@@ -174,16 +193,19 @@ export default function Message() {
 
 		setContentActive(2);
 		setTrigger(!trigger);
+
 		if (controllerGetmsgs.current) controllerGetmsgs.current.abort();
 		controllerGetmsgs.current = new AbortController();
 		const resp = await getMessages(
 			selectedConver.id,
 			controllerGetmsgs.current
 		);
+
 		if (!resp || resp.statusCode !== 200) {
 			setMessages([]);
 			return;
 		}
+
 		setMessages(resp.data.listMessages.reverse());
 	};
 
@@ -194,7 +216,7 @@ export default function Message() {
 		setRealHeight(window.innerHeight);
 	};
 
-	// ở desktop, chỉ ấn enter sẽ tự gửi, xuống dòng phải đè shiftKey + enter
+	// Ở desktop, chỉ ấn enter sẽ tự gửi, xuống dòng phải đè shiftKey + enter
 	const textBoxOnKeyDown = (e) => {
 		if (window.innerWidth <= 640) return;
 		if (e.key === "Enter" && !e.shiftKey) {
@@ -235,13 +257,12 @@ export default function Message() {
 			},
 		};
 		// Update UI
-		console.log("total messages: ", [...messages, baseMessage]);
 		setMessages([...messages, baseMessage]);
 		// check conversationId đã tồn tại không
 		if (!conversation.id) {
 			console.log("Chưa có conversation Id!!!");
 			const id = await handleCreateConversation();
-			console.log("id conversation response: ", id);
+			console.log("id conversation vừa tạo mới: ", id);
 			setConversation({ ...conversation, id });
 			sendMessage(innerHTML, id);
 			updateConversations({ ...baseConversation, id });
@@ -256,6 +277,7 @@ export default function Message() {
 			setTrigger(!trigger);
 		}, 1);
 	};
+
 	// Vị trí avatar người nhận sẽ nhảy đến
 	const [avatarReceiverPosition, setAvatarReceiverPosition] = useState(null);
 	// vị trí các nhãn thời gian của từng block tin nhắn
@@ -271,10 +293,11 @@ export default function Message() {
 		}
 		// handle chia block tin nhắn
 		setTimeLabelIndexes(getTimeLabelIndexes(messages));
-		console.log("Group label time indexes: ", getTimeLabelIndexes(messages));
-		if (conversation) handleScrollMessages();
+		// console.log("Index các block tin nhắn: ", getTimeLabelIndexes(messages));
+		if (conversation && containerMessagesRef.current) handleScrollMessages();
 	}, [messages]);
 
+	// HANDLE TỰ ĐỘNG CUỘN XUỐNG ĐÁY VÀ LẤY TIN NHẮN CŨ HƠN KHI USER CUỘN LÊN
 	// container chứa tin nhắn
 	const containerMessagesRef = useRef(null);
 	const oldConverId = useRef("");
@@ -286,14 +309,8 @@ export default function Message() {
 		}
 	};
 	const handleScrollMessages = () => {
-		// Tổng chiều cao toàn bộ nội dung trong scroll <= chiều cao phần scroll đang hiển thị
-		// if (
-		// 	containerMessagesRef.current.scrollHeight <=
-		// 	containerMessagesRef.current.clientHeight
-		// )
-		// 	return;
-		// cuộn lên không quá 800 || conversationId cũ khác conversationId hiện tại || tin nhắn mới là của bản thân
-		// tự scroll đến đáy
+		// cuộn lên không quá 800 || conversationId trước đó khác conversationId hiện tại || tin nhắn mới là của bản thân
+		// => tự scroll đến đáy & tự trigger lấy tin nhắn cũ hơn
 		if (
 			containerMessagesRef.current.scrollHeight -
 				containerMessagesRef.current.scrollTop <
@@ -307,8 +324,11 @@ export default function Message() {
 					top: containerMessagesRef.current.scrollHeight,
 				});
 				oldConverId.current = conversation.id;
-				// intersectionObserver call API lấy tiếp tin nhắn cũ
+				// hủy observer cũ
 				if (observer.current) observer.current.disconnect();
+				// có ít nhất 2 tin nhắn mới intersector
+				if (!containerMessagesRef.current.childNodes[1]) return;
+				// tạo intersectionObserver call API lấy tiếp tin nhắn cũ
 				observer.current = new IntersectionObserver(callBackAPI, {
 					root: containerMessagesRef.current,
 				});

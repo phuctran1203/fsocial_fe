@@ -161,12 +161,10 @@ export default function Profile() {
 
 	const onDrag = (e) => {
 		if (!touched || !containerTabsRef.current) return;
-
-		e.preventDefault(); // Ngăn chặn hành vi cuộn mặc định của trình duyệt
-
+		// Ngăn chặn hành vi cuộn mặc định của trình duyệt
+		e.preventDefault();
 		const clientX = e.touches?.[0]?.clientX || e.clientX;
 		const diff = clientX - startDragPos.current;
-
 		// Tăng tốc độ cuộn bằng cách nhân với speedFactor
 		containerTabsRef.current.scrollLeft =
 			scrollLeftStart.current - diff * speedFactor;
@@ -322,15 +320,18 @@ export default function Profile() {
 						</div>
 
 						<div className="self-center flex gap-4 ">
+							{/* profile options */}
 							<Popover>
-								<PopoverTrigger>
-									<Button className="btn-secondary px-3 h-10">
-										<Glyph />
-									</Button>
+								<PopoverTrigger className="btn-secondary px-3 h-10">
+									<Glyph />
 								</PopoverTrigger>
-								<PopoverContent>an</PopoverContent>
+								<PopoverContent className="bg-background p-2">
+									<Button className="btn-transparent justify-start px-3 py-2">
+										Cài đặt riêng tư
+									</Button>
+								</PopoverContent>
 							</Popover>
-
+							{/* follow, unfollow */}
 							{!isOwner && !accountInfo.relationship && (
 								<Button
 									className="btn-primary px-8 text-nowrap h-10"
