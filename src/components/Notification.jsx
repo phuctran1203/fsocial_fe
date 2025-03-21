@@ -75,7 +75,7 @@ const Noti = (props) => {
 
 			content: <span className="fs-sm">đã thả tim bình luận của bạn</span>,
 		},
-		COMMENT: {
+		COMMEN: {
 			icon: <CommentNotiIcon />,
 			content: <span className="fs-sm">đã bình luận về bài viết của bạn</span>,
 		},
@@ -100,7 +100,7 @@ const Noti = (props) => {
 						</Avatar>
 					</div>
 					<div className="absolute size-fit -top-1 -left-0.5">
-						{notiMap[type].icon}
+						{notiMap[type]?.icon || "i"}
 					</div>
 				</div>
 
@@ -109,7 +109,7 @@ const Noti = (props) => {
 						<span className="font-semibold me-1">
 							{combineIntoDisplayName(firstName, lastName)}
 						</span>
-						{notiMap[type].content}
+						{notiMap[type]?.content || "i"}
 					</p>
 					<div className="flex items-center gap-2">
 						<span className={`fs-xs ${read && "opacity-60"} `}>{textTime}</span>
