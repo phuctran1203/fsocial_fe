@@ -10,10 +10,14 @@ import Popup from "@/components/Popup";
 import { getCookie } from "@/utils/cookie";
 import { jwtDecode } from "jwt-decode";
 import { useNotificationSocket } from "@/hooks/webSocket";
+import useMessageStore from "@/store/messageStore";
 
 export default function UserLayout() {
-	const setUser = ownerAccountStore((state) => state.setUser);
+	const { user, setUser } = ownerAccountStore();
+
 	const { subscribeNotification } = useNotificationSocket();
+	const { stompClient, connectWebSocket, subscribeMessageGlobal } =
+		useMessageStore();
 
 	const getUserDetail = async () => {
 		const resp = await getOwnerProfile();
@@ -22,11 +26,16 @@ export default function UserLayout() {
 		let userId = jwtDecode(accessToken).sub;
 		setUser({ userId, ...resp.data });
 		subscribeNotification(userId);
+		connectWebSocket();
 	};
 
 	useEffect(() => {
-		getUserDetail();
-	}, []);
+		if (!user?.userId) {
+			getUserDetail();
+		} else if (stompClient) {
+			subscribeMessageGlobal(user.userId);
+		}
+	}, [stompClient]);
 
 	return (
 		<>

@@ -6,8 +6,10 @@ const useMessageStore = create((set, get) => ({
 	conversation: null,
 	stompClient: null,
 	subscription: null,
+	newMessage: null,
 
 	setMessages: (messages) => set({ messages }),
+
 	setConversation: (conversation) => set({ conversation }),
 
 	connectWebSocket: () => {
@@ -17,11 +19,13 @@ const useMessageStore = create((set, get) => ({
 		const client = new Client({
 			brokerURL: "ws://localhost:8082/message/ws",
 			reconnectDelay: 10000,
-			onConnect: () => console.log("🔗 Kết nối WebSocket!"),
+			onConnect: () => {
+				console.log("🔗 Kết nối WebSocket message!");
+				set({ stompClient: client });
+			},
 		});
 
 		client.activate();
-		set({ stompClient: client });
 	},
 
 	sendMessage: (content, id) => {
@@ -38,18 +42,29 @@ const useMessageStore = create((set, get) => ({
 		});
 	},
 
+	setSubscription: (userId) =>
+		set(() => {
+			const { stompClient, setNewMessage } = get();
+			return {
+				subscription: stompClient.subscribe(
+					`/queue/private-${userId}`,
+					(message) => {
+						const receivedMessage = JSON.parse(message.body);
+						console.log("received global trigger: ", receivedMessage);
+						// tạo zustand, lưu trigger new message cho navBar và useEffect cho Message.jsx
+						setNewMessage(receivedMessage);
+					}
+				),
+			};
+		}),
+
 	subscribeMessageGlobal: (userId) => {
-		const { subscription, stompClient } = get();
+		const { subscription, setSubscription } = get();
 		if (subscription) return;
-		subscription = stompClient.subscribe(
-			`/queue/private-${userId}`,
-			(message) => {
-				const receivedMessage = JSON.parse(message.body);
-				console.log("received global trigger: ", receivedMessage);
-				// tạo zustand, lưu trigger new message cho navBar và useEffect cho Message.jsx
-			}
-		);
+		setSubscription(userId);
 	},
+
+	setNewMessage: (newMessage) => set({ newMessage }),
 }));
 
 export default useMessageStore;

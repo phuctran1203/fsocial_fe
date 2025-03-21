@@ -2,6 +2,8 @@ import React, { useEffect, useState } from "react";
 import Post from "./Post";
 import { getPost } from "@/api/postsApi";
 import { ownerAccountStore } from "@/store/ownerAccountStore";
+import { useNavigate } from "react-router-dom";
+import { cn } from "@/lib/utils";
 
 export const regexVideo = /\/video\//;
 
@@ -42,12 +44,19 @@ export default function GenerateMediaLayout({ medias }) {
 		isPost(medias) && handleGetPost(medias[0]);
 	}, []);
 
+	const navigate = useNavigate();
+	const handleToOriginPost = () => {
+		navigate(`/post?id=${post.id}`);
+	};
+
 	return (
 		medias.length > 0 && (
 			<div
-				className={`max-h-[960px] overflow-hidden border-y transition ${classLayout(
-					medias
-				)}`}
+				className={cn(
+					"max-h-[960px] overflow-hidden transition",
+					!post ? "border-y border-x-0" : "border-b",
+					!post && classLayout(medias)
+				)}
 			>
 				{medias.map((media, index) => (
 					<div key={index} className="overflow-hidden">
@@ -62,15 +71,16 @@ export default function GenerateMediaLayout({ medias }) {
 							<video src={media} controls className="size-full object-cover" />
 						)}
 						{post && (
-							<Post
-								post={post}
-								isChildren={true}
-								showReact={false}
-								className="rounded-lg shadow-t"
-							/>
+							<div onClick={handleToOriginPost}>
+								<Post
+									post={post}
+									isChildren={true}
+									showReact={false}
+									className="border-t cursor-pointer rounded-lg overflow-hidden"
+									isShared={true}
+								/>
+							</div>
 						)}
-
-						{/* <ProcessMedia media={media} /> */}
 					</div>
 				))}
 			</div>

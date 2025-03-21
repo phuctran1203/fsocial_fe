@@ -1,4 +1,4 @@
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { ComplaintIcon, Glyph, TrashCanIcon, PencilIcon } from "./Icon";
 import { usePopupStore } from "../store/popupStore";
 import { dateTimeToPostTime } from "../utils/convertDateTime";
@@ -26,6 +26,7 @@ import { HeartPostIcon } from "./Icon";
 import { CommentPostIcon } from "./Icon";
 import { RepostPostIcon } from "./Icon";
 import { SharePostIcon } from "./Icon";
+import { cn } from "@/lib/utils";
 
 export default function Post({
 	post,
@@ -33,6 +34,7 @@ export default function Post({
 	showReact = true,
 	className = "",
 	store,
+	isShared = false,
 }) {
 	const { showPopup } = usePopupStore();
 
@@ -88,10 +90,15 @@ export default function Post({
 
 	return (
 		<div className={`${className} transition`}>
-			<div className="flex items-center justify-between px-4 pt-4 pb-3">
+			<div
+				className={cn(
+					"flex items-center justify-between px-4 pt-4 pb-1",
+					isShared && "px-6"
+				)}
+			>
 				<div className="flex space-x-2">
 					<Link to={`/profile?id=${post.userId}`}>
-						<Avatar className={`size-9`}>
+						<Avatar className={cn("size-9", isShared && "size-8")}>
 							<AvatarImage src={post.avatar} />
 							<AvatarFallback className="text-[11px] transition">
 								{combineIntoAvatarName(post.firstName, post.lastName)}
@@ -152,16 +159,18 @@ export default function Post({
 			<div>
 				{/* post content */}
 				<div
-					className="px-4 mb-2"
+					className={cn("px-5 mb-1.5", isShared && "px-7")}
 					dangerouslySetInnerHTML={{ __html: post.content.htmltext }}
 				/>
 				{/* assets post */}
-
-				<GenerateMediaLayout
-					medias={
-						post.content.media || (post.originPostId ? [post.originPostId] : [])
-					}
-				/>
+				<div>
+					<GenerateMediaLayout
+						medias={
+							post.content.media ||
+							(post.originPostId ? [post.originPostId] : [])
+						}
+					/>
+				</div>
 			</div>
 
 			{showReact && (

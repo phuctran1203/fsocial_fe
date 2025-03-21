@@ -27,9 +27,9 @@ class PostsStore {
 	};
 	// thêm 1 post mới vào đầu
 	insertPost = (post) => {
-		this.set((state) => ({
-			posts: [post, ...[state.posts || {}]],
-		}));
+		this.set((state) =>
+			state.posts ? { posts: [post, ...state.posts] } : { posts: [post] }
+		);
 	};
 	// tìm post
 	findPost = (id, get) => get().posts.find((post) => post.id === id);

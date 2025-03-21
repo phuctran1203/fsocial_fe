@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { NavLink, useLocation } from "react-router-dom";
 import styles from "./Nav.module.scss";
 // import "./Nav.scss";
@@ -23,7 +23,11 @@ import {
 import NavMorePopup from "./NavMorePopup";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import CreatePost from "./CreatePost";
-import { combineIntoAvatarName } from "@/utils/combineName";
+import {
+	combineIntoAvatarName,
+	combineIntoDisplayName,
+} from "@/utils/combineName";
+import useMessageStore from "@/store/messageStore";
 
 export default function Nav() {
 	const user = ownerAccountStore((state) => state.user);
@@ -54,6 +58,8 @@ export default function Nav() {
 	const handlePopupCreatePost = () => {
 		showPopup("Tạo bài viết", <CreatePost />);
 	};
+
+	const newMessage = useMessageStore((state) => state.newMessage);
 
 	return (
 		<nav
@@ -136,7 +142,12 @@ export default function Nav() {
 					>
 						{({ isActive }) => (
 							<>
-								<MessageNavIcon compareVar={isActive} />
+								<div className="relative">
+									<MessageNavIcon compareVar={isActive} />
+									{newMessage && !isInMessage && (
+										<div className="absolute size-2.5 -top-[1px] -right-1 bg-primary-gradient rounded-full " />
+									)}
+								</div>
 								<span
 									className={`${
 										!isInMessage ? "sm:inline" : "lg:inline"
@@ -196,7 +207,7 @@ export default function Nav() {
 										!isInMessage ? "sm:inline" : "lg:inline"
 									} hidden ${isActive && "font-semibold"}`}
 								>
-									Hồ sơ
+									{combineIntoDisplayName(user.firstName, user.lastName)}
 								</span>
 							</>
 						)}
