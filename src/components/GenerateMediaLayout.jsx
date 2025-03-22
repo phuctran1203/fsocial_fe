@@ -4,10 +4,7 @@ import { getPost } from "@/api/postsApi";
 import { ownerAccountStore } from "@/store/ownerAccountStore";
 import { useNavigate } from "react-router-dom";
 import { cn } from "@/lib/utils";
-
-export const regexVideo = /\/video\//;
-
-export const regexImage = /\/image\//;
+import { regexImage, regexVideo } from "@/config/regex";
 
 const classLayout = (medias) => {
 	if (medias.length === 1) {
