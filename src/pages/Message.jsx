@@ -4,7 +4,6 @@ import { dateTimeToMessageTime } from "../utils/convertDateTime";
 import { ownerAccountStore } from "@/store/ownerAccountStore";
 import { getConversations, getMessages } from "@/api/messageApi";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { themeStore } from "@/store/themeStore";
 import Button from "@/components/Button";
 import {
 	combineIntoAvatarName,
@@ -28,7 +27,6 @@ export default function Message() {
 		setNewMessage,
 	} = useMessageStore();
 
-	const theme = themeStore((state) => state.theme);
 	// chỉ định content hiển thị ở bên phải tương ứng button bên trái cột danh sách hội thoại
 	const [contentActive, setContentActive] = useState(0);
 
@@ -46,6 +44,7 @@ export default function Message() {
 		}
 		const data = resp.data;
 		setConversations(data);
+		if (conversation) setContentActive(2);
 	};
 
 	useEffect(() => {
@@ -107,7 +106,7 @@ export default function Message() {
 		setConversation(selectedConver);
 		console.log("selectedConver is: ", selectedConver);
 
-		if (subscription.current) subscription.current.unsubscribe();
+		if (subscription.current) await subscription.current.unsubscribe();
 		subscription.current = stompClient.subscribe(
 			`/queue/private-${selectedConver.id}`,
 			(message) => {
