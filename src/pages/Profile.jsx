@@ -31,6 +31,7 @@ import {
 	PopoverContent,
 	PopoverTrigger,
 } from "@/components/ui/popover";
+import { userProfileOptions } from "@/config/userProfileOptions";
 
 const listFriends = [
 	{
@@ -325,10 +326,16 @@ export default function Profile() {
 								<PopoverTrigger className="btn-secondary px-3 h-10">
 									<Glyph />
 								</PopoverTrigger>
-								<PopoverContent className="bg-background p-2">
-									<Button className="btn-transparent justify-start px-3 py-2">
-										Cài đặt riêng tư
-									</Button>
+								<PopoverContent className="bg-background p-1.5 w-64">
+									{userProfileOptions.map((item, index) => (
+										<Button
+											key={index}
+											to={item.to}
+											className="btn-transparent gap-1 justify-start px-3 py-2.5"
+										>
+											{item.icon} {item.content}
+										</Button>
+									))}
 								</PopoverContent>
 							</Popover>
 							{/* follow, unfollow */}

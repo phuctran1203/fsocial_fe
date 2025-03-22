@@ -25,6 +25,7 @@ import {
 } from "@/utils/combineName";
 import { Skeleton } from "./ui/skeleton";
 import { useNotificationsStore } from "@/store/notificationStore";
+import { regexInMessage, regexInSetting } from "@/config/regex";
 
 const Noti = (props) => {
 	const { id, postId, type, firstName, lastName, read, textTime, avatar } =
@@ -159,7 +160,10 @@ const Noti = (props) => {
 
 export default function Notification() {
 	const location = useLocation();
-	const isInMessage = location.pathname === "/message";
+	const isNotificationSlide =
+		regexInMessage.test(location.pathname) ||
+		regexInSetting.test(location.pathname);
+
 	const user = ownerAccountStore((state) => state.user);
 
 	const { notifications, setNotifications } = useNotificationsStore();
@@ -204,7 +208,7 @@ export default function Notification() {
 			className={` 
 			z-0 bg-black h-screen overflow-hidden flex-shrink-0
 			lg:border-l-[1px] lg:block ${
-				!isInMessage
+				!isNotificationSlide
 					? `
 				lg:relative lg:left-auto lg:min-w-fit lg:max-w-fit lg:visible
 				md:left-[260px] md:w-[calc(100%-260px)]
@@ -223,7 +227,7 @@ export default function Notification() {
 			<div
 				className={`
 				h-full relative bg-background 
-				${!isInMessage ? "lg:translate-x-0 lg:drop-shadow-none" : ""}
+				${!isNotificationSlide ? "lg:translate-x-0 lg:drop-shadow-none" : ""}
 				lg:translate-y-0
 				md:w-[360px]
 				sm:w-[340px] sm:pb-0
@@ -237,7 +241,7 @@ export default function Notification() {
 			>
 				<CloseCollapseIcon
 					className={`absolute left-full top-1/2 -translate-x-[1px] -translate-y-1/2 cursor-pointer  ${
-						!isInMessage ? "lg:hidden" : ""
+						!isNotificationSlide ? "lg:hidden" : ""
 					} sm:block hidden
 						${isVisible ? "" : "-translate-x-full"}
 						will-change-transform`}
@@ -262,7 +266,7 @@ export default function Notification() {
 
 					<div
 						className={`flex-grow overflow-y-auto sm:pe-4 ${
-							!isInMessage ? "" : "scrollable-div"
+							!isNotificationSlide ? "" : "scrollable-div"
 						}`}
 					>
 						{!notifications &&

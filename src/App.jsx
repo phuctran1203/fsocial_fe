@@ -1,4 +1,4 @@
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 
 import "./index.scss";
 
@@ -22,6 +22,8 @@ import AdminReports from "./pages/AdminReports";
 import AdminProfile from "./pages/AdminProfile";
 import UserForgotPassword from "./pages/UserForgotPassword";
 import SinglePost from "./pages/SinglePost";
+import SettingLayout from "./layout/SettingLayout";
+import UserAccountPrivacy from "./pages/UserAccountPrivacy";
 
 function App() {
 	const theme = themeStore((state) => state.theme);
@@ -43,16 +45,18 @@ function App() {
 
 				<Route path="/" element={<UserLayout />}>
 					<Route index element={<Home />} />
-					<Route path="/home" element={<Home />} />
-					<Route path="/follow" element={<Follow />} />
-					<Route path="/search" element={<Search />} />
-					<Route path="/message" element={<Message />} />
-					<Route path="/profile" element={<Profile />} />
-					<Route
-						path="/user-forgot-password"
-						element={<UserForgotPassword />}
-					/>
-					<Route path="/post" element={<SinglePost />} />
+					<Route path="home" element={<Home />} />
+					<Route path="follow" element={<Follow />} />
+					<Route path="search" element={<Search />} />
+					<Route path="message" element={<Message />} />
+					<Route path="profile" element={<Profile />} />
+					<Route path="user-forgot-password" element={<UserForgotPassword />} />
+					<Route path="post" element={<SinglePost />} />
+					<Route path="setting" element={<SettingLayout />}>
+						{/* replace props: trình duyệt sẽ không lưu lịch sử route  */}
+						<Route index element={<Navigate to="account-privacy" replace />} />
+						<Route path="account-privacy" element={<UserAccountPrivacy />} />
+					</Route>
 				</Route>
 
 				<Route path="/admin" element={<AdminLayout />}>
