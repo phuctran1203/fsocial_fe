@@ -32,6 +32,8 @@ import {
 	PopoverTrigger,
 } from "@/components/ui/popover";
 import { userProfileOptions } from "@/config/userProfileOptions";
+import { usePopupStore } from "@/store/popupStore";
+import ModalCropImage from "@/components/ModalCropImage";
 
 const listFriends = [
 	{
@@ -76,19 +78,40 @@ const listTabs = [
 ];
 export default function Profile() {
 	const location = useLocation();
-
 	const queryParams = new URLSearchParams(location.search);
-
-	const user = ownerAccountStore((state) => state.user);
+	const { user, setUser } = ownerAccountStore();
 
 	const [accountInfo, setAccountInfo] = useState({});
 
 	const maxPreviewFriendsAvatar = useRef(7);
 
+	// handle change banner, avatar
+	const { showPopup, hidePopup } = usePopupStore();
+
+	const handleSelectBanner = (e) => {
+		const el = e.target;
+		const file = el.files[0];
+		if (file) {
+			const previewURL = URL.createObjectURL(file);
+			console.log("have file");
+			showPopup(
+				null,
+				<ModalCropImage
+					image={previewURL}
+					acceptCropCallback={handleUpdateUserInfo}
+				/>
+			);
+		}
+	};
+
+	const handleUpdateUserInfo = (imageCroped) => {
+		setUser({ banner: imageCroped });
+		hidePopup();
+	};
+
+	// handle show tab
 	const containerTabsRef = useRef(null);
-
 	const wrapperTabsRef = useRef(null);
-
 	const [currentTab, setCurrentTab] = useState(null);
 
 	const setPosts = useProfilePostsStore((state) => state.setPosts);
@@ -191,7 +214,7 @@ export default function Profile() {
 		} else {
 			handleGetProfile();
 		}
-	}, [user?.userId, queryParams.get("id")]);
+	}, [user, queryParams.get("id")]);
 
 	useEffect(() => {
 		const interCallback = (entries) => {
@@ -217,8 +240,6 @@ export default function Profile() {
 	}, [currentTab]);
 
 	const isOwner = user.userId === queryParams.get("id");
-
-	const handleUpdateUserInfo = () => {};
 
 	const handleRequestFollow = () => {
 		requestFollow(queryParams.get("id"));
@@ -251,13 +272,18 @@ export default function Profile() {
 						)
 					)}
 					{isOwner && (
-						<Button
-							className="btn-secondary !w-fit absolute bottom-2 right-2 py-1 ps-2.5 pe-4 border"
-							onClick={handleUpdateUserInfo}
-						>
+						<label className="btn-secondary w-fit absolute bottom-2 right-2 py-1 ps-2.5 pe-4 border cursor-pointer">
 							<PencilChangeImageIcon />
 							Đổi ảnh bìa
-						</Button>
+							<input
+								type="file"
+								hidden
+								onChange={handleSelectBanner}
+								onClick={(e) => {
+									e.target.value = "";
+								}}
+							/>
+						</label>
 					)}
 				</div>
 				<div className="sm:-mt-6 -mt-4 mx-auto lg:max-w-[630px] ">
