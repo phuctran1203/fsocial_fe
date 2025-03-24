@@ -3,7 +3,6 @@ import Button from "../components/Button";
 import { Field, Select } from "../components/Field";
 import { useSignupStore } from "../store/signupStore";
 import { useEffect, useRef, useState } from "react";
-import EnterOTPCode from "../components/EnterOTPCode";
 import {
 	ArrowLeftIcon,
 	AtIcon,

@@ -2,7 +2,6 @@ import React, { useEffect, useRef, useState } from "react";
 import { Field } from "../components/Field";
 import { useForgotPasswordStore } from "../store/forgotPwStore";
 import Button from "../components/Button";
-import EnterOTPCode from "../components/EnterOTPCode";
 import {
 	ArrowLeftIcon,
 	EyeIcon,

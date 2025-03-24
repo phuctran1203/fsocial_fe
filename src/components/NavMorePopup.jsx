@@ -18,6 +18,7 @@ import { deleteCookie } from "@/utils/cookie";
 import { themeStore } from "@/store/themeStore";
 import { usePopupStore } from "@/store/popupStore";
 import ChangePasswordModal from "./ChangePasswordModal";
+import { ownerAccountStore } from "@/store/ownerAccountStore";
 
 export default function NavMorePopup({ inMobile, setPopoverOpen }) {
 	const { theme, setTheme } = themeStore();
@@ -29,9 +30,13 @@ export default function NavMorePopup({ inMobile, setPopoverOpen }) {
 	const [switchThemeOpen, setSwitchThemeOpen] = useState(false);
 
 	const navigate = useNavigate();
+
+	const resetUser = ownerAccountStore((state) => state.resetUser);
+
 	const handleLogout = () => {
 		deleteCookie("refresh-token");
 		deleteCookie("access-token");
+		resetUser();
 		navigate("/login");
 	};
 
