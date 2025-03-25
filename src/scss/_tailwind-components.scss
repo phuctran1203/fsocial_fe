@@ -34,4 +34,12 @@
 			var(--primary-gradient-end)
 		);
 	}
+
+	// field custom không có label, không có store
+	// thẻ cha
+	.field {
+		input {
+			// @apply
+		}
+	}
 }

@@ -55,14 +55,12 @@ export function Field({
 					id={id}
 					placeholder=""
 					value={form[id].value}
-					className={`
-					peer md:p-3 p-3.5 w-full bg-transparent border outline-none rounded
-					${
+					className={cn(
+						"peer md:p-3 p-3.5 w-full bg-transparent border outline-none rounded transition-all duration-100",
 						!form[id].isTouched || form[id].isValid
 							? "hover:border-hover focus:border-hover"
 							: "border-red-600 focus:border-red-600 hover:border-red-600"
-					}
-					transition-all duration-100`}
+					)}
 					tabIndex={allowTab ? 0 : -1}
 					autoComplete={autoComplete}
 					onChange={handleChange}
@@ -73,24 +71,22 @@ export function Field({
 				</span>
 				<label
 					htmlFor={id}
-					className={`
-					absolute bg-background rounded-sm
-					px-1.5 top-0 left-2 -translate-y-1/2
-                	peer-placeholder-shown:top-1/2 peer-hover:top-0 peer-focus:top-0  
-					${
+					className={cn(
+						`absolute bg-background rounded-sm px-1.5 top-0 left-2 -translate-y-1/2 
+						peer-placeholder-shown:top-1/2 peer-hover:top-0 peer-focus:top-0 transition`,
 						!form[id].isTouched || form[id].isValid
 							? "peer-hover:text-primary-text peer-focus:text-primary-text peer-placeholder-shown:text-gray"
 							: "text-red-600 peer-hover:text-red-600 peer-focus:text-red-600"
-					}
-					transition`}
+					)}
 				>
 					{label}
 				</label>
 			</div>
 			<span
-				className={`fs-xs text-red-600 ${
+				className={cn(
+					"fs-xs text-red-600",
 					!form[id].isTouched || form[id].isValid ? "hidden" : "block"
-				}`}
+				)}
 			>
 				*{errorMessage}
 			</span>

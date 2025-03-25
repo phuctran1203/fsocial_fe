@@ -9,7 +9,13 @@ export default function NavSetting() {
 		<div className="pt-5 px-5 h-full w-[300px] border-r space-y-2">
 			<h4 className="mb-5">Cài đặt</h4>
 			{settingNavRoute.map((item, index) => (
-				<NavLink key={index} to={item.to} className={cn(styles.navBaseStyle)}>
+				<NavLink
+					key={index}
+					to={item.to}
+					className={({ isActive }) =>
+						cn(styles.navBaseStyle, isActive && "bg-gray-3light")
+					}
+				>
 					{item.icon} {item.content}
 				</NavLink>
 			))}

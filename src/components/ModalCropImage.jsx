@@ -3,7 +3,7 @@ import Cropper from "react-easy-crop";
 import { LoadingIcon } from "./Icon";
 import { cn } from "@/lib/utils";
 
-export default function ModalCropImage({ image, acceptCropCallback }) {
+export default function ModalCropImage({ image, ratio, acceptCropCallback }) {
 	const [crop, setCrop] = useState({ x: 0, y: 0 });
 	const [zoom, setZoom] = useState(1);
 	const [croppedAreaPixels, setCroppedAreaPixels] = useState(null);
@@ -64,7 +64,7 @@ export default function ModalCropImage({ image, acceptCropCallback }) {
 					image={image}
 					crop={crop}
 					zoom={zoom}
-					aspect={3 / 1}
+					aspect={ratio}
 					onCropChange={setCrop}
 					onCropComplete={onCropComplete}
 					onZoomChange={setZoom}

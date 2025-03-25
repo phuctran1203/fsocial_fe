@@ -24,6 +24,8 @@ import UserForgotPassword from "./pages/UserForgotPassword";
 import SinglePost from "./pages/SinglePost";
 import SettingLayout from "./layout/SettingLayout";
 import UserAccountPrivacy from "./pages/UserAccountPrivacy";
+import UserAccountBasic from "./pages/UserAccountBasic";
+import UserAccountLogin from "./pages/UserAccountLogin";
 
 function App() {
 	const theme = themeStore((state) => state.theme);
@@ -54,7 +56,9 @@ function App() {
 					<Route path="post" element={<SinglePost />} />
 					<Route path="setting" element={<SettingLayout />}>
 						{/* replace props: trình duyệt sẽ không lưu lịch sử route  */}
-						<Route index element={<Navigate to="account-privacy" replace />} />
+						<Route index element={<Navigate to="account-basic" replace />} />
+						<Route path="account-basic" element={<UserAccountBasic />} />
+						<Route path="account-login" element={<UserAccountLogin />} />
 						<Route path="account-privacy" element={<UserAccountPrivacy />} />
 					</Route>
 				</Route>
