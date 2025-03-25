@@ -1,12 +1,23 @@
+import {
+	Input,
+	JumpingInput,
+	JumpingSelect,
+	SSelect,
+} from "@/components/Field";
 import { PencilChangeImageIcon } from "@/components/Icon";
 import ModalCropImage from "@/components/ModalCropImage";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { cn } from "@/lib/utils";
 import { ownerAccountStore } from "@/store/ownerAccountStore";
 import { usePopupStore } from "@/store/popupStore";
 import { combineIntoAvatarName } from "@/utils/combineName";
-import React from "react";
+import { ChevronDown, UserIcon } from "lucide-react";
+import React, { useEffect, useRef, useState } from "react";
+import { useForm } from "react-hook-form";
+import { useNavigate } from "react-router-dom";
 
 export default function UserAccountBasic() {
+	const navigate = useNavigate();
 	const { user, setUser } = ownerAccountStore();
 	const { showPopup, hidePopup } = usePopupStore();
 
@@ -50,10 +61,57 @@ export default function UserAccountBasic() {
 		}
 	};
 
+	// react hook form
+	const {
+		register,
+		handleSubmit,
+		getValues,
+		formState: { errors },
+		reset, // Thêm reset để cập nhật defaultValues
+	} = useForm({
+		mode: "onChange",
+		defaultValues: {},
+	});
+
+	useEffect(() => {
+		reset({
+			bio: user.bio,
+			firstName: user.firstName,
+			lastName: user.lastName,
+			gender: user.gender,
+		});
+	}, [user]);
+
+	const dayOptions = useRef(
+		Array.from({ length: 31 }, (_, index) => index + 1).reduce((acc, num) => {
+			acc[num] = num;
+			return acc;
+		}, {})
+	);
+	const monthOptions = useRef(
+		Array.from({ length: 12 }, (_, index) => index + 1).reduce((acc, num) => {
+			acc[num] = num;
+			return acc;
+		}, {})
+	);
+	const yearOptions = useRef(
+		Array.from(
+			{ length: new Date().getFullYear() - 19 - 1940 + 1 },
+			(_, index) => 1940 + index
+		).reduce((acc, num) => {
+			acc[num] = num;
+			return acc;
+		}, {})
+	);
+
+	const onSubmit = (data) => {
+		console.log(data);
+	};
+
 	return (
-		<div className="sm:mt-5 mt-2 space-y-5">
+		<div className="sm:mt-5 mt-2 mb-5">
 			{/* banner */}
-			<div className="space-y-3">
+			<div className="mb-5 space-y-3">
 				<p className="font-medium">Ảnh bìa</p>
 				<div className="relative aspect-[3/1] overflow-hidden lg:rounded-lg border">
 					{user.banner ? (
@@ -78,7 +136,7 @@ export default function UserAccountBasic() {
 				</div>
 			</div>
 			{/* avatar */}
-			<div className="space-y-3">
+			<div className="mb-5 space-y-3">
 				<p className="font-medium">Ảnh đại diện</p>
 				<div className="relative bg-background border-4 rounded-full p-1 w-fit transition">
 					<Avatar className={`size-[120px]`}>
@@ -100,7 +158,120 @@ export default function UserAccountBasic() {
 					</label>
 				</div>
 			</div>
-			{/* bio */}
+
+			<form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
+				{/* bio */}
+				<Input
+					label="Tiểu sử"
+					name="bio"
+					register={register}
+					errors={errors}
+					placeholder="Viết gì đó giới thiệu về bản thân"
+				/>
+				{/* name */}
+				<div className="grid grid-cols-2 gap-4">
+					<Input
+						label="Tên"
+						name="firstName"
+						register={register}
+						errors={errors}
+						validateOptions={{ required: "Tên không được để trống" }}
+					/>
+
+					<Input
+						label="Họ"
+						name="lastName"
+						register={register}
+						errors={errors}
+						validateOptions={{ required: "Họ không được để trống" }}
+					/>
+				</div>
+				{/* gender */}
+				<SSelect
+					label="Giới tính"
+					name="gender"
+					register={register}
+					errors={errors}
+					options={{
+						0: "Nam",
+						1: "Nữ",
+						2: "Khác",
+						3: "Không muốn tiết lộ",
+					}}
+					icon={<ChevronDown />}
+				/>
+				{/* birth */}
+				<div>
+					<p className="mb-4 font-medium">Ngày sinh</p>
+					<div className="grid grid-cols-3 gap-4">
+						<JumpingSelect
+							label="Ngày"
+							name="day"
+							register={register}
+							errors={errors}
+							options={dayOptions.current}
+							icon={<ChevronDown />}
+						/>
+						<JumpingSelect
+							label="Tháng"
+							name="month"
+							register={register}
+							errors={errors}
+							options={monthOptions.current}
+							icon={<ChevronDown />}
+						/>
+						<JumpingSelect
+							label="Năm"
+							name="year"
+							register={register}
+							errors={errors}
+							options={yearOptions.current}
+							icon={<ChevronDown />}
+						/>
+					</div>
+				</div>
+				{/* address */}
+				<div>
+					<p className="mb-4 font-medium">Địa chỉ</p>
+					<div className="grid grid-cols-2 gap-4">
+						<JumpingSelect
+							label="Quốc gia"
+							name="country"
+							register={register}
+							errors={errors}
+							options={{ empty: "Chọn quốc gia" }}
+							icon={<ChevronDown />}
+						/>
+
+						<JumpingSelect
+							label="Tỉnh/thành phố"
+							name="city"
+							register={register}
+							errors={errors}
+							options={{ empty: "Chọn thành phố" }}
+							icon={<ChevronDown />}
+						/>
+					</div>
+				</div>
+				<div className="grid grid-cols-2 gap-4">
+					<button
+						className="btn-secondary py-2.5"
+						onClick={() => navigate("/profile")}
+					>
+						Hủy bỏ
+					</button>
+
+					<button
+						className={cn(
+							"btn-primary py-2.5",
+							Object.keys(errors).length > 0 && "disable-btn"
+						)}
+						type="submit"
+					>
+						Lưu thay đổi
+					</button>
+				</div>
+			</form>
 		</div>
 	);
 }

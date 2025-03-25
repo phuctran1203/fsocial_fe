@@ -3,7 +3,7 @@ import { LockKeyholeIcon, ShieldCheckIcon, UserRound } from "lucide-react";
 export const userProfileOptions = {
 	OWNER: [
 		{
-			to: "/setting/account",
+			to: "/setting/account-basic",
 			icon: <UserRound className="stroke-[1.5px]" />,
 			content: <span>Thông tin cá nhân</span>,
 		},

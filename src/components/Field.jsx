@@ -1,4 +1,5 @@
 import { cn } from "@/lib/utils";
+import { ChevronDown } from "lucide-react";
 import { useEffect, useState } from "react";
 
 export function Field({
@@ -93,6 +94,178 @@ export function Field({
 		</div>
 	);
 }
+
+export function Input({
+	register,
+	errors,
+	label,
+	placeholder,
+	name,
+	validateOptions,
+	icon,
+	disabled = false,
+}) {
+	return (
+		<label
+			className={cn("block", disabled && "pointer-events-none opacity-65")}
+		>
+			<span className="block mb-2 font-medium">{label}</span>
+			<div className="relative">
+				<input
+					type="text"
+					placeholder={placeholder}
+					className={cn(
+						"custom-input",
+						errors[name] && "custom-input-error",
+						disabled && "pointer-events-none"
+					)}
+					tabIndex={disabled ? -1 : 0}
+					{...register(name, validateOptions)}
+				/>
+				<div className="absolute top-1/2 right-0 -translate-x-1/2 -translate-y-1/2">
+					{icon}
+				</div>
+			</div>
+			{errors[name] && <p className="text-red-500">{errors[name].message}</p>}
+		</label>
+	);
+}
+
+export function JumpingInput({
+	register,
+	errors,
+	label,
+	name,
+	validateOptions,
+	icon,
+	disabled = false,
+}) {
+	return (
+		<div className={cn(disabled && "pointer-events-none opacity-65")}>
+			<div className="relative">
+				<input
+					type="text"
+					placeholder=""
+					className={cn(
+						"peer custom-input",
+						errors[name] && "custom-input-error",
+						disabled && "pointer-events-none"
+					)}
+					tabIndex={disabled ? -1 : 0}
+					{...register(name, validateOptions)}
+				/>
+
+				<span
+					className={cn(
+						`fs-sm text-gray absolute bg-background rounded-sm px-1.5 top-0 left-2 -translate-y-1/2 
+						peer-placeholder-shown:top-1/2 peer-hover:top-0 peer-focus:top-0 transition`,
+						errors[name] && "text-red-500"
+					)}
+				>
+					{label}
+				</span>
+
+				<div className="absolute top-1/2 right-0 -translate-x-1/2 -translate-y-1/2">
+					{icon}
+				</div>
+			</div>
+
+			{errors[name] && <p className="text-red-500">{errors[name].message}</p>}
+		</div>
+	);
+}
+
+export function SSelect({
+	register,
+	errors,
+	label,
+	name,
+	validateOptions,
+	options = { key1: "sample1", key2: "sample2" },
+	icon,
+	disabled = false,
+}) {
+	return (
+		<label
+			className={cn("block", disabled && "pointer-events-none opacity-65")}
+		>
+			<span className="block mb-2 font-medium">{label}</span>
+			<div className="relative">
+				<select
+					className={cn(
+						"peer appearance-none custom-input",
+						errors[name] && "custom-input-error"
+					)}
+					{...register(name, validateOptions)}
+				>
+					{Object.keys(options).map((key) => {
+						return (
+							<option key={key} value={key} className="bg-background">
+								{options[key]}
+							</option>
+						);
+					})}
+				</select>
+				<div className="absolute top-1/2 right-0 -translate-x-1/2 -translate-y-1/2">
+					{icon}
+				</div>
+			</div>
+			{errors[name] && <p className="text-red-500">{errors[name].message}</p>}
+		</label>
+	);
+}
+
+export function JumpingSelect({
+	register,
+	errors,
+	label,
+	name,
+	validateOptions,
+	options = { key1: "sample1", key2: "sample2" },
+	icon,
+	disabled = false,
+}) {
+	return (
+		<div className={cn(disabled && "pointer-events-none opacity-65")}>
+			<div className="relative">
+				<select
+					className={cn(
+						"peer appearance-none custom-input",
+						errors[name] && "custom-input-error",
+						disabled && "pointer-events-none"
+					)}
+					tabIndex={disabled ? -1 : 0}
+					{...register(name, validateOptions)}
+				>
+					{Object.keys(options).map((key) => {
+						return (
+							<option key={key} value={key} className="bg-background">
+								{options[key]}
+							</option>
+						);
+					})}
+				</select>
+
+				<span
+					className={cn(
+						`fs-sm text-gray absolute bg-background rounded-sm px-1.5 top-0 left-2 -translate-y-1/2 transition`,
+						errors[name] && "text-red-500"
+					)}
+				>
+					{label}
+				</span>
+
+				<div className="absolute top-1/2 right-0 -translate-x-1/2 -translate-y-1/2">
+					{icon}
+				</div>
+			</div>
+
+			{errors[name] && <p className="text-red-500">{errors[name].message}</p>}
+		</div>
+	);
+}
+
+// old
 
 export function Select({
 	name,

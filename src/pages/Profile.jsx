@@ -219,7 +219,8 @@ export default function Profile() {
 		setTouched(false);
 	};
 
-	const isOwner = queryParams.get("id") === user.userId;
+	const isOwner =
+		!queryParams.get("id") || queryParams.get("id") === user.userId;
 
 	const handleGetProfile = async () => {
 		const resp = await getProfile(queryParams.get("id"));
@@ -232,7 +233,7 @@ export default function Profile() {
 		if (!user?.userId) return;
 		setCurrentTab(0);
 
-		if (queryParams.get("id") === user.userId) {
+		if (isOwner) {
 			setAccountInfo(user);
 		} else {
 			handleGetProfile();
@@ -240,6 +241,7 @@ export default function Profile() {
 	}, [user, queryParams.get("id")]);
 
 	useEffect(() => {
+		if (!wrapperTabsRef.current) return;
 		const interCallback = (entries) => {
 			entries.forEach((entry) => {
 				if (entry.isIntersecting && !ignoreIntersec.current) {
@@ -260,7 +262,7 @@ export default function Profile() {
 			observer.observe(element)
 		);
 		return () => observer.disconnect();
-	}, [currentTab]);
+	}, [currentTab, wrapperTabsRef.current]);
 
 	const handleRequestFollow = () => {
 		requestFollow(queryParams.get("id"));
@@ -343,7 +345,7 @@ export default function Profile() {
 									accountInfo.lastName
 								)}
 							</h3>
-							<p>{accountInfo.followers ?? 0} người theo dõi</p>
+							<p>{accountInfo.followers?.length} người theo dõi</p>
 							<div className="mt-1 flex -space-x-2">
 								{listFriends
 									.slice(0, maxPreviewFriendsAvatar.current)

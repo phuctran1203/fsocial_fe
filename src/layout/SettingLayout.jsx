@@ -6,8 +6,10 @@ export default function SettingLayout() {
 	return (
 		<div className="bg-background flex-grow flex h-full">
 			<NavSetting />
-			<div className="container max-w-[740px] overflow-y-auto">
-				<Outlet />
+			<div className="flex-grow overflow-y-auto">
+				<div className="max-w-[740px] mx-auto">
+					<Outlet />
+				</div>
 			</div>
 		</div>
 	);
