@@ -50,9 +50,9 @@ export default function NavMorePopup({ inMobile, setPopoverOpen }) {
 					}`}
 				>
 					{theme === "light" ? (
-						<SunMedium className="size-[26px]" />
+						<SunMedium className="size-[26px]" strokeWidth={1.6} />
 					) : (
-						<Moon className="size-[26px]" strokeWidth={1.4} />
+						<Moon className="size-[26px]" strokeWidth={1.6} />
 					)}
 					<span>Chế độ hiển thị</span>
 					<svg
@@ -81,7 +81,7 @@ export default function NavMorePopup({ inMobile, setPopoverOpen }) {
 						}`}
 						onClick={() => handleSetMode("light")}
 					>
-						<SunMedium />
+						<SunMedium strokeWidth={1.6} />
 						<span>Sáng</span>
 						<Check
 							className={`ms-auto size-5 ${theme != "light" && "hidden"}`}
