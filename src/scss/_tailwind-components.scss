@@ -34,4 +34,25 @@
 			var(--primary-gradient-end)
 		);
 	}
+
+	// field custom không có label, không có store
+	.custom-input {
+		@apply md:p-3 p-3.5 md:pe-10 pe-10 w-full bg-transparent border outline-none rounded transition-all duration-100
+			 hover:border-hover focus:border-hover;
+		&.custom-input-error {
+			@apply border-red-500 hover:border-red-500 focus:border-red-500;
+			animation: shake 0.2s linear;
+		}
+		@keyframes shake {
+			25% {
+				transform: translateX(2px);
+			}
+			75% {
+				transform: translateX(-2px);
+			}
+			100% {
+				transform: translateX(0);
+			}
+		}
+	}
 }

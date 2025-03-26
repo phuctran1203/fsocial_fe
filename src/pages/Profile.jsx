@@ -3,7 +3,6 @@ import React, { useEffect, useRef, useState } from "react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
 	FollowerProfileTabIcon,
-	Glyph,
 	PencilChangeImageIcon,
 	PictureProfileTabIcon,
 	PostProfileTabIcon,
@@ -17,7 +16,6 @@ import { getPosts } from "@/api/postsApi";
 import RenderPosts from "@/components/RenderPosts";
 import {
 	getFollowers,
-	getOwnerProfile,
 	getProfile,
 	requestFollow,
 	unfollow,
@@ -31,23 +29,28 @@ import {
 	PopoverContent,
 	PopoverTrigger,
 } from "@/components/ui/popover";
+import { userProfileOptions } from "@/config/userProfileOptions";
+import { usePopupStore } from "@/store/popupStore";
+import ModalCropImage from "@/components/ModalCropImage";
+import { cn } from "@/lib/utils";
+import { Ellipsis } from "lucide-react";
 
 const listFriends = [
 	{
 		firstName: "Thịnh",
-		displayName: "Phúc Thịnh",
+		lastName: "Phúc",
 		avatar: "./temp/user_2.png",
 	},
-	{ firstName: "Nam", displayName: "Phương Nam", avatar: "./temp/user_3.png" },
-	{ firstName: "Khải", displayName: "Đức Khải", avatar: "./temp/user_4.png" },
-	{ firstName: "Đạt", displayName: "Tấn Đạt", avatar: "./temp/user_5.png" },
-	{ firstName: "Cang", displayName: "Tấn Cang", avatar: "./temp/user_6.png" },
+	{ firstName: "Nam", lastName: "Phương", avatar: "./temp/user_3.png" },
+	{ firstName: "Khải", lastName: "Đức", avatar: "./temp/user_4.png" },
+	{ firstName: "Đạt", lastName: "Tấn", avatar: "./temp/user_5.png" },
+	{ firstName: "Cang", lastName: "Tấn", avatar: "./temp/user_6.png" },
 	{
 		firstName: "Nguyễn",
-		displayName: "Minh Nguyễn",
+		lastName: "Minh",
 		avatar: "./temp/user_7.jpg",
 	},
-	{ firstName: "Tiến", displayName: "Tiến Mụp", avatar: "./temp/user_8.jpg" },
+	{ firstName: "Tiến", lastName: "Tiến", avatar: "./temp/user_8.jpg" },
 	// { firstName: "Hồng", displayName: "Hồng Hài Nhi", avatar: "./temp/user_9.jpg" },
 ];
 
@@ -75,19 +78,59 @@ const listTabs = [
 ];
 export default function Profile() {
 	const location = useLocation();
-
 	const queryParams = new URLSearchParams(location.search);
-
-	const user = ownerAccountStore((state) => state.user);
+	const { user, setUser } = ownerAccountStore();
 
 	const [accountInfo, setAccountInfo] = useState({});
 
 	const maxPreviewFriendsAvatar = useRef(7);
 
+	// handle change banner, avatar
+	const { showPopup, hidePopup } = usePopupStore();
+
+	const handleSelectBanner = (e) => {
+		const el = e.target;
+		const file = el.files[0];
+		if (file) {
+			const previewURL = URL.createObjectURL(file);
+			console.log("have file");
+			showPopup(
+				null,
+				<ModalCropImage
+					image={previewURL}
+					ratio={3 / 1}
+					acceptCropCallback={(imageCroped) => {
+						setUser({ banner: imageCroped });
+						hidePopup();
+					}}
+				/>
+			);
+		}
+	};
+
+	const handleSelectAvatar = (e) => {
+		const el = e.target;
+		const file = el.files[0];
+		if (file) {
+			const previewURL = URL.createObjectURL(file);
+			console.log("have file");
+			showPopup(
+				null,
+				<ModalCropImage
+					image={previewURL}
+					ratio={1 / 1}
+					acceptCropCallback={(imageCroped) => {
+						setUser({ avatar: imageCroped });
+						hidePopup();
+					}}
+				/>
+			);
+		}
+	};
+
+	// handle show tab
 	const containerTabsRef = useRef(null);
-
 	const wrapperTabsRef = useRef(null);
-
 	const [currentTab, setCurrentTab] = useState(null);
 
 	const setPosts = useProfilePostsStore((state) => state.setPosts);
@@ -174,6 +217,9 @@ export default function Profile() {
 		setTouched(false);
 	};
 
+	const isOwner =
+		!queryParams.get("id") || queryParams.get("id") === user.userId;
+
 	const handleGetProfile = async () => {
 		const resp = await getProfile(queryParams.get("id"));
 		if (!resp || resp.statusCode !== 200) return;
@@ -185,14 +231,15 @@ export default function Profile() {
 		if (!user?.userId) return;
 		setCurrentTab(0);
 
-		if (queryParams.get("id") === user.userId) {
+		if (isOwner) {
 			setAccountInfo(user);
 		} else {
 			handleGetProfile();
 		}
-	}, [user?.userId, queryParams.get("id")]);
+	}, [user, queryParams.get("id")]);
 
 	useEffect(() => {
+		if (!wrapperTabsRef.current) return;
 		const interCallback = (entries) => {
 			entries.forEach((entry) => {
 				if (entry.isIntersecting && !ignoreIntersec.current) {
@@ -213,11 +260,7 @@ export default function Profile() {
 			observer.observe(element)
 		);
 		return () => observer.disconnect();
-	}, [currentTab]);
-
-	const isOwner = user.userId === queryParams.get("id");
-
-	const handleUpdateUserInfo = () => {};
+	}, [currentTab, wrapperTabsRef.current]);
 
 	const handleRequestFollow = () => {
 		requestFollow(queryParams.get("id"));
@@ -250,15 +293,21 @@ export default function Profile() {
 						)
 					)}
 					{isOwner && (
-						<Button
-							className="btn-secondary !w-fit absolute bottom-2 right-2 py-1 ps-2.5 pe-4 border"
-							onClick={handleUpdateUserInfo}
-						>
+						<label className="btn-secondary w-fit absolute bottom-2 right-2 py-1 ps-2.5 pe-4 border cursor-pointer">
 							<PencilChangeImageIcon />
 							Đổi ảnh bìa
-						</Button>
+							<input
+								type="file"
+								hidden
+								onChange={handleSelectBanner}
+								onClick={(e) => {
+									e.target.value = "";
+								}}
+							/>
+						</label>
 					)}
 				</div>
+
 				<div className="sm:-mt-6 -mt-4 mx-auto lg:max-w-[630px] ">
 					{/* profile detail */}
 					<div className="flex sm:flex-row sm:items-start flex-col items-center gap-4 sm:px-3 px-1">
@@ -273,12 +322,17 @@ export default function Profile() {
 								</AvatarFallback>
 							</Avatar>
 							{isOwner && (
-								<Button
-									className="btn-secondary !w-fit absolute bottom-0 right-0 p-1 !rounded-full shadow border"
-									onClick={handleUpdateUserInfo}
-								>
+								<label className="btn-secondary w-fit absolute bottom-0 right-0 p-1 rounded-full shadow border cursor-pointer">
+									<input
+										type="file"
+										hidden
+										onChange={handleSelectAvatar}
+										onClick={(e) => {
+											e.target.value = "";
+										}}
+									/>
 									<PencilChangeImageIcon />
-								</Button>
+								</label>
 							)}
 						</div>
 
@@ -289,7 +343,7 @@ export default function Profile() {
 									accountInfo.lastName
 								)}
 							</h3>
-							<p>12 người theo dõi</p>
+							<p>{accountInfo.followers?.length} người theo dõi</p>
 							<div className="mt-1 flex -space-x-2">
 								{listFriends
 									.slice(0, maxPreviewFriendsAvatar.current)
@@ -307,11 +361,16 @@ export default function Profile() {
 												</AvatarFallback>
 											</Avatar>
 											{index + 1 ===
-												(listFriends.length > maxPreviewFriendsAvatar.current
-													? maxPreviewFriendsAvatar.current
-													: listFriends.length) && (
-												<button className="absolute top-0 size-full bg-black/50 grid place-content-center rounded-full hover:bg-black/60">
-													<Glyph color="fill-txtWhite" />
+												Math.min(
+													maxPreviewFriendsAvatar.current,
+													listFriends.length
+												) && (
+												<button
+													className="absolute top-0 size-full bg-black/50 grid place-content-center rounded-full hover:bg-black/60"
+													onClick={() => clickChangeTab(3)}
+												>
+													<Ellipsis className="size-4 text-txtWhite" />
+													{/* <Glyph color="fill-txtWhite" /> */}
 												</button>
 											)}
 										</div>
@@ -322,17 +381,25 @@ export default function Profile() {
 						<div className="self-center flex gap-4 ">
 							{/* profile options */}
 							<Popover>
-								<PopoverTrigger className="btn-secondary px-3 h-10">
-									<Glyph />
+								<PopoverTrigger className="btn-secondary aspect-square h-10 border">
+									<Ellipsis className="size-5" />
 								</PopoverTrigger>
-								<PopoverContent className="bg-background p-2">
-									<Button className="btn-transparent justify-start px-3 py-2">
-										Cài đặt riêng tư
-									</Button>
+								<PopoverContent className="bg-background p-1.5 w-64">
+									{userProfileOptions[isOwner ? "OWNER" : "OTHER"].map(
+										(item, index) => (
+											<Button
+												key={index}
+												to={item.to}
+												className="btn-transparent gap-2 justify-start px-3 py-2.5"
+											>
+												{item.icon} {item.content}
+											</Button>
+										)
+									)}
 								</PopoverContent>
 							</Popover>
 							{/* follow, unfollow */}
-							{!isOwner && !accountInfo.relationship && (
+							{!isOwner && accountInfo.relationship === false && (
 								<Button
 									className="btn-primary px-8 text-nowrap h-10"
 									onClick={handleRequestFollow}
@@ -341,7 +408,7 @@ export default function Profile() {
 								</Button>
 							)}
 
-							{!isOwner && accountInfo.relationship && (
+							{!isOwner && accountInfo.relationship === true && (
 								<Button
 									className="btn-secondary px-8 text-nowrap h-10"
 									onClick={handleUnfollow}
@@ -384,11 +451,12 @@ export default function Profile() {
 						>
 							<div
 								ref={wrapperTabsRef}
-								className={`grid h-full gap-[1px] ${
+								className={cn(
+									"grid h-full gap-[1px]",
 									isOwner
 										? "grid-cols-[repeat(5,100%)]"
 										: "grid-cols-[repeat(4,100%)]"
-								}`}
+								)}
 							>
 								{/* owner posts */}
 								<div className="pt-0.5 snap-start mx-auto md:space-y-4 space-y-1.5 md:pb-0 overflow-y-auto w-full max-h-full scrollable-div">

@@ -10,7 +10,6 @@ import {
 	HomeNavIcon,
 	LogoNoBG,
 	MessageNavIcon,
-	SearchIcon,
 } from "./Icon";
 import { popupNotificationtStore, usePopupStore } from "../store/popupStore";
 import { ownerAccountStore } from "../store/ownerAccountStore";
@@ -28,13 +27,17 @@ import {
 	combineIntoDisplayName,
 } from "@/utils/combineName";
 import useMessageStore from "@/store/messageStore";
+import { regexInMessage, regexInSetting } from "@/config/regex";
+import { SearchIcon } from "lucide-react";
 
 export default function Nav() {
 	const user = ownerAccountStore((state) => state.user);
 
 	const location = useLocation();
 
-	const isInMessage = location.pathname === "/message";
+	const isNotificationSlide =
+		regexInMessage.test(location.pathname) ||
+		regexInSetting.test(location.pathname);
 
 	const isInHome = ["/", "/home"].includes(location.pathname);
 
@@ -65,7 +68,11 @@ export default function Nav() {
 		<nav
 			className={`
 			z-10 bg-background flex-shrink-0 border-0
-			${!isInMessage ? "md:w-[260px] sm:w-[210px]" : "lg:w-[260px] sm:w-[76px]"} 
+			${
+				!isNotificationSlide
+					? "md:w-[260px] sm:w-[210px]"
+					: "lg:w-[260px] sm:w-[76px]"
+			} 
 			sm:border-r sm:border-t-0 sm:static sm:flex sm:flex-col sm:justify-between sm:h-screen sm:py-6
 			fixed bottom-0 w-full border-t
 			transition
@@ -73,12 +80,10 @@ export default function Nav() {
 		>
 			<div className="sm:space-y-8 sm:block w-full">
 				{/* logo */}
-				<NavLink
-					to="/"
-					className="sm:block hidden"
-					onClick={() => toast.error("Clicked logo")}
-				>
-					<LogoNoBG className={!isInMessage ? "ms-6" : "lg:ms-6 mx-auto"} />
+				<NavLink to="/" className="sm:block hidden">
+					<LogoNoBG
+						className={!isNotificationSlide ? "ms-6" : "lg:ms-6 mx-auto"}
+					/>
 				</NavLink>
 
 				<div className="sm:space-y-3 sm:mx-4 sm:block flex justify-evenly">
@@ -89,9 +94,9 @@ export default function Nav() {
 					>
 						<HomeNavIcon compareVar={isInHome} />
 						<span
-							className={`${!isInMessage ? "sm:inline" : "lg:inline"} hidden ${
-								isInHome && "font-semibold"
-							}`}
+							className={`${
+								!isNotificationSlide ? "sm:inline" : "lg:inline"
+							} hidden ${isInHome && "font-semibold"}`}
 						>
 							Trang chủ
 						</span>
@@ -107,7 +112,7 @@ export default function Nav() {
 								<FollowNavIcon compareVar={isActive} />
 								<span
 									className={`${
-										!isInMessage ? "sm:inline" : "lg:inline"
+										!isNotificationSlide ? "sm:inline" : "lg:inline"
 									} hidden ${isActive && "font-semibold"}`}
 								>
 									Theo dõi
@@ -123,10 +128,13 @@ export default function Nav() {
 					>
 						{({ isActive }) => (
 							<>
-								<SearchIcon compareVar={isActive} />
+								<SearchIcon
+									className="size-[26px]"
+									strokeWidth={isActive ? 2.2 : 1.6}
+								/>
 								<span
 									className={`${
-										!isInMessage ? "sm:inline" : "lg:inline"
+										!isNotificationSlide ? "sm:inline" : "lg:inline"
 									} hidden ${isActive && "font-semibold"}`}
 								>
 									Tìm kiếm
@@ -144,13 +152,13 @@ export default function Nav() {
 							<>
 								<div className="relative">
 									<MessageNavIcon compareVar={isActive} />
-									{newMessage && !isInMessage && (
+									{newMessage && !isNotificationSlide && (
 										<div className="absolute size-2.5 -top-[1px] -right-1 bg-primary-gradient rounded-full " />
 									)}
 								</div>
 								<span
 									className={`${
-										!isInMessage ? "sm:inline" : "lg:inline"
+										!isNotificationSlide ? "sm:inline" : "lg:inline"
 									} hidden ${isActive && "font-semibold"}`}
 								>
 									Tin nhắn
@@ -161,7 +169,9 @@ export default function Nav() {
 
 					<button
 						className={`${styles.navBaseStyle} ${
-							!isInMessage ? "lg:!hidden sm:!flex !hidden" : "sm:!flex !hidden"
+							!isNotificationSlide
+								? "lg:!hidden sm:!flex !hidden"
+								: "sm:!flex !hidden"
 						}`}
 						onClick={toggleShowNotification}
 					>
@@ -170,7 +180,9 @@ export default function Nav() {
 							<div className="absolute size-2.5 -top-[1px] right-[1px]  bg-primary-gradient rounded-full " />
 						</div>
 						<span
-							className={`${!isInMessage ? "sm:inline" : "lg:inline"} hidden`}
+							className={`${
+								!isNotificationSlide ? "sm:inline" : "lg:inline"
+							} hidden`}
 						>
 							Thông báo
 						</span>
@@ -182,7 +194,9 @@ export default function Nav() {
 					>
 						<CreatePostNavIcon />
 						<span
-							className={`${!isInMessage ? "sm:inline" : "lg:inline"} hidden`}
+							className={`${
+								!isNotificationSlide ? "sm:inline" : "lg:inline"
+							} hidden`}
 						>
 							Tạo bài viết
 						</span>
@@ -204,7 +218,7 @@ export default function Nav() {
 
 								<span
 									className={`${
-										!isInMessage ? "sm:inline" : "lg:inline"
+										!isNotificationSlide ? "sm:inline" : "lg:inline"
 									} hidden ${isActive && "font-semibold"}`}
 								>
 									{combineIntoDisplayName(user.firstName, user.lastName)}
@@ -222,7 +236,9 @@ export default function Nav() {
 						onClick={closeNotification}
 					>
 						<HamburgerIcon />
-						<span className={!isInMessage ? "" : "lg:inline hidden"}>Thêm</span>
+						<span className={!isNotificationSlide ? "" : "lg:inline hidden"}>
+							Thêm
+						</span>
 					</PopoverTrigger>
 					<PopoverContent
 						sideOffset={10}

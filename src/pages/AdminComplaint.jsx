@@ -1,10 +1,11 @@
 import { getComplaint, readingComplaint } from "@/api/complaintApi";
 import Button from "@/components/Button";
 import ButtonGroup from "@/components/ButtonGroup";
-import { TrashCanIcon, CalendarIcon, PencilIcon } from "@/components/Icon";
+import { TrashCanIcon, CalendarIcon } from "@/components/Icon";
 import Search from "@/components/Search";
 import Table from "@/components/Table";
 import { combineIntoDisplayName } from "@/utils/combineName";
+import { Pen } from "lucide-react";
 import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 
@@ -53,11 +54,11 @@ export default function AdminComplaint() {
 		setSearchValue(value);
 	};
 
-	const handleReadingComplaint = async(id) => {
-		const res = await readingComplaint(id)
+	const handleReadingComplaint = async (id) => {
+		const res = await readingComplaint(id);
 		console.log("reading success: ", res.data);
-		return res.data
-	}
+		return res.data;
+	};
 
 	const handleSelected = (value) => {
 		const currentSelected = buttonItems[value];
@@ -79,11 +80,11 @@ export default function AdminComplaint() {
 	};
 
 	const handleReadComplaint = (id) => {
-		const res = handleReadingComplaint(id)
+		const res = handleReadingComplaint(id);
 		setData(
 			filteredData.map((item) => {
 				if (item.id === id) item.readding = true;
-				
+
 				return {
 					...item,
 				};
@@ -173,7 +174,7 @@ export default function AdminComplaint() {
 								className="relative"
 								onClick={() => handleReadComplaint(item.id)}
 							>
-								<PencilIcon />
+								<Pen className="size-[18px] " />
 								{!item.readding && (
 									<div className="absolute -top-1 left-full size-2 bg-primary-gradient rounded-full" />
 								)}

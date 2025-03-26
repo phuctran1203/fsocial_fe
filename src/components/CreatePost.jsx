@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from "react";
-import { LoadingIcon, UploadDecorIcon, XMarkIcon } from "./Icon";
+import { LoadingIcon, UploadDecorIcon } from "./Icon";
 import Button from "./Button";
 import { usePopupStore } from "../store/popupStore";
 import { TextBox } from "./Field";
@@ -12,6 +12,7 @@ import {
 	combineIntoAvatarName,
 	combineIntoDisplayName,
 } from "@/utils/combineName";
+import { X } from "lucide-react";
 
 export default function CreatePost() {
 	const hidePopup = usePopupStore((state) => state.hidePopup);
@@ -160,7 +161,7 @@ export default function CreatePost() {
 							className="btn-secondary z-10 absolute m-2 max-w-7 h-7 right-0 rounded-full shadow-md"
 							onClick={() => deleteFile(index)}
 						>
-							<XMarkIcon className="size-[15px] pointer-events-none" />
+							<X className="size-[15px] pointer-events-none" />
 						</Button>
 						{fileTypes[index] === "image" ? (
 							<img

@@ -19,7 +19,7 @@ export default function SinglePost() {
 	};
 	useEffect(() => {
 		if (user?.userId) handleGetPost();
-	}, [user?.userId]);
+	}, [user?.userId, queryParams.get("id")]);
 	return (
 		<div className="bg-background flex flex-grow transition">
 			<div className="overflow-y-auto scrollable-div w-full">

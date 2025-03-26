@@ -1,10 +1,8 @@
 import React, { useState, useEffect, useRef } from "react";
-import { PlusIcon, SearchIcon } from "../components/Icon";
 import { dateTimeToMessageTime } from "../utils/convertDateTime";
 import { ownerAccountStore } from "@/store/ownerAccountStore";
 import { getConversations, getMessages } from "@/api/messageApi";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { themeStore } from "@/store/themeStore";
 import Button from "@/components/Button";
 import {
 	combineIntoAvatarName,
@@ -15,6 +13,7 @@ import useMessageStore from "@/store/messageStore";
 import MessageHandleMessages from "@/components/MessageHandleMessages";
 import MessageHandleCreateConversation from "@/components/MessageHandleCreateConversation";
 import { cn } from "@/lib/utils";
+import { CirclePlus, SearchIcon } from "lucide-react";
 
 export default function Message() {
 	const user = ownerAccountStore((state) => state.user);
@@ -28,7 +27,6 @@ export default function Message() {
 		setNewMessage,
 	} = useMessageStore();
 
-	const theme = themeStore((state) => state.theme);
 	// chỉ định content hiển thị ở bên phải tương ứng button bên trái cột danh sách hội thoại
 	const [contentActive, setContentActive] = useState(0);
 
@@ -46,6 +44,7 @@ export default function Message() {
 		}
 		const data = resp.data;
 		setConversations(data);
+		if (conversation) setContentActive(2);
 	};
 
 	useEffect(() => {
@@ -107,7 +106,7 @@ export default function Message() {
 		setConversation(selectedConver);
 		console.log("selectedConver is: ", selectedConver);
 
-		if (subscription.current) subscription.current.unsubscribe();
+		if (subscription.current) await subscription.current.unsubscribe();
 		subscription.current = stompClient.subscribe(
 			`/queue/private-${selectedConver.id}`,
 			(message) => {
@@ -164,15 +163,15 @@ export default function Message() {
 						className="btn-transparent !w-fit p-1"
 						onClick={handleOpenCreateConversation}
 					>
-						<PlusIcon />
+						<CirclePlus />
 					</Button>
 				</div>
 				{/* search bar */}
 				<label
 					htmlFor="search-message"
-					className="flex gap-2 p-2 mx-4 border rounded-full hover:border-gray-light transition"
+					className="flex gap-2 p-2 mx-4 border rounded-full hover:border-gray transition"
 				>
-					<SearchIcon className="size-5 ms-1" color="stroke-[--gray-clr]" />
+					<SearchIcon className="size-5 ms-1 my-auto text-gray" />
 					<input
 						type="text"
 						id="search-message"
@@ -214,7 +213,7 @@ export default function Message() {
 
 							<div className="flex-grow min-w-0">
 								<div className="flex items-center gap-2">
-									<span className="font-semibold">
+									<span className="font-medium">
 										{combineIntoDisplayName(conver.firstName, conver.lastName)}
 									</span>
 									{/* dấu chấm đánh dấu chưa đọc */}

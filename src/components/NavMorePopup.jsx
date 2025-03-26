@@ -4,20 +4,15 @@ import {
 	PopoverContent,
 	PopoverTrigger,
 } from "@/components/ui/popover";
-import {
-	LogoutIcon,
-	KeyIcon,
-	SunIcon,
-	SwitchIcon,
-	MoonIcon,
-	CheckIcon,
-} from "./Icon";
+import { LogoutIcon, KeyIcon, SwitchIcon } from "./Icon";
 import styles from "./Nav.module.scss";
 import { useNavigate } from "react-router-dom";
 import { deleteCookie } from "@/utils/cookie";
 import { themeStore } from "@/store/themeStore";
 import { usePopupStore } from "@/store/popupStore";
 import ChangePasswordModal from "./ChangePasswordModal";
+import { ownerAccountStore } from "@/store/ownerAccountStore";
+import { Check, Moon, SunMedium } from "lucide-react";
 
 export default function NavMorePopup({ inMobile, setPopoverOpen }) {
 	const { theme, setTheme } = themeStore();
@@ -29,9 +24,13 @@ export default function NavMorePopup({ inMobile, setPopoverOpen }) {
 	const [switchThemeOpen, setSwitchThemeOpen] = useState(false);
 
 	const navigate = useNavigate();
+
+	const resetUser = ownerAccountStore((state) => state.resetUser);
+
 	const handleLogout = () => {
 		deleteCookie("refresh-token");
 		deleteCookie("access-token");
+		resetUser();
 		navigate("/login");
 	};
 
@@ -50,7 +49,11 @@ export default function NavMorePopup({ inMobile, setPopoverOpen }) {
 						switchThemeOpen && "bg-gray-3light"
 					}`}
 				>
-					{theme === "light" ? <SunIcon /> : <MoonIcon />}
+					{theme === "light" ? (
+						<SunMedium className="size-[26px]" strokeWidth={1.6} />
+					) : (
+						<Moon className="size-[26px]" strokeWidth={1.6} />
+					)}
 					<span>Chế độ hiển thị</span>
 					<svg
 						className={`ms-auto me-1 sm:group-hover:opacity-100 ${
@@ -78,9 +81,11 @@ export default function NavMorePopup({ inMobile, setPopoverOpen }) {
 						}`}
 						onClick={() => handleSetMode("light")}
 					>
-						<SunIcon />
+						<SunMedium strokeWidth={1.6} />
 						<span>Sáng</span>
-						<CheckIcon className={`ms-auto ${theme != "light" && "hidden"}`} />
+						<Check
+							className={`ms-auto size-5 ${theme != "light" && "hidden"}`}
+						/>
 					</button>
 
 					<button
@@ -89,9 +94,10 @@ export default function NavMorePopup({ inMobile, setPopoverOpen }) {
 						}`}
 						onClick={() => handleSetMode("dark")}
 					>
-						<MoonIcon />
-						<span>Tối</span>
-						<CheckIcon className={`ms-auto ${theme != "dark" && "hidden"}`} />
+						<Moon strokeWidth={1.4} /> <span>Tối</span>
+						<Check
+							className={`ms-auto size-5 ${theme != "dark" && "hidden"}`}
+						/>
 					</button>
 				</PopoverContent>
 			</Popover>

@@ -1,17 +1,8 @@
 import { Link, useNavigate } from "react-router-dom";
 import Button from "../components/Button";
-import { Field, Select } from "../components/Field";
-import { useSignupStore } from "../store/signupStore";
+import { JumpingInput, JumpingSelect } from "../components/Field";
 import { useEffect, useRef, useState } from "react";
-import EnterOTPCode from "../components/EnterOTPCode";
-import {
-	ArrowLeftIcon,
-	AtIcon,
-	EyeIcon,
-	EyeSplashIcon,
-	LoadingIcon,
-	UserIcon,
-} from "../components/Icon";
+import { ArrowLeftIcon, LoadingIcon } from "../components/Icon";
 import {
 	checkDuplicate,
 	requestOTP,
@@ -21,11 +12,17 @@ import {
 import { getCookie } from "@/utils/cookie";
 import { removeVietnameseAccents } from "@/utils/removeSpecialWord";
 import InputOTP4Digit from "@/components/InputOTP4Digit";
+import { useForm } from "react-hook-form";
+import { AtSign, ChevronDown, Eye, EyeOff, UserRoundIcon } from "lucide-react";
+import { regexEmail, regexName, regexPassword } from "@/config/regex";
+import {
+	dayOptions,
+	monthOptions,
+	yearOptions,
+} from "@/config/globalVariables";
 
 export default function Signup() {
 	const navigate = useNavigate();
-
-	const { form, updateField } = useSignupStore();
 
 	// Handle animation cho các step
 	const formContainer = useRef();
@@ -41,11 +38,15 @@ export default function Signup() {
 	};
 
 	useEffect(() => {
+		if (!stepsRef.current[currentStep]?.offsetHeight) return;
+		const stepHeight = stepsRef.current[currentStep].offsetHeight;
+		stepsWrapper.current.style.height = `${stepHeight + 4}px`;
 		const parent = formContainer.current;
 
 		if (!parent) return;
 
 		const resizeObserver = new ResizeObserver(() => {
+			if (!stepsRef.current[currentStep]?.offsetHeight) return;
 			// Cập nhật lại width cho stepsWrapper
 			const parentWidth = parent.offsetWidth;
 			stepsWrapper.current.style.gridTemplateColumns = `repeat(3, ${parentWidth}px)`;
@@ -61,161 +62,141 @@ export default function Signup() {
 		return () => {
 			resizeObserver.disconnect();
 		};
-	}, [
-		currentStep,
-		form.ten.isTouched,
-		form.ho.isTouched,
-		stepsRef.current[currentStep]?.offsetHeight,
-	]);
+	}, [currentStep, stepsRef.current[currentStep]?.offsetHeight]);
 
-	// Check điều kiện vượt qua step 1 và sinh username mặc định
-	const hoten = useRef(
-		form.ten.value + form.ho.value + (Math.floor(Math.random() * 9000) + 1000)
-	);
-
-	const [stepsPass, setStepsPass] = useState({ s1: false, s2: false });
-	const [errorStep1Msg, setErrorStep1Msg] = useState("");
+	// Step 1
+	const {
+		register: registerStep1,
+		trigger: triggerValidStep1,
+		formState: { errors: errorsStep1, isValid: isValidStep1 },
+		getValues: getValuesStep1,
+	} = useForm({ mode: "all" });
 
 	const handleStep1 = () => {
-		const valid = form.ho.isValid && form.ten.isValid;
-		setStepsPass((prev) => {
-			if (prev.s1 === valid) return prev;
-			return { ...prev, s1: valid };
-		});
+		triggerValidStep1();
+		const data = getValuesStep1();
+
+		if (!isValidStep1) return;
+
+		setValueStep2(
+			"username",
+			removeVietnameseAccents(data.firstName) +
+				removeVietnameseAccents(data.lastName) +
+				(Math.floor(Math.random() * 9000) + 10000)
+		);
+		setCurrentStep(2);
 	};
 
-	useEffect(() => {
-		handleStep1();
-	}, [form.ho.value, form.ten.value]);
-
-	// Check điều kiện vượt qua step 2
-	const handleStep2 = () => {
-		const valid =
-			form.username.isValid &&
-			form.email.isValid &&
-			form.password.isValid &&
-			form.rePassword.isValid;
-		setStepsPass((prev) => {
-			if (prev.s2 === valid) return prev;
-			return { ...prev, s2: valid };
-		});
-	};
-
-	useEffect(() => {
-		handleStep2();
-	}, [
-		form.username.isValid,
-		form.email.isValid,
-		form.password.isValid,
-		form.rePassword.isValid,
-	]);
-
-	const gotoStep1 = () => {
+	const backToStep1 = () => {
 		setCurrentStep(1);
 	};
 
-	const goToStep2 = () => {
-		hoten.current =
-			removeVietnameseAccents(form.ten.value) +
-			removeVietnameseAccents(form.ho.value) +
-			(Math.floor(Math.random() * 9000) + 10000);
-		setCurrentStep(2);
-		autoFocusOTP.current = false;
-	};
+	// Step 2
+	const [checkDuplicateClicked, setCheckDuplicateClicked] = useState(false);
+	const [step2Err, setStep2Err] = useState("");
+	const {
+		register: registerStep2,
+		watch: watchStep2,
+		trigger: triggerValidateStep2, // Dùng để gọi validate theo yêu cầu
+		formState: { errors: errorsStep2, isValid: isValidStep2 },
+		setError: setErrorStep2,
+		setValue: setValueStep2,
+		getValues: getValuesStep2,
+	} = useForm({ mode: "all" });
 
-	const [errMessageEmail, setErrMessageEmail] = useState(
-		"Điền đúng định dạng email"
-	);
+	const password = watchStep2("password");
 
-	const [requestOTPClicked, setRequestOTPClicked] = useState(false);
+	const handleStep2 = async () => {
+		triggerValidateStep2();
+		const dataStep2 = getValuesStep2();
+		if (!isValidStep2) return;
+		setCheckDuplicateClicked(true);
 
-	const autoFocusOTP = useRef(false);
-
-	const goToStep3 = async () => {
-		// const duplicateInto = await ;
-		// check đã tồn tại username và email
 		const dataCheck = {
-			username: form.username.value,
-			email: form.email.value,
+			username: dataStep2.username,
+			email: dataStep2.email,
 		};
 
 		const respCheckDuplicateInto = await checkDuplicate(dataCheck);
+
+		setCheckDuplicateClicked(false);
+
 		if (!respCheckDuplicateInto) {
-			setErrorStep1Msg("*Lỗi không xác định");
+			setStep2Err(
+				`*Đã có lỗi phía máy chủ, FSocial đang cố gắng khắc phục nha`
+			);
 			return;
 		}
 
-		setRequestOTPClicked(true);
-
-		if (
-			respCheckDuplicateInto?.status === 500 ||
-			respCheckDuplicateInto.message != "Thông tin hợp lệ."
-		) {
-			// updateField("username", { isValid: false });
-			// updateField("email", { isValid: false });
-			// setErrMessageUsernname(respCheckDuplicateInto.data.username);
-			// setErrMessageEmail(respCheckDuplicateInto.data.email);
-			setRequestOTPClicked(false);
+		if (respCheckDuplicateInto.statusCode !== 200) {
+			const errorMessages = respCheckDuplicateInto.data;
+			if (errorMessages.username)
+				setErrorStep2("username", {
+					type: "server",
+					message: errorMessages.username,
+				});
+			if (errorMessages.email)
+				setErrorStep2("email", {
+					type: "server",
+					message: errorMessages.email,
+				});
 			return;
 		}
 		// gửi yêu cầu lấy OTP
-		const result = await requestOTP({
-			email: form.email.value,
+		setCurrentStep(3);
+		requestOTP({
+			email: dataStep2.email,
 			type: "REGISTER",
 		});
-
-		setCurrentStep(3);
-		if (result.statusCode === 200) {
-			autoFocusOTP.current = true;
-			updateField("username", { isValid: true });
-			updateField("email", { isValid: true });
-		} else {
-			updateField("email", { isValid: false });
-			setErrMessageEmail(result);
-		}
-		setRequestOTPClicked(false);
 	};
 
-	// xác thực OTP đã gửi về email client
+	const backToStep2 = () => {
+		setCurrentStep(2);
+	};
+
+	// Step 3
+	const [OTPValue, setOTPValue] = useState("");
 	const [validOTPClicked, setValidOTPClicked] = useState(false);
+	const [step3Err, setStep3Err] = useState("");
 
-	const [OTPErr, setOTPErr] = useState("");
-
-	const goToStep4 = async () => {
+	const handleStep3 = async () => {
 		setValidOTPClicked(true);
+		const dataStep1 = getValuesStep1();
+		const dataStep2 = getValuesStep2();
 
 		const sending = {
-			username: form.username.value,
-			password: form.password.value,
-			email: form.email.value,
-			firstName: form.ten.value,
-			lastName: form.ho.value,
-			dob: `${form.year.value}-${form.month.value
+			username: dataStep2.username,
+			password: dataStep2.password,
+			email: dataStep2.email,
+			firstName: dataStep1.firstName,
+			lastName: dataStep1.lastName,
+			dob: `${dataStep1.year}-${dataStep1.month
 				.toString()
-				.padStart(2, "0")}-${form.day.value.toString().padStart(2, "0")}`,
-			gender: form.gender.value,
+				.padStart(2, "0")}-${dataStep1.day.toString().padStart(2, "0")}`,
+			gender: dataStep1.gender,
 		};
 
 		const sendingOTP = {
-			email: form.email.value,
+			email: dataStep2.email,
 			otp: OTPValue,
 			type: "REGISTER",
 		};
 
 		const respValidOTP = await validOTP(sendingOTP);
-
+		setValidOTPClicked(false);
 		if (respValidOTP.statusCode != 200) {
-			setOTPErr(respValidOTP.message);
-			setValidOTPClicked(false);
+			setStep3Err(respValidOTP.message);
 			return;
 		}
 
-		setCurrentStep(4);
 		const responseCreateAccount = await sendingCreateAccount(sending);
 		if (responseCreateAccount.statusCode === 200) {
+			setCurrentStep(4);
 			setTimeout(() => {
 				navigate("/login");
 			}, 2500);
+		} else {
+			setStep3Err("Đã xảy ra lỗi trong quá trình tạo tài khoản");
 		}
 	};
 
@@ -223,25 +204,6 @@ export default function Signup() {
 	const [isShowPassword, setIsShowPassword] = useState(false);
 
 	const [isShowRePassword, setIsShowRePassword] = useState(false);
-
-	const handleshowHidePassword = () => {
-		if (form.password.value !== form.rePassword.value) {
-			updateField(rePassword, { isValid: false });
-		} else {
-			updateField(rePassword, { isValid: true });
-		}
-	};
-
-	useEffect(() => {
-		handleshowHidePassword();
-	}, [form.password.value, form.rePassword.value]);
-
-	// Handle nhập mã OTP xác minh email
-	const [OTPValue, setOTPValue] = useState("");
-
-	useEffect(() => {
-		if (getCookie("refresh-token")) navigate("/home");
-	}, []);
 
 	return (
 		<div className="lg:w-[min(85%,1440px)] md:h-fit h-[100dvh] mx-auto relative bg-background xl:px-20 lg:px-12 lg:my-4 md:px-4 py-6 rounded-md">
@@ -350,95 +312,80 @@ export default function Signup() {
 							</div>
 							<div className="space-y-5">
 								<div className="grid grid-cols-2 gap-x-3 gap-y-0.5">
-									<Field
-										type="text"
-										name="ten"
-										id="ten"
+									<JumpingInput
 										label="Tên"
-										store={useSignupStore}
-										required={true}
-										errorMessage="Tên không được để trống và không chứa ký tự đặc biệt"
-										allowTab={currentStep === 1}
+										name="firstName"
+										register={registerStep1}
+										errors={errorsStep1}
+										validateOptions={{
+											required: "Tên không được để trống",
+											pattern: {
+												value: regexName,
+												message: "Tên không được chứa số và ký tự đặc biệt",
+											},
+										}}
 									/>
-									<Field
-										type="text"
-										name="ho"
-										id="ho"
+									<JumpingInput
 										label="Họ"
-										store={useSignupStore}
-										required={true}
-										errorMessage="Họ không được để trống và không chứa kí tự đặc biệt"
-										allowTab={currentStep === 1}
+										name="lastName"
+										register={registerStep1}
+										errors={errorsStep1}
+										validateOptions={{
+											required: "Họ không được để trống",
+											pattern: {
+												value: regexName,
+												message: "Họ không được chứa số và ký tự đặc biệt",
+											},
+										}}
 									/>
 								</div>
 								<div className="grid grid-cols-3 gap-3">
-									<Select
-										name="day"
-										id="day"
+									<JumpingSelect
 										label="Ngày"
-										store={useSignupStore}
-										options={Array.from(
-											{ length: 31 },
-											(_, index) => index + 1
-										).reduce((acc, num) => {
-											acc[num] = num;
-											return acc;
-										}, {})}
-										allowTab={currentStep === 1}
+										name="day"
+										register={registerStep1}
+										errors={errorsStep1}
+										options={dayOptions}
+										icon={<ChevronDown />}
 									/>
-									<Select
-										name="month"
-										id="month"
+									<JumpingSelect
 										label="Tháng"
-										store={useSignupStore}
-										options={Array.from(
-											{ length: 12 },
-											(_, index) => index + 1
-										).reduce((acc, num) => {
-											acc[num] = num;
-											return acc;
-										}, {})}
-										allowTab={currentStep === 1}
+										name="month"
+										register={registerStep1}
+										errors={errorsStep1}
+										options={monthOptions}
+										icon={<ChevronDown />}
 									/>
-									<Select
-										name="year"
-										id="year"
+									<JumpingSelect
 										label="Năm"
-										store={useSignupStore}
-										options={Array.from(
-											{ length: new Date().getFullYear() - 19 - 1940 + 1 },
-											(_, index) => 1940 + index
-										).reduce((acc, num) => {
-											acc[num] = num;
-											return acc;
-										}, {})}
-										allowTab={currentStep === 1}
+										name="year"
+										register={registerStep1}
+										errors={errorsStep1}
+										options={yearOptions}
+										icon={<ChevronDown />}
 									/>
 								</div>
-								<Select
-									name="gender"
-									id="gender"
+								<JumpingSelect
 									label="Giới tính"
-									store={useSignupStore}
+									name="gender"
+									register={registerStep1}
+									errors={errorsStep1}
 									options={{
 										0: "Nam",
 										1: "Nữ",
 										2: "Khác",
 										3: "Không muốn tiết lộ",
 									}}
-									allowTab={currentStep === 1}
+									icon={<ChevronDown />}
 								/>
 
-								<p className="text-red-500">{errorStep1Msg}</p>
-								<Button
-									className={`btn-primary py-3 ${
-										!stepsPass.s1 && "disable-btn"
-									}`}
-									onClick={!stepsPass.s1 ? () => {} : goToStep2}
-									allowTab={currentStep === 1}
+								<button
+									className={"btn-primary py-3"}
+									onClick={handleStep1}
+									tabIndex={isValidStep1 && currentStep === 1 ? 0 : -1}
 								>
 									Tiếp theo
-								</Button>
+								</button>
 							</div>
 						</div>
 
@@ -456,94 +403,102 @@ export default function Signup() {
 								</p>
 							</div>
 							<div className="space-y-5">
-								<Field
-									type="text"
-									name="username"
-									id="username"
+								<JumpingInput
 									label="Tên đăng nhập"
-									initValue={hoten.current}
-									store={useSignupStore}
-									required={true}
-									errorMessage="Tên đăng nhập không được để trống"
-									allowTab={currentStep === 2}
-								>
-									<UserIcon />
-								</Field>
-								<Field
-									type="email"
-									name="email"
-									id="email"
-									label="Email"
-									store={useSignupStore}
-									required={true}
-									pattern="^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$"
-									errorMessage={errMessageEmail}
-									allowTab={currentStep === 2}
-								>
-									<AtIcon />
-								</Field>
-								<Field
-									type={isShowPassword ? "text" : "password"}
-									name="password"
-									id="password"
-									label="Mật khẩu"
-									store={useSignupStore}
-									required={true}
-									pattern="^(?=.*[A-Za-z])[A-Za-z\d]{8,20}$"
-									errorMessage="Mật khẩu từ 8-20 kí tự, bao gồm cả chữ và số"
-									allowTab={currentStep === 2}
-								>
-									<div onClick={() => setIsShowPassword(!isShowPassword)}>
-										<EyeIcon
-											className={`w-full ${
-												isShowPassword ? "hidden" : "block"
-											}`}
-										/>
-										<EyeSplashIcon
-											className={`w-full ${
-												!isShowPassword ? "hidden" : "block"
-											}`}
-										/>
-									</div>
-								</Field>
+									name="username"
+									register={registerStep2}
+									errors={errorsStep2}
+									validateOptions={{
+										required: "Tên đăng nhập không được để trống",
+									}}
+									icon={<UserRoundIcon className="size-5" />}
+								/>
 
-								<Field
+								<JumpingInput
+									label="Email"
+									name="email"
+									register={registerStep2}
+									errors={errorsStep2}
+									validateOptions={{
+										required: "Email không được để trống",
+										pattern: {
+											value: regexEmail,
+											message: "Email không hợp lệ",
+										},
+									}}
+									icon={<AtSign className="size-5" />}
+								/>
+
+								<JumpingInput
+									type={isShowPassword ? "text" : "password"}
+									label="Mật khẩu"
+									name="password"
+									register={registerStep2}
+									errors={errorsStep2}
+									validateOptions={{
+										required: "Mật khẩu không được để trống",
+										pattern: {
+											value: regexPassword,
+											message: "Mật khẩu từ 8-20 kí tự, bao gồm cả chữ và số",
+										},
+									}}
+									icon={
+										!isShowPassword ? (
+											<Eye
+												className="size-5"
+												onClick={() => setIsShowPassword(true)}
+											/>
+										) : (
+											<EyeOff
+												className="size-5"
+												onClick={() => setIsShowPassword(false)}
+											/>
+										)
+									}
+								/>
+
+								<JumpingInput
 									type={isShowRePassword ? "text" : "password"}
+									label="Nhập lại Mật khẩu"
 									name="rePassword"
-									id="rePassword"
-									label="Nhập lại mật khẩu"
-									store={useSignupStore}
-									required={true}
-									compareFunction={(value) => form.password.value === value}
-									errorMessage="Nhập lại chính xác mật khẩu của bạn"
-									allowTab={currentStep === 2}
-								>
-									<div onClick={() => setIsShowRePassword(!isShowRePassword)}>
-										<EyeIcon
-											className={`w-full ${
-												isShowRePassword ? "hidden" : "block"
-											}`}
-										/>
-										<EyeSplashIcon
-											className={`w-full ${
-												!isShowRePassword ? "hidden" : "block"
-											}`}
-										/>
-									</div>
-								</Field>
+									register={registerStep2}
+									errors={errorsStep2}
+									validateOptions={{
+										required: "Mật khẩu nhập lại không được để trống",
+										pattern: {
+											value: regexPassword,
+											message: "Mật khẩu từ 8-20 kí tự, bao gồm cả chữ và số",
+										},
+										validate: (value) =>
+											value === password || "Mật khẩu nhập lại không khớp",
+									}}
+									icon={
+										!isShowRePassword ? (
+											<Eye
+												className="size-5"
+												onClick={() => setIsShowRePassword(true)}
+											/>
+										) : (
+											<EyeOff
+												className="size-5"
+												onClick={() => setIsShowRePassword(false)}
+											/>
+										)
+									}
+								/>
+								<p className="text-red-500">{step2Err}</p>
+
 								<div className="space-y-4">
 									<Button
-										className={`btn-primary py-3 ${
-											(!stepsPass.s2 || requestOTPClicked) && "disable-btn"
-										}`}
-										onClick={!stepsPass.s2 ? () => {} : goToStep3}
-										allowTab={currentStep === 2}
+										className={`btn-primary py-3`}
+										onClick={handleStep2}
+										tabIndex={isValidStep2 && currentStep === 2 ? 0 : -1}
 									>
-										{requestOTPClicked ? <LoadingIcon /> : "Tiếp theo"}
+										{checkDuplicateClicked ? <LoadingIcon /> : "Tiếp theo"}
 									</Button>
 									<Button
 										className="btn-transparent border gap-2 py-3"
-										onClick={gotoStep1}
+										onClick={backToStep1}
 										allowTab={currentStep === 2}
 									>
 										<ArrowLeftIcon /> Quay lại
@@ -576,11 +531,11 @@ export default function Signup() {
 
 							<div className="space-y-4">
 								<div>
-									<p className="text-red-600">{OTPErr}</p>
+									<p className="text-red-600">{step3Err}</p>
 									<Button
 										className={`btn-primary py-3`}
 										allowTab={currentStep === 3}
-										onClick={goToStep4}
+										onClick={handleStep3}
 									>
 										{validOTPClicked ? <LoadingIcon /> : "Xác nhận"}
 									</Button>
@@ -588,7 +543,7 @@ export default function Signup() {
 								<Button
 									className="btn-transparent border gap-2 py-3"
 									allowTab={currentStep === 3}
-									onClick={goToStep2}
+									onClick={backToStep2}
 								>
 									<ArrowLeftIcon /> Quay lại
 								</Button>
