@@ -176,7 +176,9 @@ export function JumpingSelect({
 				<span
 					className={cn(
 						`fs-sm text-gray absolute bg-background rounded-sm px-1.5 top-0 left-2 -translate-y-1/2 transition`,
-						errors[name] && "text-red-500"
+						errors[name]
+							? "text-red-500"
+							: "peer-hover:text-primary-text peer-focus:text-primary-text"
 					)}
 				>
 					{label}

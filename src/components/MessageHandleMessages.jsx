@@ -197,7 +197,7 @@ export default function MessageListMessages({
 							)}
 						</AvatarFallback>
 					</Avatar>
-					<p className="font-semibold">
+					<p className="font-medium">
 						{combineIntoDisplayName(
 							conversation.firstName,
 							conversation.lastName

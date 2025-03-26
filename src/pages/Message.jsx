@@ -213,7 +213,7 @@ export default function Message() {
 
 							<div className="flex-grow min-w-0">
 								<div className="flex items-center gap-2">
-									<span className="font-semibold">
+									<span className="font-medium">
 										{combineIntoDisplayName(conver.firstName, conver.lastName)}
 									</span>
 									{/* dấu chấm đánh dấu chưa đọc */}

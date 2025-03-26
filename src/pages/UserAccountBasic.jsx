@@ -189,6 +189,7 @@ export default function UserAccountBasic() {
 							errors={errors}
 							options={dayOptions}
 							icon={<ChevronDown />}
+							disabled={true}
 						/>
 						<JumpingSelect
 							label="Tháng"
@@ -197,6 +198,7 @@ export default function UserAccountBasic() {
 							errors={errors}
 							options={monthOptions}
 							icon={<ChevronDown />}
+							disabled={true}
 						/>
 						<JumpingSelect
 							label="Năm"
@@ -205,6 +207,7 @@ export default function UserAccountBasic() {
 							errors={errors}
 							options={yearOptions}
 							icon={<ChevronDown />}
+							disabled={true}
 						/>
 					</div>
 				</div>

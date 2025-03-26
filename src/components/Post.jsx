@@ -52,7 +52,7 @@ export default function Post({
 
 	const showRepostPopup = () => {
 		showPopup(
-			null,
+			"Đăng lại bài viết",
 			<ModalRepost id={post.originPostId || post.id} store={store} />
 		);
 	};

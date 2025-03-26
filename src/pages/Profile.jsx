@@ -381,8 +381,7 @@ export default function Profile() {
 						<div className="self-center flex gap-4 ">
 							{/* profile options */}
 							<Popover>
-								<PopoverTrigger className="btn-secondary aspect-square h-10">
-									{/* <Glyph /> */}
+								<PopoverTrigger className="btn-secondary aspect-square h-10 border">
 									<Ellipsis className="size-5" />
 								</PopoverTrigger>
 								<PopoverContent className="bg-background p-1.5 w-64">

@@ -67,7 +67,7 @@ $fs-5xl: clamp-font-size(6);
 			var(--primary-gradient-end)
 		);
 		// secondary clr
-		--secondary-clr: hsl(0, 0%, 91%);
+		--secondary-clr: hsl(0, 0%, 96%);
 		--secondary-hover-clr: hsl(0, 0%, 86%);
 		--secondary-active-clr: hsl(0, 0%, 82%);
 		// background color
@@ -86,7 +86,7 @@ $fs-5xl: clamp-font-size(6);
 		--gray-3light-clr: hsl(0, 0%, 96%); //for others active
 		// border, shadow
 		--border-clr: hsl(0, 0%, 89%);
-		--border-hover-clr: hsl(0, 0%, 88%);
+		--border-hover-clr: hsl(0, 0%, 30%);
 		--shadow-clr: hsla(0, 0%, 91%);
 		--drop-shadow: hsla(0, 0%, 0%, 0.15);
 		// text color
