@@ -13,7 +13,6 @@ export const refreshToken = async () => {
 		console.error("Error at refreshToken: ", error);
 		deleteCookie("refresh-token");
 		deleteCookie("access-token");
-		window.location.href = "/fsocial_fe/login";
 		return error.response?.data || null;
 	}
 };

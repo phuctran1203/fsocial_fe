@@ -221,10 +221,6 @@ export default function Signup() {
 
 	const [isShowRePassword, setIsShowRePassword] = useState(false);
 
-	useEffect(() => {
-		if (getCookie("refresh-token")) navigate("/home");
-	}, []);
-
 	return (
 		<div className="lg:w-[min(85%,1440px)] md:h-fit h-[100dvh] mx-auto relative bg-background xl:px-20 lg:px-12 lg:my-4 md:px-4 py-6 rounded-md">
 			<img

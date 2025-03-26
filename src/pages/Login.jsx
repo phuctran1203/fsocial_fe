@@ -1,18 +1,12 @@
-import React, { useEffect, useState } from "react";
-import { Field } from "../components/Field";
-import { useLoginStore } from "../store/loginStore";
-import {
-	EyeIcon,
-	EyeSplashIcon,
-	LoadingIcon,
-	UserIcon,
-	XMarkIcon,
-} from "../components/Icon";
+import React, { useState } from "react";
+import { JumpingInput } from "../components/Field";
+import { LoadingIcon, XMarkIcon } from "../components/Icon";
 import Button from "../components/Button";
 import { Link, useNavigate } from "react-router-dom";
 import { login } from "../api/loginApi";
-import { getCookie, setCookie } from "@/utils/cookie";
-import { ownerAccountStore } from "@/store/ownerAccountStore";
+import { setCookie } from "@/utils/cookie";
+import { useForm } from "react-hook-form";
+import { Eye, EyeOff, UserRoundIcon } from "lucide-react";
 
 const list = [
 	{
@@ -28,36 +22,31 @@ const list = [
 export default function Login() {
 	const navigate = useNavigate();
 
-	const setUser = ownerAccountStore((state) => state.setUser);
-
-	const form = useLoginStore((state) => state.form);
+	const {
+		register,
+		formState: { errors, isValid },
+		trigger,
+		getValues,
+	} = useForm({ mode: "all" });
 
 	// Handle ẩn hiện mật khẩu
 	const [isShowPassword, setIsShowPassword] = useState(false);
 
-	//handle click submit button
-	const [isDisable, setIsDisable] = useState(true);
-
-	const handleValidate = () => {
-		setIsDisable(!(form.loginName.isValid && form.password.isValid));
-	};
-
 	const [submitClicked, setSubmitClicked] = useState(false);
-
-	useEffect(() => {
-		handleValidate();
-	}, [form.loginName.isValid, form.password.isValid]);
 
 	const [loginErr, setLoginErr] = useState("");
 
 	const handleSubmitLogin = async () => {
+		trigger();
+		if (!isValid) return;
 		setSubmitClicked(true);
-		const data = {
-			username: form.loginName.value.trim(),
-			password: form.password.value.trim(),
+		const data = getValues();
+		const sending = {
+			username: data.loginName.trim(),
+			password: data.password.trim(),
 		};
 
-		const result = await login(data);
+		const result = await login(sending);
 
 		if (result.statusCode === 200) {
 			// save token and refresh token
@@ -72,10 +61,6 @@ export default function Login() {
 	};
 
 	const handleRemoveSavedAccount = () => {};
-
-	useEffect(() => {
-		if (getCookie("refresh-token")) navigate("/home");
-	}, []);
 
 	return (
 		<div
@@ -98,37 +83,41 @@ export default function Login() {
 					<span>Nền tảng mạng xã hội giới trẻ mới</span>
 				</div>
 				<div className="mb-4">
-					<Field
-						type="text"
-						name="loginName"
-						id="loginName"
+					<JumpingInput
 						label="Tên đăng nhập/Email"
-						store={useLoginStore}
-						required={true}
-						errorMessage="Không được để trống"
-					>
-						<UserIcon />
-					</Field>
+						name="loginName"
+						register={register}
+						errors={errors}
+						validateOptions={{
+							required: "Tên đăng nhập/email không được để trống",
+						}}
+						icon={<UserRoundIcon className="size-5" />}
+					/>
 				</div>
 				<div className="mb-4">
-					<Field
+					<JumpingInput
 						type={isShowPassword ? "text" : "password"}
-						name="password"
-						id="password"
 						label="Mật khẩu"
-						store={useLoginStore}
-						required={true}
-						errorMessage="Không được để trống"
-					>
-						<div onClick={() => setIsShowPassword(!isShowPassword)}>
-							<EyeIcon
-								className={`w-full ${isShowPassword ? "hidden" : "block"}`}
-							/>
-							<EyeSplashIcon
-								className={`w-full ${!isShowPassword ? "hidden" : "block"}`}
-							/>
-						</div>
-					</Field>
+						name="password"
+						register={register}
+						errors={errors}
+						validateOptions={{
+							required: "Mật khẩu không được để trống",
+						}}
+						icon={
+							!isShowPassword ? (
+								<Eye
+									className="size-5"
+									onClick={() => setIsShowPassword(true)}
+								/>
+							) : (
+								<EyeOff
+									className="size-5"
+									onClick={() => setIsShowPassword(false)}
+								/>
+							)
+						}
+					/>
 				</div>
 
 				<div className="flex justify-between mb-2">
@@ -149,14 +138,7 @@ export default function Login() {
 				</div>
 				<div className="mb-4">
 					{!submitClicked && <p className="text-red-600">{loginErr}</p>}
-					<Button
-						className={`btn-primary py-3 ${
-							(isDisable || submitClicked) && "disable-btn"
-						}`}
-						onClick={() =>
-							isDisable || submitClicked ? "" : handleSubmitLogin()
-						}
-					>
+					<Button className={`btn-primary py-3`} onClick={handleSubmitLogin}>
 						{submitClicked ? <LoadingIcon /> : "Đăng nhập"}
 					</Button>
 				</div>
