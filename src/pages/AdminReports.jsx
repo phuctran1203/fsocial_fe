@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
 	ChartContainer,
 	ChartLegend,
@@ -17,14 +17,12 @@ import {
 	PieChart,
 } from "recharts";
 import {
-	ComplaintIcon,
 	CrownTop1Icon,
 	CrownTop2Icon,
 	CrownTop3Icon,
 	GenderIcon,
 	NewCreatedAccountIcon,
 	PostProfileTabIcon,
-	StarIcon,
 } from "@/components/Icon";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Calendar } from "@/components/ui/calendar";
@@ -42,6 +40,7 @@ import {
 	combineIntoAvatarName,
 	combineIntoDisplayName,
 } from "@/utils/combineName";
+import { MessageSquareWarning, Star } from "lucide-react";
 
 const RenderLineChart = (props) => {
 	const {
@@ -323,13 +322,7 @@ export default function AdminReports() {
 				</div>
 				<div className="flex flex-col">
 					<RenderLineChart
-						icon={
-							<ComplaintIcon
-								className="size-3.5"
-								strokeClass="stroke-gray"
-								fillClass="fill-gray"
-							/>
-						}
+						icon={<MessageSquareWarning className="size-4 stroke-gray" />}
 						label="Lượt khiếu nại"
 						total={totalComplaint}
 						idFill="numberComplaints"
@@ -396,8 +389,8 @@ export default function AdminReports() {
 			{/* top KOL */}
 			<div className="pb-1 col-span-3 bg-background rounded-lg border shadow flex flex-col">
 				<div className="p-3 flex items-center gap-3">
-					<span className="border shadow rounded-full size-8 grid place-content-center fill-gray">
-						<StarIcon />
+					<span className="border shadow rounded-full size-8 grid place-content-center">
+						<Star className="size-4 stroke-gray" />
 					</span>
 					<span className="flex-grow fs-xs text-gray">Bảng xếp hạng KOL</span>
 				</div>

@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from "react";
-import { CheckIcon, TrashCanIcon, XMarkIcon } from "../components/Icon";
+import { TrashCanIcon, XMarkIcon } from "../components/Icon";
 import Button from "../components/Button";
-import { PlusIcon } from "lucide-react";
+import { Check, PlusIcon } from "lucide-react";
 import { toast } from "sonner";
 import {
 	addTermOfService,
@@ -128,13 +128,13 @@ export default function AdminPolicySettings() {
 								className="btn-transparent border !size-8"
 								onClick={acceptPolicy}
 							>
-								<CheckIcon className="size-5" />
+								<Check className="size-5" />
 							</Button>
 							<Button
 								className="btn-transparent border !size-8"
 								onClick={declinePolicy}
 							>
-								<XMarkIcon className="size-3.5" />
+								<XMarkIcon className="size-5" />
 							</Button>
 						</div>
 					</div>

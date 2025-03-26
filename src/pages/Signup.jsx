@@ -15,30 +15,14 @@ import InputOTP4Digit from "@/components/InputOTP4Digit";
 import { useForm } from "react-hook-form";
 import { AtSign, ChevronDown, Eye, EyeOff, UserRoundIcon } from "lucide-react";
 import { regexEmail, regexName, regexPassword } from "@/config/regex";
+import {
+	dayOptions,
+	monthOptions,
+	yearOptions,
+} from "@/config/globalVariables";
 
 export default function Signup() {
 	const navigate = useNavigate();
-	const dayOptions = useRef(
-		Array.from({ length: 31 }, (_, index) => index + 1).reduce((acc, num) => {
-			acc[num] = num;
-			return acc;
-		}, {})
-	);
-	const monthOptions = useRef(
-		Array.from({ length: 12 }, (_, index) => index + 1).reduce((acc, num) => {
-			acc[num] = num;
-			return acc;
-		}, {})
-	);
-	const yearOptions = useRef(
-		Array.from(
-			{ length: new Date().getFullYear() - 19 - 1940 + 1 },
-			(_, index) => 1940 + index
-		).reduce((acc, num) => {
-			acc[num] = num;
-			return acc;
-		}, {})
-	);
 
 	// Handle animation cho các step
 	const formContainer = useRef();
@@ -361,7 +345,7 @@ export default function Signup() {
 										name="day"
 										register={registerStep1}
 										errors={errorsStep1}
-										options={dayOptions.current}
+										options={dayOptions}
 										icon={<ChevronDown />}
 									/>
 									<JumpingSelect
@@ -369,7 +353,7 @@ export default function Signup() {
 										name="month"
 										register={registerStep1}
 										errors={errorsStep1}
-										options={monthOptions.current}
+										options={monthOptions}
 										icon={<ChevronDown />}
 									/>
 									<JumpingSelect
@@ -377,7 +361,7 @@ export default function Signup() {
 										name="year"
 										register={registerStep1}
 										errors={errorsStep1}
-										options={yearOptions.current}
+										options={yearOptions}
 										icon={<ChevronDown />}
 									/>
 								</div>

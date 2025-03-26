@@ -1,40 +1,52 @@
-import React, { useState, useRef } from "react";
-import { Field, Select } from "../components/Field";
+import React, { useEffect, useState } from "react";
+import { JumpingInput, JumpingSelect } from "../components/Field";
 import Button from "../components/Button";
 
 import { adminStore } from "../store/adminStore";
 
-const currentYear = new Date().getFullYear(); // 🔹 Định nghĩa biến năm hiện tại
-import {
-	EyeIcon,
-	EyeSplashIcon,
-	LoadingIcon,
-	UserIcon,
-	XMarkIcon,
-	AtIcon,
-	LogoNoBG,
-} from "../components/Icon";
+import { LogoNoBG } from "../components/Icon";
 import {
 	combineIntoAvatarName,
 	combineIntoDisplayName,
 } from "@/utils/combineName";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { useForm } from "react-hook-form";
+import { regexEmail, regexName, regexPassword } from "@/config/regex";
+import { AtSign, ChevronDown, Eye, EyeOff, UserRoundIcon } from "lucide-react";
+import {
+	dayOptions,
+	monthOptions,
+	yearOptions,
+} from "@/config/globalVariables";
 
 const AdminProfile = () => {
-	const { form, updateField } = adminStore();
+	const { user } = adminStore();
+	const {
+		register,
+		formState: { errors, isValid },
+		reset,
+		getValues,
+		watch,
+	} = useForm({ mode: "all" });
+	const newPassword = watch("newPassword");
+
+	useEffect(() => {
+		reset({
+			firstName: user.firstName,
+			lastName: user.lastName,
+			day: user.day,
+			month: user.month,
+			year: user.year,
+			gender: user.gender,
+			username: user.username,
+			email: user.email,
+		});
+	}, []);
 
 	// Handle ẩn hiện mật khẩu
-	const [isShowPassword, setIsShowPassword] = useState(false);
-	const [showOldPassword, setShowOldPassword] = useState(false);
-	const [showNewPassword, setShowNewPassword] = useState(false);
-	const [showConfirmPassword, setShowConfirmPassword] = useState(false);
-
-	const fileInputRef = useRef(null);
-
-	// Xử lý thay đổi dữ liệu nhập vào
-	const handleChange = (field, value) => {
-		setUserData((prev) => ({ ...prev, [field]: value }));
-	};
+	const [isShowOldPassword, setIsShowOldPassword] = useState(false);
+	const [isShowNewPassword, setIsShowNewPassword] = useState(false);
+	const [isShowReNewPassword, setIsShowReNewPassword] = useState(false);
 
 	const handleImageUpload = (event) => {
 		const file = event.target.files[0];
@@ -45,18 +57,7 @@ const AdminProfile = () => {
 	};
 
 	// **🔹 Hàm xử lý cập nhật thông tin vào store**
-	const handleUpdateProfile = () => {
-		// Kiểm tra mật khẩu trước khi cập nhật
-		if (
-			userData.newPassword &&
-			userData.newPassword !== userData.confirmPassword
-		) {
-			alert("Mật khẩu mới không khớp!");
-			return;
-		}
-
-		alert("Cập nhật thông tin thành công!");
-	};
+	const handleUpdateProfile = () => {};
 
 	const hours = new Date().getHours();
 
@@ -72,7 +73,7 @@ const AdminProfile = () => {
 				{hours <= 18 && "Chào buổi chiều"}
 				{hours > 18 && "Chào buổi tối"},{" "}
 				<font className="text-primary-gradient">
-					{combineIntoDisplayName(form.ten.value, form.ho.value)}
+					{combineIntoDisplayName(user.firstName, user.lastName)}
 				</font>
 				👋
 			</h5>
@@ -88,89 +89,85 @@ const AdminProfile = () => {
 					<p className="font-medium">Thông tin cá nhân</p>
 
 					<div className="grid grid-cols-2 gap-2">
-						<Field
+						<JumpingInput
 							label="Tên"
-							id="ten"
-							required={true}
-							pattern="^[A-Za-zÀ-ỹ\s]+$"
-							errorMessage="Tên không được để trống và chỉ chứa chữ cái."
-							store={adminStore}
+							name="firstName"
+							register={register}
+							errors={errors}
+							validateOptions={{
+								required: "Tên không được để trống",
+								pattern: {
+									value: regexName,
+									message: "Tên không được chứa số và ký tự đặc biệt",
+								},
+							}}
 						/>
-						<Field
+						<JumpingInput
 							label="Họ"
-							id="ho"
-							required={true}
-							pattern="^[A-Za-zÀ-ỹ\s]+$"
-							errorMessage="Họ không được để trống và chỉ chứa chữ cái."
-							store={adminStore}
+							name="lastName"
+							register={register}
+							errors={errors}
+							validateOptions={{
+								required: "Họ không được để trống",
+								pattern: {
+									value: regexName,
+									message: "Họ không được chứa số và ký tự đặc biệt",
+								},
+							}}
 						/>
 					</div>
 
 					<div className="grid grid-cols-3 gap-2">
-						<Select
-							name="day"
-							id="day"
+						<JumpingSelect
 							label="Ngày"
-							store={adminStore}
-							disable={true}
-							options={Array.from(
-								{ length: 31 },
-								(_, index) => index + 1
-							).reduce((acc, num) => {
-								acc[num] = num;
-								return acc;
-							}, {})}
+							name="day"
+							register={register}
+							errors={errors}
+							options={dayOptions}
+							disabled={true}
+							icon={<ChevronDown />}
 						/>
-						<Select
-							name="month"
-							id="month"
+						<JumpingSelect
 							label="Tháng"
-							store={adminStore}
-							disable={true}
-							options={Array.from(
-								{ length: 12 },
-								(_, index) => index + 1
-							).reduce((acc, num) => {
-								acc[num] = num;
-								return acc;
-							}, {})}
+							name="month"
+							register={register}
+							errors={errors}
+							options={monthOptions}
+							disabled={true}
+							icon={<ChevronDown />}
 						/>
-						<Select
-							name="year"
-							id="year"
+						<JumpingSelect
 							label="Năm"
-							store={adminStore}
-							disable={true}
-							options={Array.from(
-								{ length: new Date().getFullYear() - 19 - 1940 + 1 },
-								(_, index) => 1940 + index
-							).reduce((acc, num) => {
-								acc[num] = num;
-								return acc;
-							}, {})}
+							name="year"
+							register={register}
+							errors={errors}
+							options={yearOptions}
+							disabled={true}
+							icon={<ChevronDown />}
 						/>
 					</div>
 
-					<Select
-						store={adminStore}
-						id="gender"
+					<JumpingSelect
 						label="Giới tính"
 						name="gender"
+						register={register}
+						errors={errors}
 						options={{
 							0: "Nam",
 							1: "Nữ",
 							2: "Khác",
 							3: "Không muốn tiết lộ",
 						}}
+						icon={<ChevronDown />}
 					/>
 
 					{/* Avatar + Button thay ảnh đại diện */}
 					<div className="p-6 flex items-center gap-6">
 						<div className="ring-4 ring-offset-4 rounded-full ring-gray-2light">
 							<Avatar className="size-32">
-								<AvatarImage src={form.avatar.value} />
+								<AvatarImage src={user.avatar} />
 								<AvatarFallback>
-									{combineIntoAvatarName(form.ten.value, form.ho.value)}
+									{combineIntoAvatarName(user.firstName, user.lastName)}
 								</AvatarFallback>
 							</Avatar>
 						</div>
@@ -190,92 +187,115 @@ const AdminProfile = () => {
 					{/* thông tin đăng nhập */}
 					<div className="space-y-5">
 						<p className="font-medium">Thông tin đăng nhập</p>
-						<Field
-							store={adminStore}
-							id="username"
+						<JumpingInput
 							label="Tên đăng nhập"
 							name="username"
-						>
-							<UserIcon />
-						</Field>
+							register={register}
+							errors={errors}
+							validateOptions={{
+								required: "Tên đăng nhập không được để trống",
+							}}
+							icon={<UserRoundIcon className="size-5" />}
+						/>
 
-						<Field
+						<JumpingInput
 							label="Email"
-							id="email"
-							type="email"
-							required={true}
-							pattern="^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$"
-							//  compareFunction={async (value) => !(await checkDuplicate(value))} // phúc kt chỗ này nhé hihi (kt email đã tồn tại chưa)
-							errorMessage="Email không hợp lệ hoặc đã tồn tại."
-							store={adminStore}
-						>
-							<AtIcon />
-						</Field>
+							name="email"
+							register={register}
+							errors={errors}
+							validateOptions={{
+								required: "Email không được để trống",
+								pattern: {
+									value: regexEmail,
+									message: "Email không hợp lệ",
+								},
+							}}
+							icon={<AtSign className="size-5" />}
+						/>
 					</div>
 					{/* Đổi mật khẩu */}
 					<div className="space-y-5">
 						{/* Đổi mật khẩu */}
 						<p className="font-medium">Đổi mật khẩu</p>
-						<Field
-							type={showOldPassword ? "text" : "password"}
-							store={adminStore}
-							id="oldPassword"
+						<JumpingInput
+							type={isShowOldPassword ? "text" : "password"}
 							label="Mật khẩu cũ"
 							name="oldPassword"
-						>
-							<div
-								onClick={() => setShowOldPassword(!showOldPassword)}
-								className="cursor-pointer"
-							>
-								{showOldPassword ? (
-									<EyeSplashIcon className="w-full" />
-								) : (
-									<EyeIcon className="w-full" />
-								)}
-							</div>
-						</Field>
+							register={register}
+							errors={errors}
+							validateOptions={{
+								required: "Mật khẩu không được để trống",
+							}}
+							icon={
+								<div
+									className="cursor-pointer"
+									onClick={() => setIsShowOldPassword(!isShowOldPassword)}
+								>
+									{!isShowOldPassword ? (
+										<Eye className="size-5" />
+									) : (
+										<EyeOff className="size-5" />
+									)}
+								</div>
+							}
+						/>
 
-						<Field
-							type={showNewPassword ? "text" : "password"}
-							store={adminStore}
-							id="newPassword"
+						<JumpingInput
+							type={isShowNewPassword ? "text" : "password"}
 							label="Mật khẩu mới"
-							required={true}
-							pattern="^(?=.*[A-Z])(?=.*[a-z])(?=.*[0-9]).{8,}$"
-							errorMessage="Mật khẩu mới phải có ít nhất 8 ký tự, bao gồm chữ hoa, chữ thường và số."
-						>
-							<div
-								onClick={() => setShowNewPassword(!showNewPassword)}
-								className="cursor-pointer"
-							>
-								{showNewPassword ? (
-									<EyeSplashIcon className="w-full" />
-								) : (
-									<EyeIcon className="w-full" />
-								)}
-							</div>
-						</Field>
+							name="newPassword"
+							register={register}
+							errors={errors}
+							validateOptions={{
+								required: "Mật khẩu không được để trống",
+								pattern: {
+									value: regexPassword,
+									message: "Mật khẩu từ 8-20 kí tự, bao gồm cả chữ và số",
+								},
+							}}
+							icon={
+								<div
+									className="cursor-pointer"
+									onClick={() => setIsShowNewPassword(!isShowNewPassword)}
+								>
+									{!isShowNewPassword ? (
+										<Eye className="size-5" />
+									) : (
+										<EyeOff className="size-5" />
+									)}
+								</div>
+							}
+						/>
 
-						<Field
-							type={showConfirmPassword ? "text" : "password"}
-							store={adminStore}
-							id="confirmPassword"
+						<JumpingInput
+							type={isShowReNewPassword ? "text" : "password"}
 							label="Nhập lại mật khẩu mới"
-							required={true}
-							compareFunction={(value) => value === form.newPassword.value}
-							errorMessage="Mật khẩu xác nhận không khớp."
-						>
-							<div
-								onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-								className="cursor-pointer"
-							>
-								{showConfirmPassword ? (
-									<EyeSplashIcon className="w-full" />
-								) : (
-									<EyeIcon className="w-full" />
-								)}
-							</div>
-						</Field>
+							name="reNewPassword"
+							register={register}
+							errors={errors}
+							validateOptions={{
+								required: "Mật khẩu không được để trống",
+								pattern: {
+									value: regexPassword,
+									message: "Mật khẩu từ 8-20 kí tự, bao gồm cả chữ và số",
+								},
+								validate: (value) =>
+									value === newPassword ||
+									"Mật khẩu nhập lại không khớp với mật khẩu mới",
+							}}
+							icon={
+								<div
+									className="cursor-pointer"
+									onClick={() => setIsShowReNewPassword(!isShowReNewPassword)}
+								>
+									{!isShowReNewPassword ? (
+										<Eye className="size-5" />
+									) : (
+										<EyeOff className="size-5" />
+									)}
+								</div>
+							}
+						/>
 					</div>
 				</div>
 			</div>

@@ -10,8 +10,8 @@ import {
 	combineIntoAvatarName,
 	combineIntoDisplayName,
 } from "@/utils/combineName";
-import { ArrowLeftIcon } from "lucide-react";
-import { Glyph, SendIcon, SmileIcon } from "./Icon";
+import { ArrowLeftIcon, Ellipsis, Send, Smile } from "lucide-react";
+import { SmileIcon } from "./Icon";
 import { Popover, PopoverContent, PopoverTrigger } from "./ui/popover";
 import EmojiPicker from "emoji-picker-react";
 import { TextBox } from "./Field";
@@ -204,8 +204,9 @@ export default function MessageListMessages({
 						)}
 					</p>
 				</div>
-				<Glyph />
+				<Ellipsis />
 			</div>
+
 			<div
 				ref={containerMessagesRef}
 				className="overflow-y-auto px-3 pb-2 flex-grow space-y-0.5"
@@ -295,11 +296,12 @@ export default function MessageListMessages({
 					</div>
 				))}
 			</div>
+
 			{/* Thanh nhập tin nhắn */}
-			<div className="relative bg-background border-t sm:px-6 px-4 sm:py-4 py-3 flex items-end gap-3 transition">
+			<div className="relative bg-background flex items-end sm:mx-6 m-4 border-2 rounded-3xl px-2 hover:border-gray-light">
 				<Popover>
-					<PopoverTrigger className="md:py-2 py-1.5">
-						<SmileIcon className="size-6" />
+					<PopoverTrigger className="h-10">
+						<SmileIcon className="size-[22px]" />
 						<PopoverContent
 							side="bottom"
 							align="start"
@@ -317,19 +319,20 @@ export default function MessageListMessages({
 						</PopoverContent>
 					</PopoverTrigger>
 				</Popover>
+
 				<TextBox
 					texboxRef={textbox}
 					placeholder="Soạn tin nhắn"
-					className="py-1.5 max-h-[120px] bg-gray-3light border rounded-3xl px-4 flex-grow scrollable-div"
+					className="py-2 max-h-[160px] px-3 scrollable-div"
 					onKeyDown={textBoxOnKeyDown}
 					autoFocus={true}
 					trigger={trigger}
 				/>
 				<button
 					onClick={handleSendMessage}
-					className="bg-primary-gradient py-1.5 px-5 rounded-full"
+					className="grid place-content-center h-10 pe-1"
 				>
-					<SendIcon color="stroke-txtWhite" />
+					<Send className="size-5" strokeWidth={1.6} />
 				</button>
 			</div>
 		</div>

@@ -11,6 +11,7 @@ import {
 	combineIntoAvatarName,
 	combineIntoDisplayName,
 } from "@/utils/combineName";
+import GenerateMediaLayout from "./GenerateMediaLayout";
 
 export default function EditPostModal({ id, store }) {
 	const hidePopup = usePopupStore((state) => state.hidePopup);
@@ -49,13 +50,13 @@ export default function EditPostModal({ id, store }) {
 					<Avatar className={`size-9`}>
 						<AvatarImage src={post.avatar} />
 						<AvatarFallback className="text-[12px]">
-							{combineIntoAvatarName(post.firtName, post.lastName)}
+							{combineIntoAvatarName(post.firstName, post.lastName)}
 						</AvatarFallback>
 					</Avatar>
 
 					<div className="flex flex-col justify-center">
 						<span className="font-semibold">
-							{combineIntoDisplayName(post.firtName, post.lastName)}
+							{combineIntoDisplayName(post.firstName, post.lastName)}
 						</span>
 						<span className="text-gray fs-xs">
 							{dateTimeToPostTime(post.createDatetime)}
@@ -70,15 +71,14 @@ export default function EditPostModal({ id, store }) {
 					autoFocus={true}
 				/>
 				{/* assets post */}
-				{post.content.media.length > 0 && (
-					<div className="max-h-[200vh] border-y overflow-hidden transition">
-						<img
-							src={`${post.content.media[0]}`}
-							alt="Bài đăng"
-							className="w-full"
-						/>
-					</div>
-				)}
+				<div>
+					<GenerateMediaLayout
+						medias={
+							post.content.media ||
+							(post.originPostId ? [post.originPostId] : [])
+						}
+					/>
+				</div>
 			</div>
 
 			<div className="sticky bottom-0 p-3 bg-background">

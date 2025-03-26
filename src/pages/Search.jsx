@@ -1,12 +1,13 @@
 import React, { useState, useEffect, useRef } from "react";
 import Button from "../components/Button";
-import { LoadingIcon, SearchIcon } from "../components/Icon";
+import { LoadingIcon } from "../components/Icon";
 import { searchUsers, searchPosts } from "../api/searchApi";
 import { useSearchPostsStore } from "../store/postsStore";
 import RenderPosts from "@/components/RenderPosts";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { combineIntoAvatarName } from "@/utils/combineName";
+import { SearchIcon } from "lucide-react";
 
 export default function Search() {
 	const [query, setQuery] = useState("");
@@ -48,9 +49,9 @@ export default function Search() {
 			<div className="mx-auto md:space-y-5 space-y-4 lg:max-w-[540px]">
 				<label
 					htmlFor="search"
-					className="mx-3 xl:mx-0 bg-background flex items-center gap-2 py-2 px-3 border rounded-full border-gray-2light hover:drop-shadow hover:border-gray-light"
+					className="mx-3 xl:mx-0 bg-background flex items-center gap-2 py-2 px-3 border rounded-full border-gray-2light hover:drop-shadow hover:border-gray"
 				>
-					<SearchIcon color="stroke-gray" className="size-5" />
+					<SearchIcon className="size-5 text-gray flex-shrink-0" />
 					<input
 						id="search"
 						type="text"

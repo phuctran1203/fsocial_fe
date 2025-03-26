@@ -3,7 +3,6 @@ import React, { useEffect, useRef, useState } from "react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
 	FollowerProfileTabIcon,
-	Glyph,
 	PencilChangeImageIcon,
 	PictureProfileTabIcon,
 	PostProfileTabIcon,
@@ -17,7 +16,6 @@ import { getPosts } from "@/api/postsApi";
 import RenderPosts from "@/components/RenderPosts";
 import {
 	getFollowers,
-	getOwnerProfile,
 	getProfile,
 	requestFollow,
 	unfollow,
@@ -35,6 +33,7 @@ import { userProfileOptions } from "@/config/userProfileOptions";
 import { usePopupStore } from "@/store/popupStore";
 import ModalCropImage from "@/components/ModalCropImage";
 import { cn } from "@/lib/utils";
+import { Ellipsis } from "lucide-react";
 
 const listFriends = [
 	{
@@ -370,7 +369,8 @@ export default function Profile() {
 													className="absolute top-0 size-full bg-black/50 grid place-content-center rounded-full hover:bg-black/60"
 													onClick={() => clickChangeTab(3)}
 												>
-													<Glyph color="fill-txtWhite" />
+													<Ellipsis className="size-4 text-txtWhite" />
+													{/* <Glyph color="fill-txtWhite" /> */}
 												</button>
 											)}
 										</div>
@@ -381,8 +381,9 @@ export default function Profile() {
 						<div className="self-center flex gap-4 ">
 							{/* profile options */}
 							<Popover>
-								<PopoverTrigger className="btn-secondary px-3 h-10">
-									<Glyph />
+								<PopoverTrigger className="btn-secondary aspect-square h-10">
+									{/* <Glyph /> */}
+									<Ellipsis className="size-5" />
 								</PopoverTrigger>
 								<PopoverContent className="bg-background p-1.5 w-64">
 									{userProfileOptions[isOwner ? "OWNER" : "OTHER"].map(

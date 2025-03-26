@@ -10,7 +10,6 @@ import {
 	HomeNavIcon,
 	LogoNoBG,
 	MessageNavIcon,
-	SearchIcon,
 } from "./Icon";
 import { popupNotificationtStore, usePopupStore } from "../store/popupStore";
 import { ownerAccountStore } from "../store/ownerAccountStore";
@@ -29,6 +28,7 @@ import {
 } from "@/utils/combineName";
 import useMessageStore from "@/store/messageStore";
 import { regexInMessage, regexInSetting } from "@/config/regex";
+import { SearchIcon } from "lucide-react";
 
 export default function Nav() {
 	const user = ownerAccountStore((state) => state.user);
@@ -80,11 +80,7 @@ export default function Nav() {
 		>
 			<div className="sm:space-y-8 sm:block w-full">
 				{/* logo */}
-				<NavLink
-					to="/"
-					className="sm:block hidden"
-					onClick={() => toast.error("Clicked logo")}
-				>
+				<NavLink to="/" className="sm:block hidden">
 					<LogoNoBG
 						className={!isNotificationSlide ? "ms-6" : "lg:ms-6 mx-auto"}
 					/>
@@ -132,7 +128,10 @@ export default function Nav() {
 					>
 						{({ isActive }) => (
 							<>
-								<SearchIcon compareVar={isActive} />
+								<SearchIcon
+									className="size-[26px]"
+									strokeWidth={isActive ? 2.2 : 1.6}
+								/>
 								<span
 									className={`${
 										!isNotificationSlide ? "sm:inline" : "lg:inline"

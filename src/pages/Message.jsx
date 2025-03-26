@@ -1,5 +1,4 @@
 import React, { useState, useEffect, useRef } from "react";
-import { PlusIcon, SearchIcon } from "../components/Icon";
 import { dateTimeToMessageTime } from "../utils/convertDateTime";
 import { ownerAccountStore } from "@/store/ownerAccountStore";
 import { getConversations, getMessages } from "@/api/messageApi";
@@ -14,6 +13,7 @@ import useMessageStore from "@/store/messageStore";
 import MessageHandleMessages from "@/components/MessageHandleMessages";
 import MessageHandleCreateConversation from "@/components/MessageHandleCreateConversation";
 import { cn } from "@/lib/utils";
+import { CirclePlus, SearchIcon } from "lucide-react";
 
 export default function Message() {
 	const user = ownerAccountStore((state) => state.user);
@@ -163,15 +163,15 @@ export default function Message() {
 						className="btn-transparent !w-fit p-1"
 						onClick={handleOpenCreateConversation}
 					>
-						<PlusIcon />
+						<CirclePlus />
 					</Button>
 				</div>
 				{/* search bar */}
 				<label
 					htmlFor="search-message"
-					className="flex gap-2 p-2 mx-4 border rounded-full hover:border-gray-light transition"
+					className="flex gap-2 p-2 mx-4 border rounded-full hover:border-gray transition"
 				>
-					<SearchIcon className="size-5 ms-1" color="stroke-[--gray-clr]" />
+					<SearchIcon className="size-5 ms-1 my-auto text-gray" />
 					<input
 						type="text"
 						id="search-message"

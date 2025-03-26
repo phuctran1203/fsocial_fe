@@ -1,11 +1,9 @@
 import React, { useEffect, useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import {
-	Check,
 	Bell,
 	CloseCollapseIcon,
 	CommentNotiIcon,
-	Glyph,
 	HeartNotiIcon,
 	TrashCanIcon,
 	XMarkIcon,
@@ -26,6 +24,7 @@ import {
 import { Skeleton } from "./ui/skeleton";
 import { useNotificationsStore } from "@/store/notificationStore";
 import { regexInMessage, regexInSetting } from "@/config/regex";
+import { CheckCheck, EllipsisVertical } from "lucide-react";
 
 const Noti = (props) => {
 	const { id, postId, type, firstName, lastName, read, textTime, avatar } =
@@ -123,9 +122,7 @@ const Noti = (props) => {
 				</div>
 			</button>
 			<button className="px-4" onClick={open}>
-				<div className="rotate-90">
-					<Glyph />
-				</div>
+				<EllipsisVertical className="size-5" />
 			</button>
 			<div
 				className={`flex absolute top-0 h-full left-full bg-secondary ${
@@ -144,7 +141,7 @@ const Noti = (props) => {
 					onClick={markAsRead}
 					allowTab={idNotiShowing === id}
 				>
-					<Check />
+					<CheckCheck />
 				</Button>
 				<Button
 					className="btn-secondary !rounded-none px-3.5"

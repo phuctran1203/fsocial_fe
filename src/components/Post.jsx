@@ -1,5 +1,5 @@
-import { Link, useNavigate } from "react-router-dom";
-import { ComplaintIcon, Glyph, TrashCanIcon, PencilIcon } from "./Icon";
+import { Link } from "react-router-dom";
+import { TrashCanIcon } from "./Icon";
 import { usePopupStore } from "../store/popupStore";
 import { dateTimeToPostTime } from "../utils/convertDateTime";
 import {
@@ -27,6 +27,7 @@ import { CommentPostIcon } from "./Icon";
 import { RepostPostIcon } from "./Icon";
 import { SharePostIcon } from "./Icon";
 import { cn } from "@/lib/utils";
+import { Ellipsis, MessageSquareWarning, Pen } from "lucide-react";
 
 export default function Post({
 	post,
@@ -116,11 +117,11 @@ export default function Post({
 				</div>
 				<Popover open={popoverOpen} onOpenChange={setPopoverOpen}>
 					<PopoverTrigger
-						className={`btn-transparent w-fit px-2 py-3.5 ${
+						className={`btn-transparent w-fit px-2 py-2 ${
 							isChildren && "hidden"
 						}`}
 					>
-						<Glyph />
+						<Ellipsis className="size-5" />
 					</PopoverTrigger>
 					<PopoverContent
 						side="left"
@@ -133,7 +134,7 @@ export default function Post({
 								className="btn-transparent justify-start py-2 ps-3 text-nowrap gap-3"
 								onClick={handlePopupReport}
 							>
-								<ComplaintIcon /> Báo cáo
+								<MessageSquareWarning /> Báo cáo
 							</Button>
 						)}
 						{post.userId === user.userId && (
@@ -141,7 +142,7 @@ export default function Post({
 								className="btn-transparent justify-start text-nowrap py-2 ps-3 gap-3"
 								onClick={handlePopupEdit}
 							>
-								<PencilIcon /> Chỉnh sửa
+								<Pen className="size-5" strokeWidth={1.6} /> Chỉnh sửa
 							</Button>
 						)}
 						{post.userId === user.userId && (

@@ -1,18 +1,18 @@
-import {
-	Input,
-	JumpingInput,
-	JumpingSelect,
-	SSelect,
-} from "@/components/Field";
+import { Input, JumpingSelect, Select } from "@/components/Field";
 import { PencilChangeImageIcon } from "@/components/Icon";
 import ModalCropImage from "@/components/ModalCropImage";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import {
+	dayOptions,
+	monthOptions,
+	yearOptions,
+} from "@/config/globalVariables";
 import { cn } from "@/lib/utils";
 import { ownerAccountStore } from "@/store/ownerAccountStore";
 import { usePopupStore } from "@/store/popupStore";
 import { combineIntoAvatarName } from "@/utils/combineName";
-import { ChevronDown, UserIcon } from "lucide-react";
-import React, { useEffect, useRef, useState } from "react";
+import { ChevronDown } from "lucide-react";
+import React, { useEffect, useRef } from "react";
 import { useForm } from "react-hook-form";
 import { useNavigate } from "react-router-dom";
 
@@ -81,28 +81,6 @@ export default function UserAccountBasic() {
 			gender: user.gender,
 		});
 	}, [user]);
-
-	const dayOptions = useRef(
-		Array.from({ length: 31 }, (_, index) => index + 1).reduce((acc, num) => {
-			acc[num] = num;
-			return acc;
-		}, {})
-	);
-	const monthOptions = useRef(
-		Array.from({ length: 12 }, (_, index) => index + 1).reduce((acc, num) => {
-			acc[num] = num;
-			return acc;
-		}, {})
-	);
-	const yearOptions = useRef(
-		Array.from(
-			{ length: new Date().getFullYear() - 19 - 1940 + 1 },
-			(_, index) => 1940 + index
-		).reduce((acc, num) => {
-			acc[num] = num;
-			return acc;
-		}, {})
-	);
 
 	const onSubmit = (data) => {
 		console.log(data);
@@ -187,7 +165,7 @@ export default function UserAccountBasic() {
 					/>
 				</div>
 				{/* gender */}
-				<SSelect
+				<Select
 					label="Giới tính"
 					name="gender"
 					register={register}
@@ -209,7 +187,7 @@ export default function UserAccountBasic() {
 							name="day"
 							register={register}
 							errors={errors}
-							options={dayOptions.current}
+							options={dayOptions}
 							icon={<ChevronDown />}
 						/>
 						<JumpingSelect
@@ -217,7 +195,7 @@ export default function UserAccountBasic() {
 							name="month"
 							register={register}
 							errors={errors}
-							options={monthOptions.current}
+							options={monthOptions}
 							icon={<ChevronDown />}
 						/>
 						<JumpingSelect
@@ -225,7 +203,7 @@ export default function UserAccountBasic() {
 							name="year"
 							register={register}
 							errors={errors}
-							options={yearOptions.current}
+							options={yearOptions}
 							icon={<ChevronDown />}
 						/>
 					</div>

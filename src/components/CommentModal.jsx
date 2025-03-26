@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from "react";
-import { LoadingIcon, SendIcon, XMarkIcon } from "./Icon";
+import { LoadingIcon, XMarkIcon } from "./Icon";
 import Post from "./Post";
 import {
 	getComments,
@@ -22,6 +22,7 @@ import {
 import { HeartPostIcon } from "./Icon";
 import { usePopupStore } from "@/store/popupStore";
 import Button from "./Button";
+import { Send } from "lucide-react";
 
 function RenderComment({ ...props }) {
 	const { comment, selectCommentToReply, handleShowReplyComment, replies } =
@@ -364,11 +365,11 @@ export default function CommentModal({ id, store }) {
 						trigger={trigger}
 					/>
 
-					<button className="py-2" onClick={handleSendComment}>
+					<button className="py-2 px-1" onClick={handleSendComment}>
 						{submitCmtClicked ? (
 							<LoadingIcon stroke="stroke-gray-light" />
 						) : (
-							<SendIcon />
+							<Send className="size-5" />
 						)}
 					</button>
 				</div>

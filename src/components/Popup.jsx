@@ -32,10 +32,10 @@ export default function Popup() {
 				>
 					<h5 className="text-center">{heading}</h5>
 					<button
-						className={`px-4 ${
+						className={`px-3 ${
 							heading
 								? "h-full absolute right-0 top-1/2 -translate-y-1/2"
-								: "pt-4"
+								: "pt-3"
 						}`}
 						onClick={() => hidePopup()}
 					>

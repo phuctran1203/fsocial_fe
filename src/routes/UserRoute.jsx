@@ -4,7 +4,7 @@ import { Navigate, Outlet } from "react-router-dom";
 
 export default function UserRoute() {
 	const refreshToken = getCookie("refresh-token");
-	const isAdmin = true;
+	const isAdmin = false;
 	return refreshToken ? (
 		!isAdmin ? (
 			<Outlet />

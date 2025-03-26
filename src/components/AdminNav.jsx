@@ -1,8 +1,7 @@
-import React, { useEffect, useState } from "react";
-import { CheckIcon, LogoFSAdmin, LogoutIcon, MoonIcon, SunIcon } from "./Icon";
-import { adminNavRout } from "@/config/adminNavRout";
+import React, { useState } from "react";
+import { LogoFSAdmin, LogoutIcon } from "./Icon";
+import { adminNavRout } from "@/config/adminNavRoute";
 import Button from "./Button";
-import { ownerAccountStore } from "@/store/ownerAccountStore";
 import { useLocation } from "react-router-dom";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
@@ -17,12 +16,13 @@ import {
 	combineIntoDisplayName,
 } from "@/utils/combineName";
 import { adminStore } from "@/store/adminStore";
+import { Check, Moon, SunMedium } from "lucide-react";
 
 export default function AdminNav() {
 	const location = useLocation();
 	const path = location.pathname;
 	const navRoute = adminNavRout;
-	const form = adminStore((state) => state.form);
+	const { user } = adminStore();
 	const { theme, setTheme } = themeStore();
 	const handleSetMode = (modePicked) => {
 		setTheme(modePicked);
@@ -56,10 +56,10 @@ export default function AdminNav() {
 					<Avatar className={`size-[26px]`}>
 						<AvatarImage src={"../temp/default_avatar.svg"} />
 						<AvatarFallback className="text-[10px] font-semibold">
-							{combineIntoAvatarName(form.ten.value, form.ho.value)}
+							{combineIntoAvatarName(user.firstName, user.lastName)}
 						</AvatarFallback>
 					</Avatar>
-					<span>{combineIntoDisplayName(form.ten.value, form.ho.value)}</span>
+					<span>{combineIntoDisplayName(user.firstName, user.lastName)}</span>
 				</Button>
 			</div>
 			<div>
@@ -69,7 +69,7 @@ export default function AdminNav() {
 							switchThemeOpen && "bg-gray-3light"
 						}`}
 					>
-						{theme === "light" ? <SunIcon /> : <MoonIcon />}
+						{theme === "light" ? <SunMedium /> : <Moon />}
 						<span>Chế độ hiển thị</span>
 						<svg
 							className={`ms-auto me-1 sm:group-hover:opacity-100 ${
@@ -87,7 +87,7 @@ export default function AdminNav() {
 
 					<PopoverContent
 						side={"right"}
-						align="start"
+						align="end"
 						sideOffset={20}
 						className="bg-background p-2 sm:w-44 space-y-2 transition"
 					>
@@ -97,10 +97,10 @@ export default function AdminNav() {
 							}`}
 							onClick={() => handleSetMode("light")}
 						>
-							<SunIcon />
+							<SunMedium />
 							<span>Sáng</span>
-							<CheckIcon
-								className={`ms-auto ${theme != "light" && "hidden"}`}
+							<Check
+								className={`ms-auto size-5 ${theme != "light" && "hidden"}`}
 							/>
 						</button>
 
@@ -110,9 +110,11 @@ export default function AdminNav() {
 							}`}
 							onClick={() => handleSetMode("dark")}
 						>
-							<MoonIcon />
+							<Moon />
 							<span>Tối</span>
-							<CheckIcon className={`ms-auto ${theme != "dark" && "hidden"}`} />
+							<Check
+								className={`ms-auto size-5 ${theme != "dark" && "hidden"}`}
+							/>
 						</button>
 					</PopoverContent>
 				</Popover>
