@@ -104,6 +104,7 @@ export function Input({
 	validateOptions,
 	icon,
 	disabled = false,
+	type = "text",
 }) {
 	return (
 		<label
@@ -112,7 +113,7 @@ export function Input({
 			<span className="block mb-2 font-medium">{label}</span>
 			<div className="relative">
 				<input
-					type="text"
+					type={type}
 					placeholder={placeholder}
 					className={cn(
 						"custom-input",
@@ -122,7 +123,14 @@ export function Input({
 					tabIndex={disabled ? -1 : 0}
 					{...register(name, validateOptions)}
 				/>
-				<div className="absolute top-1/2 right-0 -translate-x-1/2 -translate-y-1/2">
+				<div
+					className={cn(
+						"absolute top-1/2 right-0 -translate-x-1/2 -translate-y-1/2",
+						errors[name]
+							? "text-red-500"
+							: "text-gray peer-hover:text-primary-text peer-focus:text-primary-text"
+					)}
+				>
 					{icon}
 				</div>
 			</div>
@@ -139,12 +147,13 @@ export function JumpingInput({
 	validateOptions,
 	icon,
 	disabled = false,
+	type = "text",
 }) {
 	return (
 		<div className={cn(disabled && "pointer-events-none opacity-65")}>
 			<div className="relative">
 				<input
-					type="text"
+					type={type}
 					placeholder=""
 					className={cn(
 						"peer custom-input",
@@ -157,15 +166,24 @@ export function JumpingInput({
 
 				<span
 					className={cn(
-						`fs-sm text-gray absolute bg-background rounded-sm px-1.5 top-0 left-2 -translate-y-1/2 
+						`fs-sm text-gray absolute bg-background rounded-sm px-1.5 top-0 left-2 -translate-y-1/2 pointer-events-none
 						peer-placeholder-shown:top-1/2 peer-hover:top-0 peer-focus:top-0 transition`,
-						errors[name] && "text-red-500"
+						errors[name]
+							? "text-red-500"
+							: "text-gray peer-hover:text-primary-text peer-focus:text-primary-text"
 					)}
 				>
 					{label}
 				</span>
 
-				<div className="absolute top-1/2 right-0 -translate-x-1/2 -translate-y-1/2">
+				<div
+					className={cn(
+						"absolute top-1/2 right-0 -translate-x-1/2 -translate-y-1/2",
+						errors[name]
+							? "text-red-500"
+							: "text-gray peer-hover:text-primary-text peer-focus:text-primary-text"
+					)}
+				>
 					{icon}
 				</div>
 			</div>
@@ -193,7 +211,7 @@ export function SSelect({
 			<div className="relative">
 				<select
 					className={cn(
-						"peer appearance-none custom-input",
+						"peer appearance-none custom-input cursor-pointer",
 						errors[name] && "custom-input-error"
 					)}
 					{...register(name, validateOptions)}
@@ -230,7 +248,7 @@ export function JumpingSelect({
 			<div className="relative">
 				<select
 					className={cn(
-						"peer appearance-none custom-input",
+						"peer appearance-none custom-input cursor-pointer",
 						errors[name] && "custom-input-error",
 						disabled && "pointer-events-none"
 					)}
@@ -255,7 +273,7 @@ export function JumpingSelect({
 					{label}
 				</span>
 
-				<div className="absolute top-1/2 right-0 -translate-x-1/2 -translate-y-1/2">
+				<div className="absolute top-1/2 right-0 -translate-x-1/2 -translate-y-1/2 pointer-events-none">
 					{icon}
 				</div>
 			</div>

@@ -34,7 +34,6 @@ import {
 import { userProfileOptions } from "@/config/userProfileOptions";
 import { usePopupStore } from "@/store/popupStore";
 import ModalCropImage from "@/components/ModalCropImage";
-import { min } from "date-fns";
 import { cn } from "@/lib/utils";
 
 const listFriends = [
@@ -363,10 +362,10 @@ export default function Profile() {
 												</AvatarFallback>
 											</Avatar>
 											{index + 1 ===
-												min([
+												Math.min(
 													maxPreviewFriendsAvatar.current,
-													listFriends.length,
-												]) && (
+													listFriends.length
+												) && (
 												<button
 													className="absolute top-0 size-full bg-black/50 grid place-content-center rounded-full hover:bg-black/60"
 													onClick={() => clickChangeTab(3)}
