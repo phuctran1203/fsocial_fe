@@ -49,7 +49,7 @@ export default function EditPostModal({ id, store }) {
 				<div className="flex space-x-2 px-4">
 					<Avatar className={`size-9`}>
 						<AvatarImage src={post.avatar} />
-						<AvatarFallback className="text-[12px]">
+						<AvatarFallback className="text-[11px] font-medium">
 							{combineIntoAvatarName(post.firstName, post.lastName)}
 						</AvatarFallback>
 					</Avatar>
