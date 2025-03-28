@@ -8,27 +8,47 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { combineIntoAvatarName } from "@/utils/combineName";
 import { SearchIcon } from "lucide-react";
+import {
+	messageNotFoundPost,
+	messageNotFoundUser,
+	messageReadAllPosts,
+} from "@/config/globalVariables";
 
 export default function Search() {
 	const [query, setQuery] = useState("");
-
 	const [tab, setTab] = useState("all");
-
 	const [users, setUsers] = useState(null);
-
-	const setPosts = useSearchPostsStore((state) => state.setPosts);
+	const { posts, setPosts, appendPosts, smartObserver, disconnectObserver } =
+		useSearchPostsStore();
 
 	const handleSendKeyword = async () => {
 		setSearchAction(true);
-		const [respUsers, respPosts] = await Promise.all([
-			searchUsers(query),
-			searchPosts(query),
-		]);
-		const dataUsers = respUsers.data;
-		const dataPosts = respPosts.data;
-		setUsers(dataUsers);
-		setPosts(dataPosts);
-		setSearchAction(false);
+		try {
+			const [respUsers, respPosts] = await Promise.all([
+				searchUsers(query),
+				searchPosts(query),
+			]);
+			setUsers(respUsers.data);
+			setPosts(respPosts.data);
+		} catch (error) {
+			console.log("Lỗi tìm kiếm: ", error);
+		} finally {
+			setSearchAction(false);
+		}
+	};
+
+	const fetchPosts = async (query) => {
+		const resp = await searchPosts(query);
+		if (!resp || resp.statusCode !== 200) return;
+		if (!posts) {
+			setPosts(resp.data);
+		} else {
+			if (posts.length !== 0 && resp.data.length === 0) {
+				setIsEndPosts(true);
+				return;
+			}
+			appendPosts(resp.data);
+		}
 	};
 
 	const timeout = useRef(null);
@@ -40,6 +60,17 @@ export default function Search() {
 		}, 800);
 		return () => clearTimeout(timeout.current);
 	}, [query]);
+
+	const [isEndPosts, setIsEndPosts] = useState(false);
+
+	// Infinite scroll fetch posts
+	const containerRef = useRef();
+
+	useEffect(() => {
+		const target = Array.from(containerRef.current.childNodes).at(-3);
+		if (target) smartObserver(target, () => fetchPosts(query));
+		return () => disconnectObserver();
+	}, [posts]);
 
 	return (
 		<div
@@ -112,9 +143,7 @@ export default function Search() {
 							))}
 
 						{users?.length === 0 && (
-							<p className="text-center text-gray">
-								Không tìm thấy người dùng nào
-							</p>
+							<p className="text-center text-gray">{messageNotFoundUser}</p>
 						)}
 
 						{users?.map((user) => (
@@ -148,13 +177,23 @@ export default function Search() {
 				)}
 
 				{(tab === "all" || tab === "posts") && (
-					<div className="sm:space-y-3 space-y-2">
+					<div ref={containerRef} className="sm:space-y-3 space-y-2">
 						<h5 className="font-medium lg:px-0 px-3">Bài viết liên quan</h5>
 						<RenderPosts
 							className="sm:rounded shadow-y"
 							store={useSearchPostsStore}
-							emptyMessage="Không tìm thấy bài viết nào"
 						/>
+
+						{posts?.length === 0 && (
+							<p className="my-4 text-center text-gray">
+								{messageNotFoundPost}
+							</p>
+						)}
+						{isEndPosts && (
+							<p className="pb-4 text-center text-gray">
+								{messageReadAllPosts}
+							</p>
+						)}
 					</div>
 				)}
 			</div>

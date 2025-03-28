@@ -25,6 +25,7 @@ import { Skeleton } from "./ui/skeleton";
 import { useNotificationsStore } from "@/store/notificationStore";
 import { regexInMessage, regexInSetting } from "@/config/regex";
 import { CheckCheck, EllipsisVertical } from "lucide-react";
+import { messageDontHaveNotification } from "@/config/globalVariables";
 
 const Noti = (props) => {
 	const { id, postId, type, firstName, lastName, read, textTime, avatar } =
@@ -279,7 +280,7 @@ export default function Notification() {
 							))}
 
 						{notifications?.length === 0 && (
-							<p className="p-4">Không có thông báo</p>
+							<p className="p-4">{messageDontHaveNotification}</p>
 						)}
 
 						{today.length > 0 && (

@@ -47,17 +47,19 @@ export default function Login() {
 		};
 
 		const result = await login(sending);
+		setSubmitClicked(false);
 
-		if (result.statusCode === 200) {
-			// save token and refresh token
-			setCookie("access-token", result.data.accessToken, 360 * 10); // 10 năm
-			setCookie("refresh-token", result.data.refreshToken, 360 * 10); // 10 năm
-			navigate("/home");
-		} else {
-			setLoginErr(result.message);
+		if (!result || result.statusCode !== 200) {
+			setLoginErr(
+				result?.message ||
+					"Có lỗi xảy ra trong quá trình login, FSocial sẽ sớm khắc phục"
+			);
 		}
 
-		setSubmitClicked(false);
+		// save token and refresh token
+		setCookie("access-token", result.data.accessToken, 360 * 10); // 10 năm
+		setCookie("refresh-token", result.data.refreshToken, 360 * 10); // 10 năm
+		navigate("/home");
 	};
 
 	const handleRemoveSavedAccount = () => {};
