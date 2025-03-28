@@ -58,8 +58,8 @@ export default function ModalCropImage({ image, ratio, acceptCropCallback }) {
 	};
 
 	return (
-		<div className="sm:w-[600px] w-[90vw] sm:h-fit p-2">
-			<div className="relative w-full aspect-[4/3] overflow-hidden">
+		<div className="sm:w-[600px] w-[90vw] sm:h-fit p-2 space-y-2">
+			<div className="relative w-full aspect-[4/3] overflow-hidden border">
 				<Cropper
 					image={image}
 					crop={crop}

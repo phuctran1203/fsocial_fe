@@ -243,8 +243,8 @@ export const TrashCanIcon = ({ className = "size-[24px]" }) => (
 	</svg>
 );
 
-export const XMarkIcon = ({ className }) => (
-	<X className={className} strokeWidth={2} />
+export const XMarkIcon = ({ className, ...props }) => (
+	<X className={className} strokeWidth={2} {...props} />
 );
 
 export const UploadDecorIcon = () => (

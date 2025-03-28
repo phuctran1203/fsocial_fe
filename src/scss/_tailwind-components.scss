@@ -15,6 +15,11 @@
     text-primary-text hover:bg-gray-3light focus-visible:ring-secondary active:bg-gray-2light;
 	}
 
+	.btn-outline {
+		@apply flex justify-center items-center w-full rounded outline-none transition focus-visible:ring-2 focus-visible:ring-offset-2
+		text-primary-text border border-outline hover:bg-gray-3light focus-visible:ring-outline active:bg-gray-2light;
+	}
+
 	.btn-ghost {
 		@apply flex justify-center items-center w-full rounded outline-none transition focus-visible:ring-2 focus-visible:ring-offset-2
     bg-primary-ghost text-primary hover:bg-primary hover:text-txtWhite;
@@ -37,7 +42,7 @@
 
 	// field custom không có label, không có store
 	.custom-input {
-		@apply md:p-3 p-3.5 md:pe-10 pe-10 w-full bg-transparent border outline-none rounded transition-all duration-100
+		@apply md:p-3 p-3.5 md:pe-10 pe-10 w-full bg-transparent border border-field outline-none rounded transition-all duration-100
 			 hover:border-hover focus:border-hover;
 		&.custom-input-error {
 			@apply border-red-500 hover:border-red-500 focus:border-red-500;
@@ -53,6 +58,26 @@
 			100% {
 				transform: translateX(0);
 			}
+		}
+	}
+
+	.border-bottom-faded {
+		position: relative;
+		&::before {
+			transition: all 0.2s;
+			content: "";
+			position: absolute;
+			bottom: -5px;
+			width: 100%;
+			border-bottom: 3px solid transparent;
+			border-image-slice: 1;
+			border-image-source: linear-gradient(
+				to right,
+				transparent 10%,
+				var(--primary-gradient-start),
+				var(--primary-gradient-end),
+				transparent 90%
+			);
 		}
 	}
 }

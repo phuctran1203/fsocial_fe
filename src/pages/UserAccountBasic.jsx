@@ -1,8 +1,12 @@
-import { Input, JumpingSelect, Select } from "@/components/Field";
+import { getAllCountries, getAllProvinces } from "@/api/countryApi";
+import { updateAvatar, updateBanner } from "@/api/updateProfileInfoApi";
+import { Input, JumpingSelect, Select, TextBox } from "@/components/Field";
 import { PencilChangeImageIcon } from "@/components/Icon";
 import ModalCropImage from "@/components/ModalCropImage";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
+	allCountries,
+	allProvinces,
 	dayOptions,
 	monthOptions,
 	yearOptions,
@@ -11,10 +15,12 @@ import { cn } from "@/lib/utils";
 import { ownerAccountStore } from "@/store/ownerAccountStore";
 import { usePopupStore } from "@/store/popupStore";
 import { combineIntoAvatarName } from "@/utils/combineName";
+import { getTextboxData } from "@/utils/processTextboxData";
 import { ChevronDown } from "lucide-react";
-import React, { useEffect, useRef } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { useForm } from "react-hook-form";
 import { useNavigate } from "react-router-dom";
+import { toast } from "sonner";
 
 export default function UserAccountBasic() {
 	const navigate = useNavigate();
@@ -28,11 +34,13 @@ export default function UserAccountBasic() {
 			const previewURL = URL.createObjectURL(file);
 			console.log("have file");
 			showPopup(
-				null,
+				"Cập nhật ảnh bìa",
 				<ModalCropImage
 					image={previewURL}
 					ratio={3 / 1}
-					acceptCropCallback={(imageCroped) => {
+					acceptCropCallback={async (imageCroped) => {
+						// const resp = await updateBanner();
+						toast.success("Đã cập nhật ảnh bìa");
 						setUser({ banner: imageCroped });
 						hidePopup();
 					}}
@@ -48,11 +56,13 @@ export default function UserAccountBasic() {
 			const previewURL = URL.createObjectURL(file);
 			console.log("have file");
 			showPopup(
-				null,
+				"Cập nhật ảnh đại diện",
 				<ModalCropImage
 					image={previewURL}
 					ratio={1 / 1}
-					acceptCropCallback={(imageCroped) => {
+					acceptCropCallback={async (imageCroped) => {
+						const resp = await updateAvatar();
+						toast.success("Đã cập nhật ảnh đại diện");
 						setUser({ avatar: imageCroped });
 						hidePopup();
 					}}
@@ -65,25 +75,54 @@ export default function UserAccountBasic() {
 	const {
 		register,
 		handleSubmit,
+		formState: { errors, isValid, isDirty, dirtyFields },
 		getValues,
-		formState: { errors },
-		reset, // Thêm reset để cập nhật defaultValues
+		setValue,
+		watch,
+		reset,
 	} = useForm({
 		mode: "onChange",
 		defaultValues: {},
 	});
 
+	// load data từ store lên UI
 	useEffect(() => {
-		reset({
-			bio: user.bio,
+		if (!user.userId) return;
+		const values = {
 			firstName: user.firstName,
 			lastName: user.lastName,
-			gender: user.gender,
+			country: "VN",
+			province: "VN-01",
+		};
+		reset({
+			bio: "",
+			...getValues(),
+			...values,
 		});
+		register("bio");
+		console.log(getValues());
 	}, [user]);
 
-	const onSubmit = (data) => {
+	const bioRef = useRef();
+
+	const handleOnInput = () => {
+		console.log("textbox change");
+		let innerHTML = getTextboxData(bioRef).innerHTML || "";
+		console.log("innerHTML is: ", innerHTML);
+		console.log("trước: ", getValues());
+		console.log(dirtyFields.bio);
+
+		setValue("bio", innerHTML, { shouldDirty: true });
+
+		console.log("sau: ", getValues());
+		console.log(dirtyFields.bio);
+	};
+
+	const onSubmit = async (data) => {
+		reset(getValues()); // gọi để cho isDirty, diryFields biết
 		console.log(data);
+		// const resp = await updatePersonalInfo();
+		toast.success("Đã cập nhật thông tin");
 	};
 
 	return (
@@ -91,7 +130,12 @@ export default function UserAccountBasic() {
 			{/* banner */}
 			<div className="mb-5 space-y-3">
 				<p className="font-medium">Ảnh bìa</p>
-				<div className="relative aspect-[3/1] overflow-hidden lg:rounded-lg border">
+				<div
+					className={cn(
+						"relative aspect-[3/1] overflow-hidden lg:rounded-lg border",
+						!user.banner && "border-field"
+					)}
+				>
 					{user.banner ? (
 						<img src={user.banner} alt="" />
 					) : (
@@ -139,12 +183,13 @@ export default function UserAccountBasic() {
 
 			<form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
 				{/* bio */}
-				<Input
+				<TextBox
 					label="Tiểu sử"
-					name="bio"
-					register={register}
-					errors={errors}
+					texboxRef={bioRef}
+					onInput={handleOnInput}
 					placeholder="Viết gì đó giới thiệu về bản thân"
+					className={cn("custom-input")}
+					parentClassName={dirtyFields.bio && "border-bottom-faded"}
 				/>
 				{/* name */}
 				<div className="grid grid-cols-2 gap-4">
@@ -154,6 +199,7 @@ export default function UserAccountBasic() {
 						register={register}
 						errors={errors}
 						validateOptions={{ required: "Tên không được để trống" }}
+						className={dirtyFields.firstName && "border-bottom-faded"}
 					/>
 
 					<Input
@@ -162,6 +208,7 @@ export default function UserAccountBasic() {
 						register={register}
 						errors={errors}
 						validateOptions={{ required: "Họ không được để trống" }}
+						className={dirtyFields.lastName && "border-bottom-faded"}
 					/>
 				</div>
 				{/* gender */}
@@ -177,6 +224,7 @@ export default function UserAccountBasic() {
 						3: "Không muốn tiết lộ",
 					}}
 					icon={<ChevronDown />}
+					className={dirtyFields.gender && "border-bottom-faded"}
 				/>
 				{/* birth */}
 				<div>
@@ -220,22 +268,26 @@ export default function UserAccountBasic() {
 							name="country"
 							register={register}
 							errors={errors}
-							options={{ empty: "Chọn quốc gia" }}
+							options={allCountries}
 							icon={<ChevronDown />}
+							className={dirtyFields.country && "border-bottom-faded"}
 						/>
 
 						<JumpingSelect
 							label="Tỉnh/thành phố"
-							name="city"
+							name="province"
 							register={register}
 							errors={errors}
-							options={{ empty: "Chọn thành phố" }}
+							options={allProvinces.VN}
 							icon={<ChevronDown />}
+							className={dirtyFields.province && "border-bottom-faded"}
 						/>
 					</div>
 				</div>
+				{/* button control hủy, cập nhật */}
 				<div className="grid grid-cols-2 gap-4">
 					<button
+						type="button"
 						className="btn-secondary py-2.5"
 						onClick={() => navigate("/profile")}
 					>
@@ -245,7 +297,7 @@ export default function UserAccountBasic() {
 					<button
 						className={cn(
 							"btn-primary py-2.5",
-							Object.keys(errors).length > 0 && "disable-btn"
+							(!isValid || !isDirty) && "disable-btn"
 						)}
 						type="submit"
 					>

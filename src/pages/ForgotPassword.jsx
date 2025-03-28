@@ -395,8 +395,8 @@ export default function ForgotPassword() {
 							mt-6 mb-10 relative w-10/12 mx-auto border-b-[1px] border-gray-light overflow-visible text-gray-light
 							before:absolute before:left-1/2 before:-translate-x-1/2 before:-translate-y-1/2 before:content-['Hoặc'] before:size-fit before:bg-background before:px-2"
 						/>
-						<Button className="btn-transparent border px-8 py-3" to="/login">
-							Quay lại đăng nhập
+						<Button className="btn-outline px-8 py-3 gap-1" to="/login">
+							<ArrowLeftIcon /> Quay lại đăng nhập
 						</Button>
 					</div>
 				</div>

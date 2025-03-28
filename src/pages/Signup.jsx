@@ -558,7 +558,7 @@ export default function Signup() {
 								before:absolute before:left-1/2 before:-translate-x-1/2 before:-translate-y-1/2 before:content-['Hoặc'] before:size-fit before:bg-background before:px-2"
 						/>
 						<div>
-							<Button className="btn-transparent border mb-5 gap-3 py-3">
+							<Button className="btn-outline mb-5 gap-3 py-3">
 								<img className="size-6" src="./decor/google_icon.svg" alt="" />
 								Đăng ký với Google
 							</Button>
