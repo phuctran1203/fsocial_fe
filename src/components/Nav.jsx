@@ -203,7 +203,7 @@ export default function Nav() {
 					</button>
 
 					<NavLink
-						to={`/profile?id=${user.userId}`}
+						to={`/profile`}
 						className={styles.navBaseStyle}
 						onClick={closeNotification}
 					>

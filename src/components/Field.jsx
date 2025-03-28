@@ -11,10 +11,15 @@ export function Input({
 	icon,
 	disabled = false,
 	type = "text",
+	className,
 }) {
 	return (
 		<label
-			className={cn("block", disabled && "pointer-events-none opacity-65")}
+			className={cn(
+				"block",
+				disabled && "pointer-events-none opacity-65",
+				className
+			)}
 		>
 			<span className="block mb-2 font-medium">{label}</span>
 			<div className="relative">
@@ -23,7 +28,7 @@ export function Input({
 					placeholder={placeholder}
 					className={cn(
 						"custom-input",
-						errors[name] && "custom-input-error",
+						errors && errors[name] && "custom-input-error",
 						disabled && "pointer-events-none"
 					)}
 					tabIndex={disabled ? -1 : 0}
@@ -32,7 +37,7 @@ export function Input({
 				<div
 					className={cn(
 						"absolute top-1/2 right-0 -translate-x-1/2 -translate-y-1/2",
-						errors[name]
+						errors && errors[name]
 							? "text-red-500"
 							: "text-gray peer-hover:text-primary-text peer-focus:text-primary-text"
 					)}
@@ -40,7 +45,9 @@ export function Input({
 					{icon}
 				</div>
 			</div>
-			{errors[name] && <p className="text-red-500">{errors[name].message}</p>}
+			{errors && errors[name] && (
+				<p className="text-red-500">{errors[name].message}</p>
+			)}
 		</label>
 	);
 }
@@ -66,7 +73,7 @@ export function JumpingInput({
 					placeholder=""
 					className={cn(
 						"peer custom-input",
-						errors[name] && "custom-input-error",
+						errors && errors[name] && "custom-input-error",
 						disabled && "pointer-events-none"
 					)}
 					tabIndex={disabled ? -1 : 0}
@@ -77,7 +84,7 @@ export function JumpingInput({
 					className={cn(
 						`fs-sm text-gray absolute bg-background rounded-sm px-1.5 top-0 left-2 -translate-y-1/2 pointer-events-none
 						peer-placeholder-shown:top-1/2 peer-hover:top-0 peer-focus:top-0 transition`,
-						errors[name]
+						errors && errors[name]
 							? "text-red-500"
 							: "text-gray peer-hover:text-primary-text peer-focus:text-primary-text"
 					)}
@@ -88,7 +95,7 @@ export function JumpingInput({
 				<div
 					className={cn(
 						"absolute top-1/2 right-0 -translate-x-1/2 -translate-y-1/2",
-						errors[name]
+						errors && errors[name]
 							? "text-red-500"
 							: "text-gray peer-hover:text-primary-text peer-focus:text-primary-text"
 					)}
@@ -97,7 +104,9 @@ export function JumpingInput({
 				</div>
 			</div>
 
-			{errors[name] && <p className="text-red-500">{errors[name].message}</p>}
+			{errors && errors[name] && (
+				<p className="text-red-500">{errors[name].message}</p>
+			)}
 		</div>
 	);
 }
@@ -111,17 +120,22 @@ export function Select({
 	options = { key1: "sample1", key2: "sample2" },
 	icon,
 	disabled = false,
+	className,
 }) {
 	return (
 		<label
-			className={cn("block", disabled && "pointer-events-none opacity-65")}
+			className={cn(
+				"block",
+				disabled && "pointer-events-none opacity-65",
+				className
+			)}
 		>
 			<span className="block mb-2 font-medium">{label}</span>
 			<div className="relative">
 				<select
 					className={cn(
 						"peer appearance-none custom-input cursor-pointer",
-						errors[name] && "custom-input-error"
+						errors && errors[name] && "custom-input-error"
 					)}
 					{...register(name, validateOptions)}
 				>
@@ -137,7 +151,9 @@ export function Select({
 					{icon}
 				</div>
 			</div>
-			{errors[name] && <p className="text-red-500">{errors[name].message}</p>}
+			{errors && errors[name] && (
+				<p className="text-red-500">{errors[name].message}</p>
+			)}
 		</label>
 	);
 }
@@ -151,14 +167,17 @@ export function JumpingSelect({
 	options = { key1: "sample1", key2: "sample2" },
 	icon,
 	disabled = false,
+	className,
 }) {
 	return (
-		<div className={cn(disabled && "pointer-events-none opacity-65")}>
+		<div
+			className={cn(disabled && "pointer-events-none opacity-65", className)}
+		>
 			<div className="relative">
 				<select
 					className={cn(
 						"peer appearance-none custom-input cursor-pointer",
-						errors[name] && "custom-input-error",
+						errors && errors[name] && "custom-input-error",
 						disabled && "pointer-events-none"
 					)}
 					tabIndex={disabled ? -1 : 0}
@@ -176,7 +195,7 @@ export function JumpingSelect({
 				<span
 					className={cn(
 						`fs-sm text-gray absolute bg-background rounded-sm px-1.5 top-0 left-2 -translate-y-1/2 transition`,
-						errors[name]
+						errors && errors[name]
 							? "text-red-500"
 							: "peer-hover:text-primary-text peer-focus:text-primary-text"
 					)}
@@ -189,23 +208,29 @@ export function JumpingSelect({
 				</div>
 			</div>
 
-			{errors[name] && <p className="text-red-500">{errors[name].message}</p>}
+			{errors && errors[name] && (
+				<p className="text-red-500">{errors[name].message}</p>
+			)}
 		</div>
 	);
 }
 
 export function TextBox({
 	texboxRef,
+	label,
 	placeholder,
 	innerHTML,
 	contentEditable = true,
 	onKeyDown = () => {},
+	onInput = () => {},
 	autoFocus = false,
 	trigger = false,
 	className,
+	parentClassName,
 }) {
-	const onInput = (e) => {
+	const onAutoInput = (e) => {
 		if (e.target.innerHTML == "<br>") e.target.innerHTML = "";
+		onInput();
 	};
 
 	useEffect(() => {
@@ -217,7 +242,7 @@ export function TextBox({
 				const selection = window.getSelection();
 
 				if (texboxRef.current.lastChild) {
-					range.setStartAfter(texboxRef.current.lastChild); // Đặt con trỏ sau thẻ <a>
+					range.setStartAfter(texboxRef.current.lastChild);
 					range.collapse(true); // true => con trỏ sẽ đặt sau phần tử cuối
 					selection.removeAllRanges();
 					selection.addRange(range);
@@ -227,18 +252,21 @@ export function TextBox({
 	}, [trigger]);
 
 	return (
-		<div
-			ref={texboxRef}
-			className={cn(
-				`text-base relative w-full outline-none overflow-auto scroll-pb-2
-				before:absolute before:ps-0.5 empty:before:content-[attr(data-placeholder)] before:text-gray before:pointer-events-none transition`,
-				className
-			)}
-			contentEditable={contentEditable}
-			data-placeholder={placeholder}
-			onKeyDown={onKeyDown}
-			onInput={onInput}
-			dangerouslySetInnerHTML={{ __html: innerHTML }}
-		></div>
+		<div className={cn("w-full", parentClassName)}>
+			{label && <span className="block mb-2 font-medium">{label}</span>}
+			<div
+				ref={texboxRef}
+				className={cn(
+					`text-base relative w-full outline-none overflow-auto scroll-pb-2
+					before:absolute before:ps-0.5 empty:before:content-[attr(data-placeholder)] before:text-gray before:pointer-events-none transition`,
+					className
+				)}
+				contentEditable={contentEditable}
+				data-placeholder={placeholder}
+				onKeyDown={onKeyDown}
+				onInput={onAutoInput}
+				dangerouslySetInnerHTML={{ __html: innerHTML }}
+			></div>
+		</div>
 	);
 }

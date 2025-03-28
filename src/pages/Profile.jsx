@@ -95,7 +95,7 @@ export default function Profile() {
 			const previewURL = URL.createObjectURL(file);
 			console.log("have file");
 			showPopup(
-				null,
+				"Cập nhật ảnh bìa",
 				<ModalCropImage
 					image={previewURL}
 					ratio={3 / 1}
@@ -115,7 +115,7 @@ export default function Profile() {
 			const previewURL = URL.createObjectURL(file);
 			console.log("have file");
 			showPopup(
-				null,
+				"Cập nhật ảnh đại diện",
 				<ModalCropImage
 					image={previewURL}
 					ratio={1 / 1}
@@ -278,7 +278,12 @@ export default function Profile() {
 		<div className="flex-grow bg-background transition overflow-auto scrollable-div">
 			<div className="lg:max-w-[630px] mx-auto">
 				{/* banner */}
-				<div className="relative sm:mt-5 mt-2 aspect-[3/1] overflow-hidden lg:rounded-lg border">
+				<div
+					className={cn(
+						"relative sm:mt-5 mt-2 aspect-[3/1] overflow-hidden lg:rounded-lg border",
+						!accountInfo.banner && "border-field"
+					)}
+				>
 					{accountInfo.banner ? (
 						<img
 							src={accountInfo.banner}

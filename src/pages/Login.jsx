@@ -148,7 +148,7 @@ export default function Login() {
 					<div className="border-t border-gray-light flex-grow"></div>
 				</div>
 				<div className="mb-4">
-					<Button className="btn-transparent border mb-5 gap-3 py-3">
+					<Button className="btn-outline mb-5 gap-3 py-3">
 						<img className="size-6" src="./decor/google_icon.svg" alt="" />
 						Đăng nhập với Google
 					</Button>
@@ -181,7 +181,7 @@ export default function Login() {
 					{list.map((user, index) => (
 						<div
 							key={index}
-							className="group relative max-w-52 border rounded cursor-pointer overflow-hidden"
+							className="group relative max-w-52 border border-field rounded cursor-pointer overflow-hidden"
 						>
 							<div className="aspect-square border-b">
 								<img
@@ -194,16 +194,16 @@ export default function Login() {
 							<p className="text-center py-2.5 font-semibold">{user.name}</p>
 
 							<Button
-								className="absolute right-1 top-1 btn-secondary border !size-7 sm:opacity-0 group-hover:opacity-100 !rounded-full transition"
+								className="absolute right-1 top-1 btn-secondary border border-field size-7 sm:opacity-0 group-hover:opacity-100 rounded-full transition"
 								onClick={handleRemoveSavedAccount}
 							>
-								<XMarkIcon />
+								<XMarkIcon className="size-5" strokeWidth={3} />
 							</Button>
 						</div>
 					))}
 
-					<div className="overflow-hidden max-w-52 border rounded cursor-pointer">
-						<div className=" aspect-square grid place-content-center border-b">
+					<div className="overflow-hidden max-w-52 border border-field rounded cursor-pointer">
+						<div className=" aspect-square grid place-content-center border-b border-field">
 							<div className="bg-primary-gradient lg:size-12 size-10 rounded-full">
 								<svg fill="none" viewBox="0 0 24 24">
 									<path

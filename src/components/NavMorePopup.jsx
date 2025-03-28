@@ -6,16 +6,19 @@ import {
 } from "@/components/ui/popover";
 import { LogoutIcon, KeyIcon, SwitchIcon } from "./Icon";
 import styles from "./Nav.module.scss";
-import { useNavigate } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { deleteCookie } from "@/utils/cookie";
 import { themeStore } from "@/store/themeStore";
 import { usePopupStore } from "@/store/popupStore";
 import ChangePasswordModal from "./ChangePasswordModal";
 import { ownerAccountStore } from "@/store/ownerAccountStore";
-import { Check, Moon, SunMedium } from "lucide-react";
+import { Check, Moon, SettingsIcon, SunMedium } from "lucide-react";
+import { regexInSetting } from "@/config/regex";
 
 export default function NavMorePopup({ inMobile, setPopoverOpen }) {
 	const { theme, setTheme } = themeStore();
+	const location = useLocation();
+	const isInSetting = regexInSetting.test(location.pathname);
 
 	const handleSetMode = (modePicked) => {
 		setTheme(modePicked);
@@ -43,6 +46,15 @@ export default function NavMorePopup({ inMobile, setPopoverOpen }) {
 
 	return (
 		<>
+			<Link
+				className={styles.navMore}
+				to={!isInSetting && "/setting"}
+				onClick={() => setPopoverOpen(false)}
+			>
+				<SettingsIcon className="size-[26px]" strokeWidth={1.6} />
+				<span>Cài đặt</span>
+			</Link>
+
 			<Popover onOpenChange={setSwitchThemeOpen}>
 				<PopoverTrigger
 					className={`group ${styles.navMore} ${

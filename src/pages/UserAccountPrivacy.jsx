@@ -22,7 +22,7 @@ export default function UserAccountPrivacy() {
 		<div className="space-y-5 pt-7">
 			<div>
 				<p className="mb-3 font-medium">Tài khoản riêng tư</p>
-				<div className="border rounded-3xl py-5 px-6 flex items-center justify-between sm:gap-32 gap-2">
+				<div className="border border-field rounded-3xl py-5 px-6 flex items-center justify-between sm:gap-32 gap-2">
 					<p>
 						Khi bật riêng tư, chỉ những người theo dõi bạn mới có thể nhìn thấy
 						bài đăng, hình ảnh, video,... của bạn.
@@ -38,7 +38,7 @@ export default function UserAccountPrivacy() {
 			<div>
 				<p className="mb-3 font-medium">Bài đăng đã tương tác</p>
 
-				<div className="border rounded-3xl py-5 px-6 flex items-center justify-between sm:gap-32 gap-2">
+				<div className="border border-field rounded-3xl py-5 px-6 flex items-center justify-between sm:gap-32 gap-2">
 					<p>
 						Cho phép người khác xem bài viết mà bạn đã tương tác khi xem trang
 						cá nhân của bạn.

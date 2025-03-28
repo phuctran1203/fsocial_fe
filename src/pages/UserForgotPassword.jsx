@@ -164,7 +164,7 @@ export default function UserForgotPassword() {
 		<div className="flex-grow flex justify-center items-center bg-background">
 			<div
 				ref={formContainer}
-				className={`w-[450px] md:py-8 py-5 overflow-hidden md:border rounded`}
+				className={`w-[450px] md:py-8 py-5 overflow-hidden md:border rounded shadow-md`}
 			>
 				<div
 					ref={stepsWrapper}
