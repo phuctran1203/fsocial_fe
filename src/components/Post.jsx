@@ -101,7 +101,7 @@ export default function Post({
 					<Link to={`/profile?id=${post.userId}`}>
 						<Avatar className={cn("size-9", isShared && "size-8")}>
 							<AvatarImage src={post.avatar} />
-							<AvatarFallback className="text-[11px] transition">
+							<AvatarFallback className="text-[11px] font-medium transition">
 								{combineIntoAvatarName(post.firstName, post.lastName)}
 							</AvatarFallback>
 						</Avatar>

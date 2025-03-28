@@ -358,7 +358,7 @@ export default function Profile() {
 												className={`size-7 ring-[2px] ring-background transition`}
 											>
 												<AvatarImage src={friend.avatar} />
-												<AvatarFallback>
+												<AvatarFallback className="text-[11px] font-medium">
 													{combineIntoAvatarName(
 														friend.firstName,
 														friend.lastName

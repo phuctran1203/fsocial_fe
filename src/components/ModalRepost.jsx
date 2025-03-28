@@ -71,11 +71,11 @@ export default function ModalRepost({ id, store }) {
 
 	return (
 		<div className="relative flex-grow flex flex-col sm:w-[550px] w-screen sm:h-fit sm:max-h-[90dvh] h-[100dvh]">
-			<div className="flex-grow space-y-2 overflow-y-auto scrollable-div">
+			<div className="mt-3 flex-grow space-y-2 overflow-y-auto scrollable-div">
 				<div className="flex items-center space-x-2 px-4">
 					<Avatar className={`size-9 grid`}>
 						<AvatarImage src={user.avatar} />
-						<AvatarFallback className="text-[11px]">
+						<AvatarFallback className="text-[11px] font-medium">
 							{combineIntoAvatarName(user.firstName, user.lastName)}
 						</AvatarFallback>
 					</Avatar>
