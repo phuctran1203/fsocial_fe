@@ -1,3 +1,10 @@
+export const messageReadAllPosts = "Bạn đã xem hết bài đăng";
+export const messageDontHavePost =
+	"Hãy theo dõi những người khác để xem những bài viết mới nhé";
+export const messageNotFoundUser = "Không tìm thấy người dùng";
+export const messageNotFoundPost = "Không tìm thấy bài viết";
+export const messageDontHaveNotification = "Không có thông báo";
+
 export const dayOptions = Array.from(
 	{ length: 31 },
 	(_, index) => index + 1

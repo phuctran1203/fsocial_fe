@@ -50,11 +50,8 @@ API.interceptors.response.use(
 		if (error.response?.status === 401) {
 			console.log("Token hết hạn, làm mới token...");
 			const resp = await refreshToken();
-			// đoạn này không bắt statusCode, ko check resp nữa
-			// vì refreshToken sẽ gọi lại API axiosInstance này,
-			// nếu response của refreshToken có lỗi
-			// thì sẽ bị axiosInstance này tóm từ bên trên -> "if (path === "/account/refresh-token"){}"
-			// nếu không bị tóm thì sẽ chạy được xuống dưới này
+			if (!resp || resp.statusCode !== 200) return Promise.reject(error);
+
 			console.log("Làm mới token thành công, thử gửi lại request...");
 			error.config.headers["Authorization"] = `Bearer ${resp.data.accessToken}`;
 			return API(error.config);

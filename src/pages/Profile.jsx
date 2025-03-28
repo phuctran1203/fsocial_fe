@@ -1,14 +1,7 @@
 import { ownerAccountStore } from "@/store/ownerAccountStore";
 import React, { useEffect, useRef, useState } from "react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import {
-	FollowerProfileTabIcon,
-	PencilChangeImageIcon,
-	PictureProfileTabIcon,
-	PostProfileTabIcon,
-	ReactedProfileTabIcon,
-	VideoProfileTabIcon,
-} from "@/components/Icon";
+import { PencilChangeImageIcon } from "@/components/Icon";
 import Button from "@/components/Button";
 import { useLocation } from "react-router-dom";
 import { useProfilePostsStore } from "@/store/postsStore";
@@ -34,55 +27,15 @@ import { usePopupStore } from "@/store/popupStore";
 import ModalCropImage from "@/components/ModalCropImage";
 import { cn } from "@/lib/utils";
 import { Ellipsis } from "lucide-react";
+import { messageReadAllPosts } from "@/config/globalVariables";
+import { listTabs } from "@/config/userProfileTabs";
+import { listFriends } from "@/data/fakeDataFriends";
 
-const listFriends = [
-	{
-		firstName: "Thịnh",
-		lastName: "Phúc",
-		avatar: "./temp/user_2.png",
-	},
-	{ firstName: "Nam", lastName: "Phương", avatar: "./temp/user_3.png" },
-	{ firstName: "Khải", lastName: "Đức", avatar: "./temp/user_4.png" },
-	{ firstName: "Đạt", lastName: "Tấn", avatar: "./temp/user_5.png" },
-	{ firstName: "Cang", lastName: "Tấn", avatar: "./temp/user_6.png" },
-	{
-		firstName: "Nguyễn",
-		lastName: "Minh",
-		avatar: "./temp/user_7.jpg",
-	},
-	{ firstName: "Tiến", lastName: "Tiến", avatar: "./temp/user_8.jpg" },
-	// { firstName: "Hồng", displayName: "Hồng Hài Nhi", avatar: "./temp/user_9.jpg" },
-];
-
-const listTabs = [
-	{
-		label: "Bài đăng",
-		icon: <PostProfileTabIcon />,
-	},
-	{
-		label: "Hình ảnh",
-		icon: <PictureProfileTabIcon />,
-	},
-	{
-		label: "Video",
-		icon: <VideoProfileTabIcon />,
-	},
-	{
-		label: "Người theo dõi",
-		icon: <FollowerProfileTabIcon />,
-	},
-	{
-		label: "Đã tương tác",
-		icon: <ReactedProfileTabIcon />,
-	},
-];
 export default function Profile() {
 	const location = useLocation();
 	const queryParams = new URLSearchParams(location.search);
 	const { user, setUser } = ownerAccountStore();
-
 	const [accountInfo, setAccountInfo] = useState({});
-
 	const maxPreviewFriendsAvatar = useRef(7);
 
 	// handle change banner, avatar
@@ -128,22 +81,56 @@ export default function Profile() {
 		}
 	};
 
-	// handle show tab
+	// handle click follow, hủy follow
+	const handleRequestFollow = () => {
+		requestFollow(queryParams.get("id"));
+		console.log("current account is: ", accountInfo);
+		setAccountInfo({ ...accountInfo, relationship: true });
+	};
+
+	const handleUnfollow = () => {
+		unfollow(queryParams.get("id"));
+		console.log("current account is: ", accountInfo);
+		setAccountInfo({ ...accountInfo, relationship: false });
+	};
+
+	// handle các tab
 	const containerTabsRef = useRef(null);
 	const wrapperTabsRef = useRef(null);
 	const [currentTab, setCurrentTab] = useState(null);
 
-	const setPosts = useProfilePostsStore((state) => state.setPosts);
+	// handle post user
+	const {
+		posts: postsUser,
+		setPosts: setPostsUser,
+		appendPosts: appendPostsUser,
+		smartObserver: smartObserverPostsUser,
+		disconnectObserver: disconnectObserverPostsUser,
+	} = useProfilePostsStore();
+	const [isEndUserPosts, setIsEndUserPosts] = useState(false);
 
-	const showPosts = async () => {
-		const resp = await getPosts(user.userId);
-		setPosts(resp?.statusCode === 200 ? resp.data : null);
+	const showPosts = () => {
+		fetchPostsUser();
 	};
 
+	const fetchPostsUser = async () => {
+		const resp = await getPosts(user.userId);
+		if (!resp || resp.statusCode !== 200) return;
+		if (!postsUser) {
+			setPostsUser(resp.data);
+		} else {
+			if (postsUser.length !== 0 && resp.data.length === 0) {
+				setIsEndUserPosts(true);
+				return;
+			}
+			appendPostsUser(resp.data);
+		}
+	};
+	// handle tab hình ảnh
 	const showPictures = async () => {};
-
+	// handle tab video
 	const showVideos = async () => {};
-
+	// handle tab những ai đang theo dõi user
 	const [followers, setFollowers] = useState(null);
 
 	const showFollowers = async () => {
@@ -152,8 +139,12 @@ export default function Profile() {
 		if (!resp || resp.statusCode !== 200) return;
 		setFollowers(resp.data);
 	};
+	// handle tab bài viết user đã tương tác
+	const showPostsReacted = async () => {
+		fetchPostsReacted();
+	};
 
-	const showPostsReacted = async () => {};
+	const fetchPostsReacted = () => {};
 
 	useEffect(() => {
 		switch (currentTab) {
@@ -191,7 +182,7 @@ export default function Profile() {
 	const [touched, setTouched] = useState(false);
 	const startDragPos = useRef(0);
 	const scrollLeftStart = useRef(0);
-	const speedFactor = 2; // Tăng tốc cuộn lên 1.8 lần
+	const speedFactor = 2; // Tăng tốc cuộn lên 2 lần
 
 	const ignoreIntersec = useRef(false);
 
@@ -262,17 +253,14 @@ export default function Profile() {
 		return () => observer.disconnect();
 	}, [currentTab, wrapperTabsRef.current]);
 
-	const handleRequestFollow = () => {
-		requestFollow(queryParams.get("id"));
-		console.log("current account is: ", accountInfo);
-		setAccountInfo({ ...accountInfo, relationship: true });
-	};
+	// Infinite scroll fetch posts
+	const containerUserPostsRef = useRef();
 
-	const handleUnfollow = () => {
-		unfollow(queryParams.get("id"));
-		console.log("current account is: ", accountInfo);
-		setAccountInfo({ ...accountInfo, relationship: false });
-	};
+	useEffect(() => {
+		const target = Array.from(containerUserPostsRef.current.childNodes).at(-3);
+		if (target) smartObserverPostsUser(target, fetchPostsUser);
+		return () => disconnectObserverPostsUser();
+	}, [postsUser]);
 
 	return (
 		<div className="flex-grow bg-background transition overflow-auto scrollable-div">
@@ -440,7 +428,7 @@ export default function Profile() {
 									}`}
 									onClick={() => clickChangeTab(index)}
 								>
-									{tab.icon}{" "}
+									{tab.icon}
 									<span className="sm:inline hidden"> {tab.label}</span>
 								</button>
 							))}
@@ -464,11 +452,19 @@ export default function Profile() {
 								)}
 							>
 								{/* owner posts */}
-								<div className="pt-0.5 snap-start mx-auto md:space-y-4 space-y-1.5 md:pb-0 overflow-y-auto w-full max-h-full scrollable-div">
+								<div
+									ref={containerUserPostsRef}
+									className="pt-0.5 snap-start mx-auto md:space-y-4 space-y-1.5 md:pb-0 overflow-y-auto w-full max-h-full scrollable-div"
+								>
 									<RenderPosts
 										className="sm:rounded shadow-y border-x"
 										store={useProfilePostsStore}
 									/>
+									{isEndUserPosts && (
+										<p className="pb-4 text-center text-gray">
+											{messageReadAllPosts}
+										</p>
+									)}
 								</div>
 								{/* owner pictures */}
 								<div className="snap-start grid grid-cols-3 gap-[1px] h-fit overflow-y-auto w-full max-h-full scrollable-div">

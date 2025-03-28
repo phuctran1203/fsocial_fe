@@ -1,5 +1,9 @@
 import { getPost } from "@/api/postsApi";
 import RenderPosts from "@/components/RenderPosts";
+import {
+	messageDontHavePost,
+	messageNotFoundPost,
+} from "@/config/globalVariables";
 import { ownerAccountStore } from "@/store/ownerAccountStore";
 import { useSinglePostStore } from "@/store/postsStore";
 import React, { useEffect } from "react";
@@ -10,11 +14,13 @@ export default function SinglePost() {
 	const queryParams = new URLSearchParams(location.search);
 	const postId = queryParams.get("id");
 	const user = ownerAccountStore((state) => state.user);
-	const setPosts = useSinglePostStore.getState().setPosts;
+	const { posts, setPosts } = useSinglePostStore();
 
 	const handleGetPost = async () => {
 		const resp = await getPost(user.userId, postId);
-		if (!resp || resp.statusCode !== 200) return;
+		if (!resp || resp.statusCode !== 200) {
+			setPosts([]);
+		}
 		setPosts([resp.data]);
 	};
 	useEffect(() => {
@@ -35,6 +41,9 @@ export default function SinglePost() {
 						className="sm:rounded shadow-y"
 						store={useSinglePostStore}
 					/>
+					{posts?.length === 0 && (
+						<p className="my-4 text-center text-gray">{messageNotFoundPost}</p>
+					)}
 				</div>
 			</div>
 		</div>

@@ -10,8 +10,8 @@ import {
 	combineIntoAvatarName,
 	combineIntoDisplayName,
 } from "@/utils/combineName";
-import { ArrowLeftIcon, Ellipsis, Send, Smile } from "lucide-react";
-import { SmileIcon } from "./Icon";
+import { ArrowLeftIcon, Ellipsis, Send } from "lucide-react";
+import { ImageIcon, SmileIcon, XMarkIcon } from "./Icon";
 import { Popover, PopoverContent, PopoverTrigger } from "./ui/popover";
 import EmojiPicker from "emoji-picker-react";
 import { TextBox } from "./Field";
@@ -168,6 +168,22 @@ export default function MessageListMessages({
 	const handleEmojiClick = (emojiObject) => {
 		textbox.current.innerHTML += emojiObject.emoji;
 	};
+
+	// Handle chọn gửi ảnh
+	const [image, setImage] = useState(null);
+	const onFileChanged = (e) => {
+		const el = e.target;
+		const file = el.files[0];
+		if (!file) return;
+		console.log("có file");
+		const imageURL = URL.createObjectURL(file);
+		setImage(imageURL);
+		el.value = "";
+	};
+	const removeImage = () => {
+		setImage(null);
+	};
+
 	// handle căn chỉnh chiều cao khi bàn phím ảo mở lên trên mobile
 	const [realHeight, setRealHeight] = useState(window.visualViewport.height);
 
@@ -299,6 +315,21 @@ export default function MessageListMessages({
 
 			{/* Thanh nhập tin nhắn */}
 			<div className="relative bg-background flex items-end sm:mx-6 m-4 border-2 rounded-3xl px-2 hover:border-gray-light">
+				{/* previewImages */}
+				{image && (
+					<div className="absolute bottom-full left-10 mb-3 h-60 bg-background border rounded-lg p-3">
+						<div className="relative h-full">
+							<img src={image} alt="" className="h-full" />
+							<button
+								className="btn-secondary absolute size-6 border right-0 top-0 translate-x-1/4 -translate-y-1/4"
+								onClick={removeImage}
+							>
+								<XMarkIcon className="size-4" strokeWidth={2.5} />
+							</button>
+						</div>
+					</div>
+				)}
+
 				<Popover>
 					<PopoverTrigger className="h-10">
 						<SmileIcon className="size-[22px]" />
@@ -320,14 +351,26 @@ export default function MessageListMessages({
 					</PopoverTrigger>
 				</Popover>
 
+				<label className="h-10 px-1 place-content-center cursor-pointer">
+					{/* how? lạ nhể, ko cóa layout mà vẫn place center được =)) ? */}
+					<ImageIcon className="size-[21px]" />
+					<input
+						type="file"
+						hidden
+						accept=".png, .jpg, .jpeg"
+						onChange={onFileChanged}
+					/>
+				</label>
+
 				<TextBox
 					texboxRef={textbox}
 					placeholder="Soạn tin nhắn"
-					className="py-2 max-h-[160px] px-3 scrollable-div"
+					className="py-2 max-h-[160px] px-2 scrollable-div"
 					onKeyDown={textBoxOnKeyDown}
 					autoFocus={true}
 					trigger={trigger}
 				/>
+
 				<button
 					onClick={handleSendMessage}
 					className="grid place-content-center h-10 pe-1"
