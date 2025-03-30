@@ -78,7 +78,7 @@ function RenderComment({ ...props }) {
 					{/* time, like, reply button */}
 					<div className="flex items-center gap-2 text-gray">
 						<span className="text-gray fs-sm">
-							{dateTimeToNotiTime(comment.created_datetime).textTime}
+							{dateTimeToNotiTime(comment.createDatetime).textTime}
 						</span>
 
 						<button

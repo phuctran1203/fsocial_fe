@@ -62,7 +62,7 @@ export function dateTimeToPostTime(time) {
 	const yesterday = new Date();
 	yesterday.setDate(yesterday.getDate() - 1);
 	if (previousTime.toDateString() === yesterday.toDateString()) {
-		return `${previousTime.getHours()}:${addPadStart(
+		return `${addPadStart(previousTime.getHours())}:${addPadStart(
 			previousTime.getMinutes()
 		)} hôm qua`;
 	}

@@ -3,51 +3,59 @@ import { Outlet } from "react-router-dom";
 import Nav from "../components/Nav";
 import Notification from "../components/Notification";
 import Header from "../components/Header";
-import { Toaster } from "sonner";
+import { toast, Toaster } from "sonner";
 import { getOwnerProfile } from "@/api/profileApi";
 import { ownerAccountStore } from "@/store/ownerAccountStore";
 import Popup from "@/components/Popup";
 import { getCookie } from "@/utils/cookie";
 import { jwtDecode } from "jwt-decode";
-import { useNotificationSocket } from "@/hooks/webSocket";
 import useMessageStore from "@/store/messageStore";
+import { useValidRefreshTokenStore } from "@/store/validRefreshTokenStore";
+import ExpiredDialog from "@/components/ExpiredDialog";
+import useNotificationsStore from "@/store/notificationStore";
+import cleanupStore from "@/utils/cleanupStore";
 
 export default function UserLayout() {
-	const { user, setUser } = ownerAccountStore();
-
-	const { subscribeNotification } = useNotificationSocket();
-	const { stompClient, connectWebSocket, subscribeMessageGlobal } =
-		useMessageStore();
+	const { setUser } = ownerAccountStore();
+	const { refreshToken } = useValidRefreshTokenStore();
+	const { connectNotificationWebSocket, cleanNotificationWebSocket } =
+		useNotificationsStore();
+	const { connectMessageWebSocket, cleanMessageWebSocket } = useMessageStore();
 
 	const getUserDetail = async () => {
 		const resp = await getOwnerProfile();
 		if (!resp) return;
 		const accessToken = getCookie("access-token");
+		if (!accessToken) {
+			console.log("User layout: không có accessToken trong cookie");
+			return;
+		}
 		let userId = jwtDecode(accessToken).sub;
 		setUser({ userId, ...resp.data });
-		subscribeNotification(userId);
-		connectWebSocket();
+		connectNotificationWebSocket(userId);
+		connectMessageWebSocket(userId);
 	};
 
 	useEffect(() => {
-		if (!user?.userId) {
-			getUserDetail();
-		} else if (stompClient) {
-			subscribeMessageGlobal(user.userId);
-		}
-	}, [stompClient]);
+		getUserDetail();
+		return () => {
+			cleanupStore();
+		};
+	}, []);
 
 	return (
 		<>
 			{/* nav top appear in mobile */}
-			<main className="sm:flex relative h-[100dvh]">
-				<Header />
-				<Nav />
-				<Outlet />
-				<Notification />
-			</main>
-			<Popup />
-			<Toaster position="top-center" />
+			<>
+				<main className="sm:flex relative h-[100dvh]">
+					<Header />
+					<Nav />
+					{refreshToken ? <Outlet /> : <ExpiredDialog />}
+					<Notification />
+				</main>
+				<Popup />
+				<Toaster position="top-center" />
+			</>
 		</>
 	);
 }

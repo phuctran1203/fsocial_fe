@@ -338,8 +338,8 @@ export default function Profile() {
 							</h3>
 							<p>{accountInfo.followers?.length} người theo dõi</p>
 							<div className="mt-1 flex -space-x-2">
-								{listFriends
-									.slice(0, maxPreviewFriendsAvatar.current)
+								{accountInfo.followers
+									?.slice(0, maxPreviewFriendsAvatar.current)
 									.map((friend, index) => (
 										<div key={index} className="relative">
 											<Avatar
@@ -356,7 +356,7 @@ export default function Profile() {
 											{index + 1 ===
 												Math.min(
 													maxPreviewFriendsAvatar.current,
-													listFriends.length
+													accountInfo.followers.length
 												) && (
 												<button
 													className="absolute top-0 size-full bg-black/50 grid place-content-center rounded-full hover:bg-black/60"
