@@ -22,7 +22,7 @@ import {
 	combineIntoDisplayName,
 } from "@/utils/combineName";
 import { Skeleton } from "./ui/skeleton";
-import { useNotificationsStore } from "@/store/notificationStore";
+import useNotificationsStore from "@/store/notificationStore";
 import { regexInMessage, regexInSetting } from "@/config/regex";
 import { CheckCheck, EllipsisVertical } from "lucide-react";
 import { messageDontHaveNotification } from "@/config/globalVariables";
@@ -183,7 +183,7 @@ export default function Notification() {
 	const handleGetNotification = async () => {
 		const resp = await getNotification(user.userId);
 		if (!resp || resp.statusCode !== 200) return;
-		const data = resp.data;
+		const data = resp.data.notifications;
 		const processData = data.map((noti) => {
 			const { textTime, labelType } = dateTimeToNotiTime(noti.createdAt);
 			return {

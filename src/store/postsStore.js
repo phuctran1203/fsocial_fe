@@ -6,6 +6,10 @@ class PostsStore {
 		this.set = set;
 		this.observer = null;
 	}
+	// Clean posts
+	cleanPostsStore = () => {
+		this.set({ posts: null });
+	};
 	// cập nhật các thuộc tính của 1 post
 	updatePost = (id, newProps) => {
 		this.set((state) => ({
@@ -72,6 +76,8 @@ export const useHomePostsStore = create((set, get) => {
 	return {
 		posts: null,
 
+		cleanPostsStore: store.cleanPostsStore,
+
 		updatePost: store.updatePost,
 
 		replacePost: store.replacePost,
@@ -97,6 +103,8 @@ export const useFollowPostsStore = create((set, get) => {
 	const store = new PostsStore(set);
 	return {
 		posts: null,
+
+		cleanPostsStore: store.cleanPostsStore,
 
 		updatePost: store.updatePost,
 
@@ -124,6 +132,8 @@ export const useSearchPostsStore = create((set, get) => {
 	return {
 		posts: null,
 
+		cleanPostsStore: store.cleanPostsStore,
+
 		updatePost: store.updatePost,
 
 		replacePost: store.replacePost,
@@ -150,6 +160,8 @@ export const useProfilePostsStore = create((set, get) => {
 	return {
 		posts: null,
 
+		cleanPostsStore: store.cleanPostsStore,
+
 		updatePost: store.updatePost,
 
 		replacePost: store.replacePost,
@@ -175,6 +187,8 @@ export const useSinglePostStore = create((set) => {
 	const store = new PostsStore(set);
 	return {
 		posts: null,
+
+		cleanPostsStore: store.cleanPostsStore,
 
 		updatePost: store.updatePost,
 

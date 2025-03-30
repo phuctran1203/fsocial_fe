@@ -22,7 +22,7 @@ export default function Message() {
 		setMessages,
 		conversation,
 		setConversation,
-		stompClient,
+		setSubscription,
 		newMessage,
 		setNewMessage,
 	} = useMessageStore();
@@ -74,50 +74,45 @@ export default function Message() {
 		});
 	};
 
-	// update lại giao diện list conversations khi có tin nhắn từ người khác đến,
 	useEffect(() => {
-		// User đang mở cuộc trò chuyện trùng với global message trigger
+		// Nếu user đang mở cuộc trò chuyện trùng với global message trigger
 		if (
 			!newMessage ||
 			!conversation ||
 			newMessage.conversationId === conversation.id
-		)
+		) {
 			return;
+		}
+
 		const baseConversation = {
 			id: newMessage.conversationId,
 			lastMessage: newMessage,
 		};
+
 		updateConversations(baseConversation);
 		setNewMessage(null);
 	}, [newMessage]);
 
 	// HANDLE CHỌN CUỘC TRÒ CHUYỆN VÀ NHẮN TIN
-	const subscription = useRef(null);
+	// trigger auto focus lại textbox
+	const [trigger, setTrigger] = useState(true);
 	const controllerGetmsgs = useRef(null);
+
 	const handleChooseConversation = async (selectedConver) => {
 		if (
 			conversation &&
 			conversation.id === selectedConver.id &&
 			contentActive === 2
-		)
+		) {
 			return;
+		}
+		setMessages(null);
+		setContentActive(2);
 		setTrigger(!trigger);
 		if (selectedConver.lastMessage) selectedConver.lastMessage.read = true;
 		setConversation(selectedConver);
 		console.log("selectedConver is: ", selectedConver);
-
-		if (subscription.current) await subscription.current.unsubscribe();
-		subscription.current = stompClient.subscribe(
-			`/queue/private-${selectedConver.id}`,
-			(message) => {
-				const receivedMessage = JSON.parse(message.body);
-				console.log("received trigger: ", receivedMessage);
-				if (receivedMessage.receiverId !== user.userId) return;
-				setMessages([...useMessageStore.getState().messages, receivedMessage]);
-			}
-		);
-
-		setContentActive(2);
+		setSubscription(selectedConver.id);
 
 		if (controllerGetmsgs.current) controllerGetmsgs.current.abort();
 		controllerGetmsgs.current = new AbortController();
@@ -127,14 +122,11 @@ export default function Message() {
 		);
 
 		if (!resp || resp.statusCode !== 200) {
-			setMessages([]);
 			return;
 		}
 
 		setMessages(resp.data.listMessages.reverse());
 	};
-	// trigger auto focus lại textbox
-	const [trigger, setTrigger] = useState(true);
 
 	// Quay lại danh sách cuộc hội thoại (chỉ có ở mobile)
 	const handleGoBack = () => {

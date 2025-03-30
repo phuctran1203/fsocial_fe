@@ -39,6 +39,8 @@ API.interceptors.request.use(
 API.interceptors.response.use(
 	(response) => response,
 	async (error) => {
+		console.error("Axios error: ", error);
+
 		const path = new URL(error.config.url, API.defaults.baseURL).pathname;
 
 		// Nếu lỗi từ request refresh-token thì không gọi lại refreshToken nữa
@@ -47,8 +49,9 @@ API.interceptors.response.use(
 		}
 
 		// Nếu lỗi 401 từ các API khác, thử refresh token
-		if (error.response?.status === 401) {
-			console.log("Token hết hạn, làm mới token...");
+		if ([401, 400].includes(error.response?.status)) {
+			if (error.response?.status === 401)
+				console.log("Token hết hạn, làm mới token...");
 			const resp = await refreshToken();
 			if (!resp || resp.statusCode !== 200) return Promise.reject(error);
 

@@ -17,6 +17,7 @@ import EmojiPicker from "emoji-picker-react";
 import { TextBox } from "./Field";
 import { createConversation } from "@/api/messageApi";
 import { getTextboxData } from "@/utils/processTextboxData";
+import { Skeleton } from "./ui/skeleton";
 
 export default function MessageListMessages({
 	handleGoBack,
@@ -44,6 +45,10 @@ export default function MessageListMessages({
 	const [timeLabelIndexes, setTimeLabelIndexes] = useState([]);
 
 	useEffect(() => {
+		if (!messages) {
+			setReady(false);
+			return;
+		}
 		// tìm tin nhắn mới nhất người gửi đã gửi
 		for (let i = messages.length - 1; i >= 0; i--) {
 			if (messages[i].receiverId !== conversation.receiverId) {
@@ -51,10 +56,9 @@ export default function MessageListMessages({
 				break;
 			}
 		}
-		// handle chia block tin nhắn
+		// handle chia block tin nhắn -> hiển thị nhãn time trên từng block
 		setTimeLabelIndexes(getTimeLabelIndexes(messages));
-		// console.log("Index các block tin nhắn: ", getTimeLabelIndexes(messages));
-		if (conversation && containerMessagesRef.current) handleScrollMessages();
+		if (containerMessagesRef.current) handleScrollMessages();
 	}, [messages]);
 
 	// HANDLE TỰ ĐỘNG CUỘN XUỐNG ĐÁY VÀ LẤY TIN NHẮN CŨ HƠN KHI USER CUỘN LÊN
@@ -62,6 +66,8 @@ export default function MessageListMessages({
 	const containerMessagesRef = useRef(null);
 	const oldConverId = useRef("");
 	const observer = useRef();
+	const [ready, setReady] = useState(false);
+
 	const callBackAPI = (entries) => {
 		if (entries[0].isIntersecting) {
 			observer.current.unobserve(entries[0].target);
@@ -93,6 +99,9 @@ export default function MessageListMessages({
 					root: containerMessagesRef.current,
 				});
 				observer.current.observe(containerMessagesRef.current.childNodes[1]);
+
+				// set ready hiển thị message
+				if (!ready) setReady(true);
 			}, 100);
 		}
 	};
@@ -111,11 +120,13 @@ export default function MessageListMessages({
 		const resp = await createConversation(conversation.receiverId);
 		if (!resp || resp.statusCode !== 200) return null;
 		const data = await resp.data;
-		console.log("id crated is: ", data.id);
+		console.log("id created is: ", data.id);
 		return data.id;
 	};
+
 	// messsage chuẩn bị gửi lưu ở đây
 	const textbox = useRef(null);
+
 	// gửi tin nhắn
 	const handleSendMessage = async () => {
 		const { innerText, innerHTML } = getTextboxData(textbox);
@@ -164,7 +175,7 @@ export default function MessageListMessages({
 		}, 1);
 	};
 
-	// handle show hide emoji picker
+	// handle show/hide emoji picker
 	const handleEmojiClick = (emojiObject) => {
 		textbox.current.innerHTML += emojiObject.emoji;
 	};
@@ -197,7 +208,10 @@ export default function MessageListMessages({
 	}, []);
 
 	return (
-		<div style={{ height: realHeight }} className="flex flex-col size-full">
+		<div
+			style={{ height: realHeight }}
+			className="relative flex flex-col size-full"
+		>
 			{/* header thông tin */}
 			<div className={`py-3 px-5 border-b flex items-center justify-between`}>
 				<div className="flex items-center">
@@ -223,94 +237,125 @@ export default function MessageListMessages({
 				<Ellipsis />
 			</div>
 
-			<div
-				ref={containerMessagesRef}
-				className="overflow-y-auto px-3 pb-2 flex-grow space-y-0.5"
-			>
-				{messages.map((message, index) => (
-					<div key={index}>
-						{/* label time for messages block */}
-						{timeLabelIndexes.includes(index) && (
-							<p
-								className={`fs-xs pt-3 pb-1.5 text-gray text-center transition`}
-							>
-								{dateTimeToMessageTime(message.createAt)}
-							</p>
-						)}
+			<div className="relative flex-grow min-h-0">
+				{/* skeleton */}
+				{!ready && (
+					<div className="absolute overflow-hidden inset-0 pt-3 bg-background z-10 px-3 pb-2 space-y-0.5">
+						<Skeleton className="ms-7 w-32 sm:h-8 h-7 rounded-2xl" />
+						<Skeleton className="ms-7 w-48 sm:h-8 h-7 rounded-2xl" />
+						<Skeleton className="ms-auto w-28 sm:h-8 h-7 rounded-2xl" />
+						<Skeleton className="ms-7 w-28 sm:h-8 h-7 rounded-2xl" />
+						<Skeleton className="ms-7 w-24 sm:h-8 h-7 rounded-2xl" />
+						<Skeleton className="ms-auto w-44 sm:h-8 h-7 rounded-2xl" />
+						<Skeleton className="ms-auto w-44 sm:h-8 h-7 rounded-2xl" />
+						<Skeleton className="ms-auto w-24 sm:h-8 h-7 rounded-2xl" />
+						<Skeleton className="ms-7 w-32 sm:h-8 h-7 rounded-2xl" />
+						<Skeleton className="ms-auto w-28 sm:h-8 h-7 rounded-2xl" />
+						<Skeleton className="ms-7 w-24 sm:h-8 h-7 rounded-2xl" />
+						<Skeleton className="ms-auto w-44 sm:h-8 h-7 rounded-2xl" />
+						<Skeleton className="ms-auto w-32 sm:h-8 h-7 rounded-2xl" />
+						<Skeleton className="ms-7 w-28 sm:h-8 h-7 rounded-2xl" />
+						<Skeleton className="ms-auto w-24 sm:h-8 h-7 rounded-2xl" />
+						<Skeleton className="ms-7 w-24 sm:h-8 h-7 rounded-2xl" />
+						<Skeleton className="ms-auto w-44 sm:h-8 h-7 rounded-2xl" />
+						<Skeleton className="ms-auto w-28 sm:h-8 h-7 rounded-2xl" />
+						<Skeleton className="ms-7 w-24 sm:h-8 h-7 rounded-2xl" />
+						<Skeleton className="ms-auto w-44 sm:h-8 h-7 rounded-2xl" />
+						<Skeleton className="ms-auto w-28 sm:h-8 h-7 rounded-2xl" />
+					</div>
+				)}
 
-						{/* when is owner-account's message */}
-						{message.receiverId !== user.userId && (
-							<div
-								className={`relative ${
-									index === indexMsgShow && "pb-5"
-								} transition`}
-							>
-								<div
-									className={cn(
-										"px-3 py-1 ms-auto rounded-2xl w-fit md:max-w-[60%] max-w-[80%] text-txtWhite cursor-pointer transition",
-										theme === "light" ? "bg-primary-gradient" : "bg-gray-3light"
-									)}
-									dangerouslySetInnerHTML={{
-										__html: message.content,
-									}}
-									onClick={() => showTimeLabel(index)}
-								/>
+				<div
+					ref={containerMessagesRef}
+					className="overflow-y-auto h-full px-3 pb-2 space-y-0.5"
+				>
+					{messages?.map((message, index) => (
+						<div key={index}>
+							{/* label time for messages block */}
+							{timeLabelIndexes.includes(index) && (
 								<p
-									className={cn(
-										"fs-xs -z-10 text-gray absolute bottom-0 right-1 transition",
-										index === indexMsgShow ? "opacity-100" : "opacity-0"
-									)}
+									className={`fs-xs pt-3 pb-1.5 text-gray text-center transition`}
 								>
 									{dateTimeToMessageTime(message.createAt)}
 								</p>
-							</div>
-						)}
+							)}
 
-						{/* when is not owner-account's message */}
-						{message.receiverId === user.userId && (
-							<div
-								className={cn(
-									"relative transition",
-									index === indexMsgShow && "pb-5"
-								)}
-							>
-								<div className="flex gap-1 items-end">
-									{avatarReceiverPosition === index ? (
-										<Avatar className={`size-6`}>
-											<AvatarImage src={conversation.avatar} />
-											<AvatarFallback className="text-[6px]">
-												{combineIntoAvatarName(
-													conversation.firstName,
-													conversation.lastName
-												)}
-											</AvatarFallback>
-										</Avatar>
-									) : (
-										<div className="size-6" />
-									)}
+							{/* when is owner-account's message */}
+							{message.receiverId !== user.userId && (
+								<div
+									className={`relative ${
+										index === indexMsgShow && "pb-5"
+									} transition`}
+								>
 									<div
 										className={cn(
-											"px-3 py-1 rounded-2xl w-fit md:max-w-[60%] max-w-[80%] cursor-pointer transition bg-secondary",
-											theme === "dark" &&
-												"bg-background ring-1 ring-gray-3light ring-inset"
+											"px-3 py-1 ms-auto rounded-2xl w-fit md:max-w-[60%] max-w-[80%] text-txtWhite cursor-pointer transition",
+											theme === "light"
+												? "bg-primary-gradient"
+												: "bg-gray-3light"
 										)}
 										dangerouslySetInnerHTML={{
 											__html: message.content,
 										}}
 										onClick={() => showTimeLabel(index)}
 									/>
+									<p
+										className={cn(
+											"fs-xs -z-10 text-gray absolute bottom-0 right-1 transition",
+											index === indexMsgShow ? "opacity-100" : "opacity-0"
+										)}
+									>
+										{dateTimeToMessageTime(message.createAt)}
+									</p>
 								</div>
-								<p
-									className={`fs-xs -z-10 text-gray absolute bottom-0 left-8 ${
-										index === indexMsgShow ? "opacity-100" : "opacity-0"
-									} transition`}
+							)}
+
+							{/* when is not owner-account's message */}
+							{message.receiverId === user.userId && (
+								<div
+									className={cn(
+										"relative transition",
+										index === indexMsgShow && "pb-5"
+									)}
 								>
-									{dateTimeToMessageTime(message.createAt)}
-								</p>
-							</div>
-						)}
-					</div>
-				))}
+									<div className="flex gap-1 items-end">
+										{avatarReceiverPosition === index ? (
+											<Avatar className={`size-6`}>
+												<AvatarImage src={conversation.avatar} />
+												<AvatarFallback className="text-[6px]">
+													{combineIntoAvatarName(
+														conversation.firstName,
+														conversation.lastName
+													)}
+												</AvatarFallback>
+											</Avatar>
+										) : (
+											<div className="size-6" />
+										)}
+										<div
+											className={cn(
+												"px-3 py-1 rounded-2xl w-fit md:max-w-[60%] max-w-[80%] cursor-pointer transition bg-secondary",
+												theme === "dark" &&
+													"bg-background ring-1 ring-gray-3light ring-inset"
+											)}
+											dangerouslySetInnerHTML={{
+												__html: message.content,
+											}}
+											onClick={() => showTimeLabel(index)}
+										/>
+									</div>
+									<p
+										className={`fs-xs -z-10 text-gray absolute bottom-0 left-8 ${
+											index === indexMsgShow ? "opacity-100" : "opacity-0"
+										} transition`}
+									>
+										{dateTimeToMessageTime(message.createAt)}
+									</p>
+								</div>
+							)}
+						</div>
+					))}
+				</div>
 			</div>
 
 			{/* Thanh nhập tin nhắn */}

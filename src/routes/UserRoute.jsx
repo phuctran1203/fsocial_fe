@@ -1,17 +1,18 @@
-import { getCookie } from "@/utils/cookie";
+import { useValidRefreshTokenStore } from "@/store/validRefreshTokenStore";
 import React from "react";
 import { Navigate, Outlet } from "react-router-dom";
 
 export default function UserRoute() {
-	const refreshToken = getCookie("refresh-token");
 	const isAdmin = false;
-	return refreshToken ? (
-		!isAdmin ? (
+	const refreshToken = useValidRefreshTokenStore.getState().refreshToken;
+
+	return !isAdmin ? (
+		refreshToken ? (
 			<Outlet />
 		) : (
-			<Navigate to="/admin" />
+			<Navigate to="login" />
 		)
 	) : (
-		<Navigate to="/login" />
+		<Navigate to="/admin" />
 	);
 }

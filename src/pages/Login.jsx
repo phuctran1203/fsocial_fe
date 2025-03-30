@@ -7,6 +7,7 @@ import { login } from "../api/loginApi";
 import { setCookie } from "@/utils/cookie";
 import { useForm } from "react-hook-form";
 import { Eye, EyeOff, UserRoundIcon } from "lucide-react";
+import { useValidRefreshTokenStore } from "@/store/validRefreshTokenStore";
 
 const list = [
 	{
@@ -21,6 +22,7 @@ const list = [
 
 export default function Login() {
 	const navigate = useNavigate();
+	const { setRefreshToken } = useValidRefreshTokenStore();
 
 	const {
 		register,
@@ -59,6 +61,7 @@ export default function Login() {
 		// save token and refresh token
 		setCookie("access-token", result.data.accessToken, 360 * 10); // 10 năm
 		setCookie("refresh-token", result.data.refreshToken, 360 * 10); // 10 năm
+		setRefreshToken(result.data.refreshToken);
 		navigate("/home");
 	};
 

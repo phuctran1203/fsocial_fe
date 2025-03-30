@@ -18,5 +18,5 @@ export const ownerAccountStore = create((set) => ({
 			},
 		})),
 
-	resetUser: () => set({ user: {} }),
+	cleanOwnerAccountStore: () => set({ user: {} }),
 }));

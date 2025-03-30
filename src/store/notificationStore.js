@@ -1,19 +1,53 @@
 import { dateTimeToNotiTime } from "@/utils/convertDateTime";
+import { Client } from "@stomp/stompjs";
 import { create } from "zustand";
 
-export const useNotificationsStore = create((set, get) => ({
+const useNotificationsStore = create((set, get) => ({
 	notifications: null,
+	stompClientNotification: null,
+
+	connectNotificationWebSocket: (userId) => {
+		const { stompClientNotification } = get();
+		if (stompClientNotification) return;
+		const client = new Client({
+			brokerURL: "ws://localhost:8087/notification/ws",
+			reconnectDelay: 5000,
+			onConnect: () => {
+				console.log(
+					"Kết nối WebSocket notification, đang lắng nghe trigger global notification"
+				);
+				client.subscribe(`/topic/notifications-${userId}`, (message) => {
+					const receivedMessage = JSON.parse(message.body);
+					console.log(
+						"Eeceived global trigger notification: ",
+						receivedMessage
+					);
+					insertNotifications(receivedMessage);
+				});
+				set({ stompClientNotification: client });
+			},
+		});
+		client.activate();
+	},
+
+	cleanNotificationWebSocket: () => {
+		const { stompClientNotification } = get();
+		if (stompClientNotification)
+			return stompClientNotification.deactivate().then(() => {
+				console.log("Disconnected notification socket server");
+				set({ notifications: null, stompClientNotification: null });
+			});
+	},
 
 	setNotifications: (allNotifications) =>
 		set({ notifications: allNotifications }),
 
-	updateNotification: (id, props) =>
-		set(() => {
-			const process = get().notifications.map((noti) =>
-				noti.id === id ? { ...noti, ...props } : noti
-			);
-			return { notifications: process };
-		}),
+	updateNotification: (id, props) => {
+		const process = get().notifications.map((noti) =>
+			noti.id === id ? { ...noti, ...props } : noti
+		);
+		set({ notifications: process });
+	},
 
 	deleteNotification: (id) =>
 		set(() => {
@@ -21,16 +55,15 @@ export const useNotificationsStore = create((set, get) => ({
 			return { notifications: process };
 		}),
 
-	insertNotifications: (notification) =>
-		set(() => {
-			const { textTime, labelType } = dateTimeToNotiTime(
-				notification.createdAt
-			);
-			return {
-				notifications: [
-					{ ...notification, textTime, labelType },
-					...get().notifications,
-				],
-			};
-		}),
+	insertNotifications: (notification) => {
+		const { textTime, labelType } = dateTimeToNotiTime(notification.createdAt);
+		set({
+			notifications: [
+				{ ...notification, textTime, labelType },
+				...get().notifications,
+			],
+		});
+	},
 }));
+
+export default useNotificationsStore;

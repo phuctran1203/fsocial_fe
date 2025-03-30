@@ -1,7 +1,9 @@
 import { deleteCookie, getCookie, setCookie } from "@/utils/cookie";
 import API from "./axiosInstance";
+import { useValidRefreshTokenStore } from "@/store/validRefreshTokenStore";
 
 export const refreshToken = async () => {
+	const setRefreshToken = useValidRefreshTokenStore.getState().setRefreshToken;
 	try {
 		const refreshToken = getCookie("refresh-token");
 		const resp = await API.post("/account/refresh-token", { refreshToken });
@@ -11,8 +13,7 @@ export const refreshToken = async () => {
 		return data;
 	} catch (error) {
 		console.error("Error at refreshToken: ", error);
-		deleteCookie("refresh-token");
-		deleteCookie("access-token");
+		setRefreshToken(null);
 		return error.response?.data || null;
 	}
 };
