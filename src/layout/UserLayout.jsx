@@ -18,9 +18,8 @@ import cleanupStore from "@/utils/cleanupStore";
 export default function UserLayout() {
 	const { setUser } = ownerAccountStore();
 	const { refreshToken } = useValidRefreshTokenStore();
-	const { connectNotificationWebSocket, cleanNotificationWebSocket } =
-		useNotificationsStore();
-	const { connectMessageWebSocket, cleanMessageWebSocket } = useMessageStore();
+	const { connectNotificationWebSocket } = useNotificationsStore();
+	const { connectMessageWebSocket } = useMessageStore();
 
 	const getUserDetail = async () => {
 		const resp = await getOwnerProfile();
@@ -31,6 +30,8 @@ export default function UserLayout() {
 			return;
 		}
 		let userId = jwtDecode(accessToken).sub;
+		console.log("lấy được userId: ", userId);
+
 		setUser({ userId, ...resp.data });
 		connectNotificationWebSocket(userId);
 		connectMessageWebSocket(userId);

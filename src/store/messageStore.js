@@ -12,17 +12,16 @@ const useMessageStore = create((set, get) => ({
 	setMessages: (messages) => set({ messages }),
 
 	setSubscription: (conversationId) => {
-		const userId = ownerAccountStore.getState().userId;
-		const { subscription, stompClientMessage } = get();
+		const userId = ownerAccountStore.getState().user.userId;
+		const { subscription, stompClientMessage, setMessages } = get();
 		if (subscription) subscription.unsubscribe();
 		set({
 			subscription: stompClientMessage.subscribe(
 				`/queue/private-${conversationId}`,
 				(message) => {
 					const receivedMessage = JSON.parse(message.body);
-					console.log("received trigger: ", receivedMessage);
 					if (receivedMessage.receiverId !== userId) return;
-					setMessages([...[get().messages || []], receivedMessage]);
+					setMessages([...get().messages, receivedMessage]);
 				}
 			),
 		});
@@ -31,7 +30,7 @@ const useMessageStore = create((set, get) => ({
 	setConversation: (conversation) => set({ conversation }),
 
 	connectMessageWebSocket: (userId) => {
-		const { stompClientMessage } = get();
+		const { stompClientMessage, setNewMessage } = get();
 		if (stompClientMessage) return;
 
 		const client = new Client({
