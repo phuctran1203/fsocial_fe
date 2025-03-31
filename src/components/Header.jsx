@@ -9,11 +9,14 @@ import {
 	PopoverContent,
 	PopoverTrigger,
 } from "@/components/ui/popover";
+import useNotificationsStore from "@/store/notificationStore";
 
 export default function Header() {
 	const isInMessage = useLocation().pathname === "/message";
 
 	const { isVisible, setIsVisible } = popupNotificationtStore();
+
+	const unreadCount = useNotificationsStore((state) => state.unreadCount);
 
 	const [popoverOpen, setPopoverOpen] = useState(false);
 
@@ -40,7 +43,9 @@ export default function Header() {
 						<div className="cursor-pointer" onClick={toggleShowNoti}>
 							<Bell />
 						</div>
-						<div className="absolute size-2.5 -top-[1px] right-[1px] bg-primary-gradient rounded-full " />
+						{unreadCount > 0 && (
+							<div className="absolute size-2.5 -top-[1px] right-[1px] bg-primary-gradient rounded-full " />
+						)}
 					</div>
 
 					<Popover open={popoverOpen} onOpenChange={setPopoverOpen}>

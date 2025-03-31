@@ -24,7 +24,7 @@ import {
 import { Skeleton } from "./ui/skeleton";
 import useNotificationsStore from "@/store/notificationStore";
 import { regexInMessage, regexInSetting } from "@/config/regex";
-import { CheckCheck, EllipsisVertical } from "lucide-react";
+import { CheckCheck, EllipsisVertical, PawPrint, Rss } from "lucide-react";
 import { messageDontHaveNotification } from "@/config/globalVariables";
 
 const Noti = (props) => {
@@ -36,7 +36,12 @@ const Noti = (props) => {
 
 	const setVisible = popupNotificationtStore((state) => state.setIsVisible);
 
-	const { deleteNotification, updateNotification } = useNotificationsStore();
+	const {
+		deleteNotification,
+		updateNotification,
+		unreadCount,
+		setUnreadCount,
+	} = useNotificationsStore();
 
 	const open = () => {
 		setIdNotiShowing(id);
@@ -54,6 +59,7 @@ const Noti = (props) => {
 
 	const markAsRead = async () => {
 		//call mark this noti as read
+		setUnreadCount(read ? unreadCount + 1 : unreadCount - 1);
 		updateNotification(id, { read: !read });
 		close();
 		markReadNotification(id);
@@ -68,18 +74,23 @@ const Noti = (props) => {
 
 	const notiMap = {
 		LIKE: {
-			icon: <HeartNotiIcon />,
+			icon: <HeartNotiIcon className="size-5" />,
 			content: <span className="fs-sm">đã thả tim bài viết của bạn</span>,
 		},
 
 		likeComment: {
-			icon: <HeartNotiIcon />,
+			icon: <HeartNotiIcon className="size-5" />,
 			content: <span className="fs-sm">đã thả tim bình luận của bạn</span>,
 		},
 
 		COMMENT: {
-			icon: <CommentNotiIcon />,
+			icon: <CommentNotiIcon className="size-5" />,
 			content: <span className="fs-sm">đã bình luận về bài viết của bạn</span>,
+		},
+
+		FOLLOW: {
+			icon: <PawPrint className="fill-logo size-5 stroke-logo" />,
+			content: <span className="fs-sm">đã bắt đầu theo dõi bạn</span>,
 		},
 	};
 
@@ -164,7 +175,8 @@ export default function Notification() {
 
 	const user = ownerAccountStore((state) => state.user);
 
-	const { notifications, setNotifications } = useNotificationsStore();
+	const { notifications, setNotifications, unreadCount, setUnreadCount } =
+		useNotificationsStore();
 
 	const today = !notifications
 		? []
@@ -184,6 +196,7 @@ export default function Notification() {
 		const resp = await getNotification(user.userId);
 		if (!resp || resp.statusCode !== 200) return;
 		const data = resp.data.notifications;
+		setUnreadCount(resp.data.unreadCount);
 		const processData = data.map((noti) => {
 			const { textTime, labelType } = dateTimeToNotiTime(noti.createdAt);
 			return {
@@ -256,7 +269,7 @@ export default function Notification() {
 						<div className="relative">
 							<Bell active={true} />
 							<span className="absolute bottom-1/2 left-1/2 px-1 bg-primary font-bold rounded-full text-txtWhite text-[12px]">
-								99+
+								{unreadCount}
 							</span>
 						</div>
 						<h5>Thông báo</h5>

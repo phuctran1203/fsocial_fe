@@ -29,6 +29,7 @@ import {
 import useMessageStore from "@/store/messageStore";
 import { regexInMessage, regexInSetting } from "@/config/regex";
 import { SearchIcon } from "lucide-react";
+import useNotificationsStore from "@/store/notificationStore";
 
 export default function Nav() {
 	const user = ownerAccountStore((state) => state.user);
@@ -63,6 +64,8 @@ export default function Nav() {
 	};
 
 	const newMessage = useMessageStore((state) => state.newMessage);
+
+	const unreadCount = useNotificationsStore((state) => state.unreadCount);
 
 	return (
 		<nav
@@ -177,7 +180,9 @@ export default function Nav() {
 					>
 						<div className="relative">
 							<Bell active={isVisibleNoti} />
-							<div className="absolute size-2.5 -top-[1px] right-[1px]  bg-primary-gradient rounded-full " />
+							{unreadCount > 0 && (
+								<div className="absolute size-2.5 -top-[1px] right-[1px] bg-primary-gradient rounded-full " />
+							)}
 						</div>
 						<span
 							className={`${
