@@ -219,18 +219,18 @@ export default function MessageListMessages({
 						<ArrowLeftIcon className={"sm:hidden me-3"} />
 					</button>
 					<Avatar className={`size-9 me-2`}>
-						<AvatarImage src={conversation.avatar} />
+						<AvatarImage src={conversation?.avatar} />
 						<AvatarFallback className="text-xs">
 							{combineIntoAvatarName(
-								conversation.firstName,
-								conversation.lastName
+								conversation?.firstName,
+								conversation?.lastName
 							)}
 						</AvatarFallback>
 					</Avatar>
 					<p className="font-medium">
 						{combineIntoDisplayName(
-							conversation.firstName,
-							conversation.lastName
+							conversation?.firstName,
+							conversation?.lastName
 						)}
 					</p>
 				</div>
