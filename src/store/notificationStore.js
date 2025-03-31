@@ -3,11 +3,17 @@ import { Client } from "@stomp/stompjs";
 import { create } from "zustand";
 
 const useNotificationsStore = create((set, get) => ({
+	unreadCount: 0,
 	notifications: null,
 	stompClientNotification: null,
 
 	connectNotificationWebSocket: (userId) => {
-		const { stompClientNotification } = get();
+		const {
+			stompClientNotification,
+			insertNotifications,
+			unreadCount,
+			setUnreadCount,
+		} = get();
 		if (stompClientNotification) return;
 		const client = new Client({
 			brokerURL: "ws://localhost:8087/notification/ws",
@@ -19,10 +25,11 @@ const useNotificationsStore = create((set, get) => ({
 				client.subscribe(`/topic/notifications-${userId}`, (message) => {
 					const receivedMessage = JSON.parse(message.body);
 					console.log(
-						"Eeceived global trigger notification: ",
+						"Received global trigger notification: ",
 						receivedMessage
 					);
 					insertNotifications(receivedMessage);
+					setUnreadCount(unreadCount + 1);
 				});
 				set({ stompClientNotification: client });
 			},
@@ -41,6 +48,8 @@ const useNotificationsStore = create((set, get) => ({
 
 	setNotifications: (allNotifications) =>
 		set({ notifications: allNotifications }),
+
+	setUnreadCount: (unreadCount) => set({ unreadCount }),
 
 	updateNotification: (id, props) => {
 		const process = get().notifications.map((noti) =>
