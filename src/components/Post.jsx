@@ -28,6 +28,7 @@ import { RepostPostIcon } from "./Icon";
 import { SharePostIcon } from "./Icon";
 import { cn } from "@/lib/utils";
 import { Ellipsis, MessageSquareWarning, Pen } from "lucide-react";
+import { regexImage, regexVideo } from "@/config/regex";
 
 export default function Post({
 	post,
@@ -42,6 +43,24 @@ export default function Post({
 	const [popoverOpen, setPopoverOpen] = useState(false);
 
 	const user = ownerAccountStore.getState().user;
+
+	const processMedias = () => {
+		if (post.content.media) {
+			return post.content.media.map((media) => {
+				let type;
+				if (regexImage.test(media)) type = "image";
+				else if (regexVideo.test(media)) type = "video";
+				return {
+					src: media,
+					type,
+				};
+			});
+		}
+		if (post.originPostId) {
+			return [{ src: post.originPostId, type: "post" }];
+		}
+		return [];
+	};
 
 	const showCommentPopup = () => {
 		showPopup(
@@ -165,12 +184,7 @@ export default function Post({
 				/>
 				{/* assets post */}
 				<div>
-					<GenerateMediaLayout
-						medias={
-							post.content.media ||
-							(post.originPostId ? [post.originPostId] : [])
-						}
-					/>
+					<GenerateMediaLayout medias={processMedias()} />
 				</div>
 			</div>
 

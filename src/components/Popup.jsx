@@ -1,6 +1,6 @@
 import { usePopupStore } from "@/store/popupStore";
 import { themeStore } from "@/store/themeStore";
-import React from "react";
+import React, { useEffect, useRef } from "react";
 import { XMarkIcon } from "./Icon";
 import { cn } from "@/lib/utils";
 
@@ -8,6 +8,7 @@ export default function Popup() {
 	const { heading, isOpen, children, hidePopup } = usePopupStore();
 
 	const theme = themeStore((state) => state.theme);
+
 	return (
 		<div
 			className={`z-10 fixed inset-0 sm:py-2 bg-black flex items-center justify-center ${

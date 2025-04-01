@@ -41,6 +41,8 @@ import {
 	combineIntoDisplayName,
 } from "@/utils/combineName";
 import { MessageSquareWarning, Star } from "lucide-react";
+import { dateClassToISO8601 } from "@/utils/convertDateTime";
+import { getNumberOfComplaint } from "@/api/adminReportApi";
 
 const RenderLineChart = (props) => {
 	const {
@@ -244,12 +246,30 @@ export default function AdminReports() {
 		setDate({ from: template.from, to: template.to });
 	};
 
-	useEffect(() => {
-		// get data
+	const fetchReports = async () => {
+		console.log("current date: ", date);
+		console.log("Start date: ", dateClassToISO8601(date.from));
+		console.log("end date: ", dateClassToISO8601(date.to));
+		const start = dateClassToISO8601(date.from);
+		const end =
+			date.from.getTime() !== date.to.getTime()
+				? dateClassToISO8601(date.to)
+				: null;
+
+		const [respComplaint] = await Promise.all([
+			getNumberOfComplaint(start, end),
+		]);
+
+		console.log("respComplaint: ", respComplaint);
+
 		setChartDataPosts(fakeChartDataPosts);
 		setChartDataNumberCreatedAccounts(fakeChartDataNumberCreatedAccounts);
 		setChartDataNumberComplaints(fakeChartDataNumberComplaints);
 		setTopKOL(fakeTopKOL);
+	};
+
+	useEffect(() => {
+		fetchReports();
 	}, []);
 
 	return (
@@ -272,6 +292,7 @@ export default function AdminReports() {
 				<div className="flex-grow space-y-1">
 					{analyzeTemplate.map((templatePicker, index) => (
 						<button
+							key={index}
 							className={`w-full text-left p-2 rounded-md hover:bg-gray-3light font-medium text-gray fs-xs ${
 								templateSelect === index && "bg-gray-2light text-primary-text"
 							}`}

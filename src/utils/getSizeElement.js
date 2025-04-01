@@ -16,6 +16,6 @@ export function getVideoSize(url) {
 		video.onloadedmetadata = () => {
 			resolve({ width: video.videoWidth, height: video.videoHeight });
 		};
-		video.error = reject;
+		video.onerror = reject;
 	});
 }

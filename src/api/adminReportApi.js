@@ -1,4 +1,4 @@
-import API from './axiosInstance';
+import API from "./axiosInstance";
 
 export const getNumberOfPost = async () => {
 	try {
@@ -24,14 +24,21 @@ export const getNumberOfNewRegistration = async () => {
 	}
 };
 
-export const getNumberOfComplaint = async () => {
+export const getNumberOfComplaint = async (startDate, endDate) => {
+	let endpoint;
+
+	if (startDate && endDate)
+		endpoint = `/timeline/complaint/statistics_complaint_start_end?startDate=${startDate}&endDate=${endDate}`;
+	else if (startDate)
+		endpoint = `/timeline/complaint/statistics_complaint_today?date_time=${startDate}`;
+	console.log(endpoint);
 	try {
-		const resp = await API.get(`/report/complaint`);
+		const resp = await API.get(endpoint);
 		const data = resp.data;
-		console.log("Resp number of complaint: ", data);
+		console.log("Resp getNumberOfComplaint: ", data);
 		return data;
 	} catch (error) {
-		console.error("Error at number of complaint:", error);
+		console.error("Error at getNumberOfComplaint:", error);
 		return error.response?.data || null;
 	}
 };
