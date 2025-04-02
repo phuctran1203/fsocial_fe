@@ -55,6 +55,7 @@ export default function ModalRepost({ id, store }) {
 			lastName: user.lastName,
 			avatar: user.avatar,
 		};
+
 		insertPost(postCreated);
 		toast.success("Đăng bài viết thành công");
 		hidePopup();

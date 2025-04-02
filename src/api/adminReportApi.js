@@ -1,25 +1,39 @@
 import API from "./axiosInstance";
 
-export const getNumberOfPost = async () => {
+export const getNumberOfPost = async (startDate, endDate) => {
+	let endpoint;
+
+	if (startDate && endDate)
+		endpoint = `/timeline/post/statistics_post_start_end?startDate=${startDate}&endDate=${endDate}`;
+	else if (startDate)
+		endpoint = `/timeline/post/statistics_post_today?date_time=${startDate}`;
+
 	try {
-		const resp = await API.get(`/report/NumberOfPost`);
+		const resp = await API.get(endpoint);
 		const data = resp.data;
-		console.log("Resp number of post: ", data);
+		console.log("Resp getNumberOfPost: ", data);
 		return data;
 	} catch (error) {
-		console.error("Error at number of post:", error);
+		console.error("Error at getNumberOfPost:", error);
 		return error.response?.data || null;
 	}
 };
 
-export const getNumberOfNewRegistration = async () => {
+export const getNumberOfNewRegistration = async (startDate, endDate) => {
+	let endpoint;
+
+	if (startDate && endDate)
+		endpoint = `/account/statistics_register_start_end?startDate=${startDate}&endDate=${endDate}`;
+	else if (startDate)
+		endpoint = `/account/statistics_register_today?date_time=${startDate}`;
+
 	try {
-		const resp = await API.get(`/report`);
+		const resp = await API.get(endpoint);
 		const data = resp.data;
-		console.log("Resp Number Of New Registration: ", data);
+		console.log("Resp getNumberOfNewRegistration: ", data);
 		return data;
 	} catch (error) {
-		console.error("Error at Number Of New Registration:", error);
+		console.error("Error at getNumberOfNewRegistration:", error);
 		return error.response?.data || null;
 	}
 };
@@ -31,7 +45,7 @@ export const getNumberOfComplaint = async (startDate, endDate) => {
 		endpoint = `/timeline/complaint/statistics_complaint_start_end?startDate=${startDate}&endDate=${endDate}`;
 	else if (startDate)
 		endpoint = `/timeline/complaint/statistics_complaint_today?date_time=${startDate}`;
-	console.log(endpoint);
+
 	try {
 		const resp = await API.get(endpoint);
 		const data = resp.data;

@@ -11,23 +11,7 @@ import {
 
 export default function AdminPolicySettings() {
 	const [policies, setPolicies] = useState([]);
-	const siblingRef = useRef(null);
 	const inputAddPolicy = useRef(null);
-
-	// const policiesJson = [
-	// 	{
-	// 		id: 1,
-	// 		reason: "Có dấu hiệu lừa đảo",
-	// 	},
-	// 	{
-	// 		id: 2,
-	// 		reason: "Chứa nội dung/video/hình ảnh nhạy cảm",
-	// 	},
-	// 	{
-	// 		id: 3,
-	// 		reason: "Hành vi công kích, ngôn từ mất kiểm soát",
-	// 	},
-	// ];
 
 	const [addPolicyClicked, setAddPolicyClicked] = useState(false);
 
@@ -47,16 +31,18 @@ export default function AdminPolicySettings() {
 			return;
 		}
 		console.log("Data ", inputAddPolicy.current.value);
-		const handleAddTermOfService = async (value) => {
-			const res = await addTermOfService(value);
-			return res.data;
-		};
-		const res = await handleAddTermOfService(inputAddPolicy.current.value);
-		console.log("Thêm mới chính sách thành công: ", res);
+
+		const res = await addTermOfService(inputAddPolicy.current.value);
+		if (!res || res.statusCode !== 200) {
+			toast.error("Thêm chính sách thất bại");
+			return;
+		}
+		toast.success("Thêm chính sách thành công");
+		const data = res.data;
 		setPolicies((prev) => [
 			{
-				id: res.id,
-				name: res.name,
+				id: data.id,
+				name: data.name,
 			},
 			...prev,
 		]);
@@ -74,16 +60,19 @@ export default function AdminPolicySettings() {
 		setPolicies(policies.filter((item) => item.id !== id));
 	};
 
-	const submitPolicies = async () => {};
-
 	const handleDeletePolicy = async (id) => {
 		const res = await removeTermOfService(id);
-		console.log("Xóa chính sách thành công: ", res.data);
+		if (!res || res.statusCode !== 200) {
+			toast.error("Xóa chính sách thất bại");
+			return;
+		}
+		toast.success("Xóa chính sách thành công");
 	};
 
 	useEffect(() => {
 		const fetchPolicy = async () => {
 			const res = await getTermOfService();
+			if (!res || res.statusCode !== 200) return;
 			setPolicies(res.data);
 		};
 
@@ -102,12 +91,6 @@ export default function AdminPolicySettings() {
 						</p>
 					</div>
 
-					{/* <Button
-            className={"btn-primary ms-auto !w-[200px] py-2.5"}
-            onClick={submitPolicies}
-          >
-            Lưu cập nhật
-          </Button> */}
 					<Button
 						className="z-10 btn-transparent !bg-background sticky top-0 border p-4 !justify-start"
 						onClick={handleAddPolicy}

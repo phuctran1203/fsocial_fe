@@ -1,7 +1,7 @@
 import { regexImage, regexVideo } from "@/config/regex";
 
 export const processMedias = (post) => {
-	if (post.content?.media) {
+	if (post.content.media) {
 		return post.content.media.map((media) => {
 			let type;
 			if (regexImage.test(media)) type = "image";
