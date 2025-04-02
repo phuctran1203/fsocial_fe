@@ -1,28 +1,17 @@
 import React, { useState, useEffect, useRef } from "react";
-import { CheckIcon, TrashCanIcon, XMarkIcon } from "../components/Icon";
+import { TrashCanIcon, XMarkIcon } from "../components/Icon";
 import Button from "../components/Button";
-import { PlusIcon } from "lucide-react";
+import { Check, PlusIcon } from "lucide-react";
 import { toast } from "sonner";
+import {
+	addTermOfService,
+	getTermOfService,
+	removeTermOfService,
+} from "@/api/termOfServiceApi";
 
 export default function AdminPolicySettings() {
 	const [policies, setPolicies] = useState([]);
-	const siblingRef = useRef(null);
 	const inputAddPolicy = useRef(null);
-
-	const policiesJson = [
-		{
-			id: 1,
-			reason: "Có dấu hiệu lừa đảo",
-		},
-		{
-			id: 2,
-			reason: "Chứa nội dung/video/hình ảnh nhạy cảm",
-		},
-		{
-			id: 3,
-			reason: "Hành vi công kích, ngôn từ mất kiểm soát",
-		},
-	];
 
 	const [addPolicyClicked, setAddPolicyClicked] = useState(false);
 
@@ -33,7 +22,7 @@ export default function AdminPolicySettings() {
 		}, 1);
 	};
 
-	const acceptPolicy = () => {
+	const acceptPolicy = async () => {
 		if (inputAddPolicy.current.value.trim() === "") {
 			toast.warning("Không được để trống!");
 			setTimeout(() => {
@@ -41,11 +30,19 @@ export default function AdminPolicySettings() {
 			}, 1);
 			return;
 		}
-		const reason = inputAddPolicy.current.value;
+		console.log("Data ", inputAddPolicy.current.value);
+
+		const res = await addTermOfService(inputAddPolicy.current.value);
+		if (!res || res.statusCode !== 200) {
+			toast.error("Thêm chính sách thất bại");
+			return;
+		}
+		toast.success("Thêm chính sách thành công");
+		const data = res.data;
 		setPolicies((prev) => [
 			{
-				id: Date.now(),
-				reason: reason,
+				id: data.id,
+				name: data.name,
 			},
 			...prev,
 		]);
@@ -58,14 +55,28 @@ export default function AdminPolicySettings() {
 		setAddPolicyClicked(false);
 	};
 
-	const handleRemovePolicy = (index) => {
-		setPolicies(policies.filter((_, i) => i !== index));
+	const handleRemovePolicy = (id) => {
+		handleDeletePolicy(id);
+		setPolicies(policies.filter((item) => item.id !== id));
 	};
 
-	const submitPolicies = () => {};
+	const handleDeletePolicy = async (id) => {
+		const res = await removeTermOfService(id);
+		if (!res || res.statusCode !== 200) {
+			toast.error("Xóa chính sách thất bại");
+			return;
+		}
+		toast.success("Xóa chính sách thành công");
+	};
 
 	useEffect(() => {
-		setPolicies(policiesJson);
+		const fetchPolicy = async () => {
+			const res = await getTermOfService();
+			if (!res || res.statusCode !== 200) return;
+			setPolicies(res.data);
+		};
+
+		fetchPolicy();
 	}, []);
 
 	return (
@@ -74,12 +85,12 @@ export default function AdminPolicySettings() {
 				<div className="px-1 space-y-4">
 					<div>
 						<h5>Cập nhật chính sách</h5>
-						<p className="fs-sm text-gray"> Cập nhật các chính sách, loại vi phạm mới cho mạng xã hội</p>
+						<p className="fs-sm text-gray">
+							{" "}
+							Cập nhật các chính sách, loại vi phạm mới cho mạng xã hội
+						</p>
 					</div>
 
-					<Button className={"btn-primary ms-auto !w-[200px] py-2.5"} onClick={submitPolicies}>
-						Lưu cập nhật
-					</Button>
 					<Button
 						className="z-10 btn-transparent !bg-background sticky top-0 border p-4 !justify-start"
 						onClick={handleAddPolicy}
@@ -96,26 +107,39 @@ export default function AdminPolicySettings() {
 							placeholder="Điền nội dung vi phạm"
 						/>
 						<div className="absolute right-4 top-1/2 -translate-y-1/2 flex gap-2">
-							<Button className="btn-transparent border !size-8" onClick={acceptPolicy}>
-								<CheckIcon className="size-5" />
+							<Button
+								className="btn-transparent border !size-8"
+								onClick={acceptPolicy}
+							>
+								<Check className="size-5" />
 							</Button>
-							<Button className="btn-transparent border !size-8" onClick={declinePolicy}>
-								<XMarkIcon className="size-3.5" />
+							<Button
+								className="btn-transparent border !size-8"
+								onClick={declinePolicy}
+							>
+								<XMarkIcon className="size-5" />
 							</Button>
 						</div>
 					</div>
 
 					{policies.map((policy, index) => (
-						<div className="flex items-center justify-between w-full bg-background p-5 rounded border" key={index}>
-							<span>{policy.reason}</span>
-							<button onClick={() => handleRemovePolicy(index)}>
+						<div
+							className="flex items-center justify-between w-full bg-background p-5 rounded border"
+							key={index}
+						>
+							<span>{policy.name}</span>
+							<button onClick={() => handleRemovePolicy(policy.id)}>
 								<TrashCanIcon />
 							</button>
 						</div>
 					))}
 				</div>
 			</div>
-			<img className="w-full mt-auto" src="../decor/rocket-launching.svg" alt="Rocket Illustration" />
+			<img
+				className="w-full mt-auto"
+				src="../decor/rocket-launching.svg"
+				alt="Rocket Illustration"
+			/>
 		</div>
 	);
 }

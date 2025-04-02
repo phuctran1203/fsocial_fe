@@ -1,15 +1,7 @@
 import { ownerAccountStore } from "@/store/ownerAccountStore";
 import React, { useEffect, useRef, useState } from "react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import {
-	FollowerProfileTabIcon,
-	Glyph,
-	PencilChangeImageIcon,
-	PictureProfileTabIcon,
-	PostProfileTabIcon,
-	ReactedProfileTabIcon,
-	VideoProfileTabIcon,
-} from "@/components/Icon";
+import { PencilChangeImageIcon } from "@/components/Icon";
 import Button from "@/components/Button";
 import { useLocation } from "react-router-dom";
 import { useProfilePostsStore } from "@/store/postsStore";
@@ -17,7 +9,6 @@ import { getPosts } from "@/api/postsApi";
 import RenderPosts from "@/components/RenderPosts";
 import {
 	getFollowers,
-	getOwnerProfile,
 	getProfile,
 	requestFollow,
 	unfollow,
@@ -26,76 +17,118 @@ import {
 	combineIntoAvatarName,
 	combineIntoDisplayName,
 } from "@/utils/combineName";
+import {
+	Popover,
+	PopoverContent,
+	PopoverTrigger,
+} from "@/components/ui/popover";
+import { userProfileOptions } from "@/config/userProfileOptions";
+import { usePopupStore } from "@/store/popupStore";
+import ModalCropImage from "@/components/ModalCropImage";
+import { cn } from "@/lib/utils";
+import { Ellipsis } from "lucide-react";
+import { messageReadAllPosts } from "@/config/globalVariables";
+import { listTabs } from "@/config/userProfileTabs";
+import { listFriends } from "@/data/fakeDataFriends";
 
-const listFriends = [
-	{
-		firstName: "Thịnh",
-		displayName: "Phúc Thịnh",
-		avatar: "./temp/user_2.png",
-	},
-	{ firstName: "Nam", displayName: "Phương Nam", avatar: "./temp/user_3.png" },
-	{ firstName: "Khải", displayName: "Đức Khải", avatar: "./temp/user_4.png" },
-	{ firstName: "Đạt", displayName: "Tấn Đạt", avatar: "./temp/user_5.png" },
-	{ firstName: "Cang", displayName: "Tấn Cang", avatar: "./temp/user_6.png" },
-	{
-		firstName: "Nguyễn",
-		displayName: "Minh Nguyễn",
-		avatar: "./temp/user_7.jpg",
-	},
-	{ firstName: "Tiến", displayName: "Tiến Mụp", avatar: "./temp/user_8.jpg" },
-	// { firstName: "Hồng", displayName: "Hồng Hài Nhi", avatar: "./temp/user_9.jpg" },
-];
-
-const listTabs = [
-	{
-		label: "Bài đăng",
-		icon: <PostProfileTabIcon />,
-	},
-	{
-		label: "Hình ảnh",
-		icon: <PictureProfileTabIcon />,
-	},
-	{
-		label: "Video",
-		icon: <VideoProfileTabIcon />,
-	},
-	{
-		label: "Người theo dõi",
-		icon: <FollowerProfileTabIcon />,
-	},
-	{
-		label: "Đã tương tác",
-		icon: <ReactedProfileTabIcon />,
-	},
-];
 export default function Profile() {
 	const location = useLocation();
-
 	const queryParams = new URLSearchParams(location.search);
-
-	const user = ownerAccountStore((state) => state.user);
-
+	const { user, setUser } = ownerAccountStore();
 	const [accountInfo, setAccountInfo] = useState({});
-
 	const maxPreviewFriendsAvatar = useRef(7);
 
-	const containerTabsRef = useRef(null);
+	// handle change banner, avatar
+	const { showPopup, hidePopup } = usePopupStore();
 
-	const wrapperTabsRef = useRef(null);
-
-	const [currentTab, setCurrentTab] = useState(null);
-
-	const setPosts = useProfilePostsStore((state) => state.setPosts);
-
-	const showPosts = async () => {
-		const resp = await getPosts(user.userId);
-		setPosts(resp?.statusCode === 200 ? resp.data : null);
+	const handleSelectBanner = (e) => {
+		const el = e.target;
+		const file = el.files[0];
+		if (file) {
+			const previewURL = URL.createObjectURL(file);
+			console.log("have file");
+			showPopup(
+				"Cập nhật ảnh bìa",
+				<ModalCropImage
+					image={previewURL}
+					ratio={3 / 1}
+					acceptCropCallback={(imageCroped) => {
+						setUser({ banner: imageCroped });
+						hidePopup();
+					}}
+				/>
+			);
+		}
 	};
 
+	const handleSelectAvatar = (e) => {
+		const el = e.target;
+		const file = el.files[0];
+		if (file) {
+			const previewURL = URL.createObjectURL(file);
+			console.log("have file");
+			showPopup(
+				"Cập nhật ảnh đại diện",
+				<ModalCropImage
+					image={previewURL}
+					ratio={1 / 1}
+					acceptCropCallback={(imageCroped) => {
+						setUser({ avatar: imageCroped });
+						hidePopup();
+					}}
+				/>
+			);
+		}
+	};
+
+	// handle click follow, hủy follow
+	const handleRequestFollow = () => {
+		requestFollow(queryParams.get("id"));
+		setAccountInfo({ ...accountInfo, relationship: true });
+	};
+
+	const handleUnfollow = () => {
+		unfollow(queryParams.get("id"));
+		setAccountInfo({ ...accountInfo, relationship: false });
+	};
+
+	// handle các tab
+	const containerTabsRef = useRef(null);
+	const wrapperTabsRef = useRef(null);
+	const [currentTab, setCurrentTab] = useState(null);
+
+	// handle post user
+	const {
+		posts: postsUser,
+		setPosts: setPostsUser,
+		appendPosts: appendPostsUser,
+		smartObserver: smartObserverPostsUser,
+		disconnectObserver: disconnectObserverPostsUser,
+	} = useProfilePostsStore();
+	const [isEndUserPosts, setIsEndUserPosts] = useState(false);
+
+	const showPosts = () => {
+		fetchPostsUser();
+	};
+
+	const fetchPostsUser = async () => {
+		const resp = await getPosts(user.userId);
+		if (!resp || resp.statusCode !== 200) return;
+		if (!postsUser) {
+			setPostsUser(resp.data);
+		} else {
+			if (postsUser.length !== 0 && resp.data.length === 0) {
+				setIsEndUserPosts(true);
+				return;
+			}
+			appendPostsUser(resp.data);
+		}
+	};
+	// handle tab hình ảnh
 	const showPictures = async () => {};
-
+	// handle tab video
 	const showVideos = async () => {};
-
+	// handle tab những ai đang theo dõi user
 	const [followers, setFollowers] = useState(null);
 
 	const showFollowers = async () => {
@@ -104,8 +137,12 @@ export default function Profile() {
 		if (!resp || resp.statusCode !== 200) return;
 		setFollowers(resp.data);
 	};
+	// handle tab bài viết user đã tương tác
+	const showPostsReacted = async () => {
+		fetchPostsReacted();
+	};
 
-	const showPostsReacted = async () => {};
+	const fetchPostsReacted = () => {};
 
 	useEffect(() => {
 		switch (currentTab) {
@@ -143,7 +180,7 @@ export default function Profile() {
 	const [touched, setTouched] = useState(false);
 	const startDragPos = useRef(0);
 	const scrollLeftStart = useRef(0);
-	const speedFactor = 2; // Tăng tốc cuộn lên 1.8 lần
+	const speedFactor = 2; // Tăng tốc cuộn lên 2 lần
 
 	const ignoreIntersec = useRef(false);
 
@@ -156,12 +193,10 @@ export default function Profile() {
 
 	const onDrag = (e) => {
 		if (!touched || !containerTabsRef.current) return;
-
-		e.preventDefault(); // Ngăn chặn hành vi cuộn mặc định của trình duyệt
-
+		// Ngăn chặn hành vi cuộn mặc định của trình duyệt
+		e.preventDefault();
 		const clientX = e.touches?.[0]?.clientX || e.clientX;
 		const diff = clientX - startDragPos.current;
-
 		// Tăng tốc độ cuộn bằng cách nhân với speedFactor
 		containerTabsRef.current.scrollLeft =
 			scrollLeftStart.current - diff * speedFactor;
@@ -170,6 +205,9 @@ export default function Profile() {
 	const onEnd = () => {
 		setTouched(false);
 	};
+
+	const isOwner =
+		!queryParams.get("id") || queryParams.get("id") === user.userId;
 
 	const handleGetProfile = async () => {
 		const resp = await getProfile(queryParams.get("id"));
@@ -182,14 +220,15 @@ export default function Profile() {
 		if (!user?.userId) return;
 		setCurrentTab(0);
 
-		if (queryParams.get("id") === user.userId) {
+		if (isOwner) {
 			setAccountInfo(user);
 		} else {
 			handleGetProfile();
 		}
-	}, [user?.userId, queryParams.get("id")]);
+	}, [user, queryParams.get("id")]);
 
 	useEffect(() => {
+		if (!wrapperTabsRef.current) return;
 		const interCallback = (entries) => {
 			entries.forEach((entry) => {
 				if (entry.isIntersecting && !ignoreIntersec.current) {
@@ -210,29 +249,27 @@ export default function Profile() {
 			observer.observe(element)
 		);
 		return () => observer.disconnect();
-	}, [currentTab]);
+	}, [currentTab, wrapperTabsRef.current]);
 
-	const isOwner = user.userId === queryParams.get("id");
+	// Infinite scroll fetch posts
+	const containerUserPostsRef = useRef();
 
-	const handleUpdateUserInfo = () => {};
-
-	const handleRequestFollow = () => {
-		requestFollow(queryParams.get("id"));
-		console.log("current account is: ", accountInfo);
-		setAccountInfo({ ...accountInfo, relationship: true });
-	};
-
-	const handleUnfollow = () => {
-		unfollow(queryParams.get("id"));
-		console.log("current account is: ", accountInfo);
-		setAccountInfo({ ...accountInfo, relationship: false });
-	};
+	useEffect(() => {
+		const target = Array.from(containerUserPostsRef.current.childNodes).at(-3);
+		if (target) smartObserverPostsUser(target, fetchPostsUser);
+		return () => disconnectObserverPostsUser();
+	}, [postsUser]);
 
 	return (
 		<div className="flex-grow bg-background transition overflow-auto scrollable-div">
 			<div className="lg:max-w-[630px] mx-auto">
 				{/* banner */}
-				<div className="relative sm:mt-5 mt-2 aspect-[3/1] overflow-hidden lg:rounded-lg border">
+				<div
+					className={cn(
+						"relative sm:mt-5 mt-2 aspect-[3/1] overflow-hidden lg:rounded-lg border",
+						!accountInfo.banner && "border-field"
+					)}
+				>
 					{accountInfo.banner ? (
 						<img
 							src={accountInfo.banner}
@@ -247,19 +284,25 @@ export default function Profile() {
 						)
 					)}
 					{isOwner && (
-						<Button
-							className="btn-secondary !w-fit absolute bottom-2 right-2 py-1 ps-2.5 pe-4 border"
-							onClick={handleUpdateUserInfo}
-						>
+						<label className="btn-secondary w-fit absolute bottom-2 right-2 py-1 ps-2.5 pe-4 border cursor-pointer">
 							<PencilChangeImageIcon />
 							Đổi ảnh bìa
-						</Button>
+							<input
+								type="file"
+								hidden
+								onChange={handleSelectBanner}
+								onClick={(e) => {
+									e.target.value = "";
+								}}
+							/>
+						</label>
 					)}
 				</div>
+
 				<div className="sm:-mt-6 -mt-4 mx-auto lg:max-w-[630px] ">
 					{/* profile detail */}
 					<div className="flex sm:flex-row sm:items-start flex-col items-center gap-4 sm:px-3 px-1">
-						<div className="relative bg-background border-4 rounded-full p-1 w-fit transition">
+						<div className="relative bg-background border-4 rounded-full p-1 mt-3 w-fit transition">
 							<Avatar className={`size-[120px]`}>
 								<AvatarImage src={accountInfo.avatar} />
 								<AvatarFallback className="text-[40px] transition">
@@ -269,34 +312,42 @@ export default function Profile() {
 									)}
 								</AvatarFallback>
 							</Avatar>
+
 							{isOwner && (
-								<Button
-									className="btn-secondary !w-fit absolute bottom-0 right-0 p-1 !rounded-full shadow border"
-									onClick={handleUpdateUserInfo}
-								>
+								<label className="btn-secondary w-fit absolute bottom-0 right-0 p-1 rounded-full shadow border cursor-pointer">
+									<input
+										type="file"
+										hidden
+										onChange={handleSelectAvatar}
+										onClick={(e) => {
+											e.target.value = "";
+										}}
+									/>
 									<PencilChangeImageIcon />
-								</Button>
+								</label>
 							)}
 						</div>
 
-						<div className="sm:self-end sm:block flex flex-col items-center flex-grow sm:mb-2">
-							<h3>
+						<div className="flex-grow sm:self-center sm:block sm:px-0 sm:pt-5 px-4  flex flex-col items-center">
+							<h3 className="line-clamp-2">
 								{combineIntoDisplayName(
 									accountInfo.firstName,
 									accountInfo.lastName
 								)}
 							</h3>
-							<p>12 người theo dõi</p>
+
+							<p>{accountInfo.followers?.length} người theo dõi</p>
+
 							<div className="mt-1 flex -space-x-2">
-								{listFriends
-									.slice(0, maxPreviewFriendsAvatar.current)
+								{accountInfo.followers
+									?.slice(0, maxPreviewFriendsAvatar.current)
 									.map((friend, index) => (
 										<div key={index} className="relative">
 											<Avatar
 												className={`size-7 ring-[2px] ring-background transition`}
 											>
 												<AvatarImage src={friend.avatar} />
-												<AvatarFallback>
+												<AvatarFallback className="text-[11px] font-medium">
 													{combineIntoAvatarName(
 														friend.firstName,
 														friend.lastName
@@ -304,11 +355,15 @@ export default function Profile() {
 												</AvatarFallback>
 											</Avatar>
 											{index + 1 ===
-												(listFriends.length > maxPreviewFriendsAvatar.current
-													? maxPreviewFriendsAvatar.current
-													: listFriends.length) && (
-												<button className="absolute top-0 size-full bg-black/50 grid place-content-center rounded-full hover:bg-black/60">
-													<Glyph color="fill-txtWhite" />
+												Math.min(
+													maxPreviewFriendsAvatar.current,
+													accountInfo.followers.length
+												) && (
+												<button
+													className="absolute top-0 size-full bg-black/50 grid place-content-center rounded-full hover:bg-black/60"
+													onClick={() => clickChangeTab(3)}
+												>
+													<Ellipsis className="size-4 text-txtWhite" />
 												</button>
 											)}
 										</div>
@@ -317,10 +372,27 @@ export default function Profile() {
 						</div>
 
 						<div className="self-center flex gap-4 ">
-							<Button className="btn-secondary px-3 h-10">
-								<Glyph />
-							</Button>
-							{!isOwner && !accountInfo.relationship && (
+							{/* profile options */}
+							<Popover>
+								<PopoverTrigger className="btn-secondary aspect-square h-10 border">
+									<Ellipsis className="size-5" />
+								</PopoverTrigger>
+								<PopoverContent className="bg-background p-1.5 w-64">
+									{userProfileOptions[isOwner ? "OWNER" : "OTHER"].map(
+										(item, index) => (
+											<Button
+												key={index}
+												to={item.to}
+												className="btn-transparent gap-2 justify-start px-3 py-2.5"
+											>
+												{item.icon} {item.content}
+											</Button>
+										)
+									)}
+								</PopoverContent>
+							</Popover>
+							{/* follow, unfollow */}
+							{!isOwner && accountInfo.relationship === false && (
 								<Button
 									className="btn-primary px-8 text-nowrap h-10"
 									onClick={handleRequestFollow}
@@ -328,9 +400,10 @@ export default function Profile() {
 									Theo dõi
 								</Button>
 							)}
-							{!isOwner && accountInfo.relationship && (
+
+							{!isOwner && accountInfo.relationship === true && (
 								<Button
-									className="btn-secondary px-8 text-nowrap h-10"
+									className="btn-secondary px-5 text-nowrap h-10"
 									onClick={handleUnfollow}
 								>
 									Đang theo dõi
@@ -355,7 +428,7 @@ export default function Profile() {
 									}`}
 									onClick={() => clickChangeTab(index)}
 								>
-									{tab.icon}{" "}
+									{tab.icon}
 									<span className="sm:inline hidden"> {tab.label}</span>
 								</button>
 							))}
@@ -371,18 +444,27 @@ export default function Profile() {
 						>
 							<div
 								ref={wrapperTabsRef}
-								className={`grid h-full gap-[1px] ${
+								className={cn(
+									"grid h-full gap-[1px]",
 									isOwner
 										? "grid-cols-[repeat(5,100%)]"
 										: "grid-cols-[repeat(4,100%)]"
-								}`}
+								)}
 							>
 								{/* owner posts */}
-								<div className="pt-0.5 snap-start mx-auto md:space-y-4 space-y-1.5 md:pb-0 overflow-y-auto w-full max-h-full scrollable-div">
+								<div
+									ref={containerUserPostsRef}
+									className="pt-0.5 snap-start mx-auto md:space-y-4 space-y-1.5 md:pb-0 overflow-y-auto w-full max-h-full scrollable-div"
+								>
 									<RenderPosts
 										className="sm:rounded shadow-y border-x"
 										store={useProfilePostsStore}
 									/>
+									{isEndUserPosts && (
+										<p className="pb-4 text-center text-gray">
+											{messageReadAllPosts}
+										</p>
+									)}
 								</div>
 								{/* owner pictures */}
 								<div className="snap-start grid grid-cols-3 gap-[1px] h-fit overflow-y-auto w-full max-h-full scrollable-div">

@@ -9,5 +9,5 @@ export const login = (data) =>
 		})
 		.catch((error) => {
 			console.error("Error at login: ", error);
-			return error.response?.data || {};
+			return error.response?.data || null;
 		});

@@ -1,24 +1,29 @@
-import { ComplaintIcon, PolicySettingIcon, StatisticalIcon, UserManagementIcon } from "@/components/Icon";
+import {
+	BookMarked,
+	ChartNoAxesCombined,
+	MessageSquareWarning,
+	UserRoundPen,
+} from "lucide-react";
 
 export const adminNavRout = [
 	{
 		name: "Khiếu nại",
 		to: "/admin/complaint",
-		icon: <ComplaintIcon className="size-6" />,
+		icon: <MessageSquareWarning strokeWidth={1.6} />,
 	},
 	{
 		name: "Quản lý người dùng",
 		to: "/admin/user-management",
-		icon: <UserManagementIcon />,
+		icon: <UserRoundPen strokeWidth={1.6} />,
 	},
 	{
 		name: "Thống kê",
 		to: "/admin/reports",
-		icon: <StatisticalIcon />,
+		icon: <ChartNoAxesCombined strokeWidth={1.6} />,
 	},
 	{
 		name: "Cài đặt chính sách",
 		to: "/admin/policy-setting",
-		icon: <PolicySettingIcon />,
+		icon: <BookMarked strokeWidth={1.6} />,
 	},
 ];

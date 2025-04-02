@@ -1,8 +1,7 @@
-import React, { useEffect, useState } from "react";
-import { CheckIcon, LogoFSAdmin, LogoutIcon, MoonIcon, SunIcon } from "./Icon";
-import { adminNavRout } from "@/config/adminNavRout";
+import React, { useState } from "react";
+import { LogoFSAdmin, LogoutIcon } from "./Icon";
+import { adminNavRout } from "@/config/adminNavRoute";
 import Button from "./Button";
-import { ownerAccountStore } from "@/store/ownerAccountStore";
 import { useLocation } from "react-router-dom";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
@@ -12,13 +11,18 @@ import {
 } from "@/components/ui/popover";
 import { themeStore } from "@/store/themeStore";
 import styles from "./Nav.module.scss";
-import { combineIntoAvatarName } from "@/utils/combineName";
+import {
+	combineIntoAvatarName,
+	combineIntoDisplayName,
+} from "@/utils/combineName";
+import { adminStore } from "@/store/adminStore";
+import { Check, Moon, SunMedium } from "lucide-react";
 
 export default function AdminNav() {
 	const location = useLocation();
 	const path = location.pathname;
 	const navRoute = adminNavRout;
-	const user = ownerAccountStore((state) => state.user);
+	const { user } = adminStore();
 	const { theme, setTheme } = themeStore();
 	const handleSetMode = (modePicked) => {
 		setTheme(modePicked);
@@ -45,7 +49,7 @@ export default function AdminNav() {
 				))}
 				<Button
 					to="/admin/profile"
-					className={`btn-transparent justify-start p-3 py-3.5
+					className={`btn-transparent justify-start p-3 py-3.5 gap-3
                         ${path === "/profile" && "bg-gray-3light font-medium"}
                         hover:bg-gray-3light`}
 				>
@@ -55,6 +59,7 @@ export default function AdminNav() {
 							{combineIntoAvatarName(user.firstName, user.lastName)}
 						</AvatarFallback>
 					</Avatar>
+					<span>{combineIntoDisplayName(user.firstName, user.lastName)}</span>
 				</Button>
 			</div>
 			<div>
@@ -64,7 +69,7 @@ export default function AdminNav() {
 							switchThemeOpen && "bg-gray-3light"
 						}`}
 					>
-						{theme === "light" ? <SunIcon /> : <MoonIcon />}
+						{theme === "light" ? <SunMedium /> : <Moon />}
 						<span>Chế độ hiển thị</span>
 						<svg
 							className={`ms-auto me-1 sm:group-hover:opacity-100 ${
@@ -82,7 +87,7 @@ export default function AdminNav() {
 
 					<PopoverContent
 						side={"right"}
-						align="start"
+						align="end"
 						sideOffset={20}
 						className="bg-background p-2 sm:w-44 space-y-2 transition"
 					>
@@ -92,10 +97,10 @@ export default function AdminNav() {
 							}`}
 							onClick={() => handleSetMode("light")}
 						>
-							<SunIcon />
+							<SunMedium />
 							<span>Sáng</span>
-							<CheckIcon
-								className={`ms-auto ${theme != "light" && "hidden"}`}
+							<Check
+								className={`ms-auto size-5 ${theme != "light" && "hidden"}`}
 							/>
 						</button>
 
@@ -105,9 +110,11 @@ export default function AdminNav() {
 							}`}
 							onClick={() => handleSetMode("dark")}
 						>
-							<MoonIcon />
+							<Moon />
 							<span>Tối</span>
-							<CheckIcon className={`ms-auto ${theme != "dark" && "hidden"}`} />
+							<Check
+								className={`ms-auto size-5 ${theme != "dark" && "hidden"}`}
+							/>
 						</button>
 					</PopoverContent>
 				</Popover>

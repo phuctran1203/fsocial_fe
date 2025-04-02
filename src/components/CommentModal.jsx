@@ -1,12 +1,17 @@
 import React, { useEffect, useRef, useState } from "react";
-import { LoadingIcon, SendIcon, XMarkIcon } from "./Icon";
+import { LoadingIcon, XMarkIcon } from "./Icon";
 import Post from "./Post";
-import { getComments, sendComment, replyComment } from "../api/commentsApi";
+import {
+	getComments,
+	sendComment,
+	replyComment,
+	getRepliesComment,
+} from "../api/commentsApi";
 
 import { ownerAccountStore } from "../store/ownerAccountStore";
 import { TextBox } from "./Field";
 import { dateTimeToNotiTime } from "../utils/convertDateTime";
-import { Link } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { getTextboxData } from "@/utils/processTextboxData";
@@ -15,15 +20,22 @@ import {
 	combineIntoDisplayName,
 } from "@/utils/combineName";
 import { HeartPostIcon } from "./Icon";
+import { usePopupStore } from "@/store/popupStore";
+import Button from "./Button";
+import { Send } from "lucide-react";
+import { getPost } from "@/api/postsApi";
 
 function RenderComment({ ...props }) {
 	const { comment, selectCommentToReply, handleShowReplyComment, replies } =
 		props;
 	// if (comment.reply != undefined) {
-	// 	console.log("all props is: ", props);
-	// 	console.log("comment is: ", comment);
-	// 	console.log("replies is: ", replies);
+	// console.log("all props is: ", props);
+	// console.log("comment is: ", comment);
+	// console.log("replies is: ", replies);
 	// }
+	const navigate = useNavigate();
+
+	const hidePopup = usePopupStore((state) => state.hidePopup);
 
 	const [like, setLike] = useState(false);
 
@@ -34,33 +46,40 @@ function RenderComment({ ...props }) {
 		setCountLikes(like ? countLikes - 1 : countLikes + 1);
 	};
 
+	const handleDirectToProfile = () => {
+		hidePopup();
+		navigate(`/profile?id=${comment.userId}`);
+	};
+
 	return (
 		<div className="flex gap-3">
 			{/* avatar */}
-			<Link to="">
-				<Avatar className={`size-9`}>
-					<AvatarImage src={comment.avatar} />
-					<AvatarFallback className="text-[11px]">
-						{combineIntoAvatarName(comment.firstName, comment.lastName)}
-					</AvatarFallback>
-				</Avatar>
-			</Link>
+
+			<Avatar
+				className={`size-9 cursor-pointer`}
+				onClick={handleDirectToProfile}
+			>
+				<AvatarImage src={comment.avatar} />
+				<AvatarFallback className="text-[11px]">
+					{combineIntoAvatarName(comment.firstName, comment.lastName)}
+				</AvatarFallback>
+			</Avatar>
 
 			<div>
 				<div className="space-y-1">
 					{/* tên */}
-					<Link
-						to=""
+					<Button
+						onClick={handleDirectToProfile}
 						className="font-semibold text-gray fs-xs hover:underline hover:text-primary-text"
 					>
 						{combineIntoDisplayName(comment.firstName, comment.lastName)}
-					</Link>
+					</Button>
 					{/* nội dung cmt */}
 					<div dangerouslySetInnerHTML={{ __html: comment.content.htmltext }} />
 					{/* time, like, reply button */}
 					<div className="flex items-center gap-2 text-gray">
 						<span className="text-gray fs-sm">
-							{dateTimeToNotiTime(comment.createdAt).textTime}
+							{dateTimeToNotiTime(comment.createDatetime).textTime}
 						</span>
 
 						<button
@@ -93,15 +112,15 @@ function RenderComment({ ...props }) {
 						{!replies ? (
 							<button
 								className="fs-xs ps-2 font-semibold text-gray hover:underline"
-								onClick={() => handleShowReplyComment(comment.commentId)}
+								onClick={() => handleShowReplyComment(comment.id)}
 							>
-								{replies.reply.length} phản hồi
+								Xem phản hồi
 							</button>
 						) : (
-							replies.reply.map((reply, index) => (
+							replies.reply.map((cmtReply, index) => (
 								<RenderComment
 									key={index}
-									comment={reply}
+									comment={cmtReply}
 									selectCommentToReply={selectCommentToReply}
 								/>
 							))
@@ -115,21 +134,41 @@ function RenderComment({ ...props }) {
 
 export default function CommentModal({ id, store }) {
 	const user = ownerAccountStore((state) => state.user);
-
 	const textbox = useRef(null);
+	const { updatePost, findPost } = store();
 
-	const { posts, updatePost } = store();
+	// chuẩn bị data, trường hợp tìm trong 1 store mà chưa có post đó, tự call api lấy về
+	const [post, setPost] = useState(null);
 
-	const post = posts?.find((p) => p.id == id);
+	const handleGetPost = async () => {
+		const found = findPost(id);
+		if (found) {
+			setPost(found);
+			getComment(id);
+			return;
+		}
+		const resp = await getPost(user.userId, id);
+		if (!resp || resp.statusCode !== 200) return;
+		setPost(resp.data);
+		getComment(id);
+	};
 
 	const [comments, setComments] = useState([]);
 
+	const getComment = async (id) => {
+		const respGetComment = await getComments(id);
+		if (!respGetComment || respGetComment.statusCode !== 207) return;
+		setComments(respGetComment.data.reverse());
+	};
+
+	useEffect(() => {
+		handleGetPost();
+	}, []);
+
+	// Handle gửi comment
 	const [submitCmtClicked, setSubmitCmtClicked] = useState(false);
-
 	const [selectReply, setSelectReply] = useState({});
-
 	const [commentsReply, setCommentsReply] = useState([]);
-
 	const [trigger, setTrigger] = useState(false); // trigger tự động focus texbox sau khi đã gửi comment
 
 	const selectCommentToReply = (selectedComment) => {
@@ -175,7 +214,7 @@ export default function CommentModal({ id, store }) {
 		let respSendCmt = null;
 		if (selectReply.id) {
 			//id là id của comment được chọn để phản hồi
-			formData.append("commentId", selectReply.id);
+			formData.append("commentId", selectReply.commentId || selectReply.id);
 			respSendCmt = await replyComment(formData);
 		} else {
 			formData.append("postId", id);
@@ -249,7 +288,23 @@ export default function CommentModal({ id, store }) {
 		setSubmitCmtClicked(false);
 	};
 
-	const handleShowReplyComment = (commentId) => {};
+	// Hiển thị các reply comment
+	const handleShowReplyComment = async (commentId) => {
+		const resp = await getRepliesComment(commentId);
+		if (!resp || resp.statusCode !== 200) {
+			toast.error("Lấy phản hồi bình luận thất bại");
+			return;
+		}
+		const repliesCmt = {
+			id: commentId,
+			reply: resp.data,
+		};
+		// mặc định chưa show replies của cmt này -> cmt này chưa có trong list replies
+		const newReplies = [...commentsReply, repliesCmt];
+		console.log("newReplies after resp get Replies is: ", newReplies);
+
+		setCommentsReply(newReplies);
+	};
 
 	const textBoxOnKeyDown = (e) => {
 		if (window.innerWidth <= 640) return;
@@ -258,38 +313,31 @@ export default function CommentModal({ id, store }) {
 		}
 	};
 
-	const getComment = async () => {
-		const respGetComment = await getComments(post.id);
-		if (!respGetComment || respGetComment.statusCode !== 207) return;
-		setComments(respGetComment.data);
-	};
-
-	useEffect(() => {
-		getComment();
-	}, []);
-
 	return (
-		<div className="relative flex-grow flex flex-col sm:w-[560px] w-screen sm:h-[90dvh] h-[100dvh]">
+		<div className="relative pt-10 flex flex-col sm:w-[540px] w-screen sm:h-[95dvh] h-[100dvh]">
 			<div className="overflow-y-auto scrollable-div flex-grow flex flex-col">
-				<Post
-					post={post}
-					isChildren={true}
-					className="border-b "
-					store={store}
-				/>
+				{post && (
+					<Post
+						post={post}
+						setPost={setPost} //post update lên store và lên cả CommentModal này
+						isChildren={true}
+						className="border-b"
+						store={store}
+						allowCarousel={true}
+					/>
+				)}
 
 				<div className="space-y-3 pt-3 pb-14 px-5 flex-grow">
-					{comments.length > 0 ? (
-						comments.map((comment, index) => (
-							<RenderComment
-								key={index}
-								comment={comment}
-								selectCommentToReply={selectCommentToReply}
-								handleShowReplyComment={handleShowReplyComment}
-								replies={commentsReply.find((item) => item.id === comment.id)}
-							/>
-						))
-					) : (
+					{comments.map((comment, index) => (
+						<RenderComment
+							key={index}
+							comment={comment}
+							selectCommentToReply={selectCommentToReply}
+							handleShowReplyComment={handleShowReplyComment}
+							replies={commentsReply.find((item) => item.id === comment.id)}
+						/>
+					))}
+					{comments.length === 0 && (
 						<p>Hãy là người đầu tiên bình luận bài viết này</p>
 					)}
 				</div>
@@ -332,11 +380,11 @@ export default function CommentModal({ id, store }) {
 						trigger={trigger}
 					/>
 
-					<button className="py-2" onClick={handleSendComment}>
+					<button className="py-2 px-1" onClick={handleSendComment}>
 						{submitCmtClicked ? (
 							<LoadingIcon stroke="stroke-gray-light" />
 						) : (
-							<SendIcon />
+							<Send className="size-5" />
 						)}
 					</button>
 				</div>

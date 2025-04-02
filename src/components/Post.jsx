@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import { ComplaintIcon, Glyph, TrashCanIcon, PencilIcon } from "./Icon";
+import { TrashCanIcon } from "./Icon";
 import { usePopupStore } from "../store/popupStore";
 import { dateTimeToPostTime } from "../utils/convertDateTime";
 import {
@@ -26,18 +26,23 @@ import { HeartPostIcon } from "./Icon";
 import { CommentPostIcon } from "./Icon";
 import { RepostPostIcon } from "./Icon";
 import { SharePostIcon } from "./Icon";
+import { cn } from "@/lib/utils";
+import { Ellipsis, MessageSquareWarning, Pen } from "lucide-react";
+import { processMedias } from "@/utils/processMedia";
 
 export default function Post({
 	post,
+	setPost,
 	isChildren,
 	showReact = true,
 	className = "",
 	store,
+	isShared = false,
+	allowCarousel = false,
+	blockEvent,
 }) {
 	const { showPopup } = usePopupStore();
-
 	const [popoverOpen, setPopoverOpen] = useState(false);
-
 	const user = ownerAccountStore.getState().user;
 
 	const showCommentPopup = () => {
@@ -48,7 +53,10 @@ export default function Post({
 	};
 
 	const showRepostPopup = () => {
-		showPopup(null, <ModalRepost id={post.id} store={store} />);
+		showPopup(
+			"Đăng lại bài viết",
+			<ModalRepost id={post.originPostId || post.id} store={store} />
+		);
 	};
 
 	const handlePopupReport = () => {
@@ -70,27 +78,39 @@ export default function Post({
 	};
 
 	const likes = post.countLikes;
-
 	const liked = post.like;
-
-	const updatePost = store((state) => state.updatePost);
+	const updatePost = store ? store((state) => state.updatePost) : () => {};
 
 	const handleLike = async () => {
+		// set in UI comment modal
+		if (setPost)
+			setPost((prev) => ({
+				...prev,
+				like: !liked,
+				countLikes: liked ? likes - 1 : likes + 1,
+			}));
+		// update in store
 		updatePost(post.id, {
 			like: !liked,
 			countLikes: liked ? likes - 1 : likes + 1,
 		});
+		// call api
 		likePost(post.id);
 	};
 
 	return (
 		<div className={`${className} transition`}>
-			<div className="flex items-center justify-between px-4 pt-4 pb-3">
+			<div
+				className={cn(
+					"flex items-center justify-between px-4 pt-4 pb-1",
+					isShared && "px-6"
+				)}
+			>
 				<div className="flex space-x-2">
 					<Link to={`/profile?id=${post.userId}`}>
-						<Avatar className={`size-9`}>
+						<Avatar className={cn("size-9", isShared && "size-8")}>
 							<AvatarImage src={post.avatar} />
-							<AvatarFallback className="text-[11px] transition">
+							<AvatarFallback className="text-[11px] font-medium transition">
 								{combineIntoAvatarName(post.firstName, post.lastName)}
 							</AvatarFallback>
 						</Avatar>
@@ -106,11 +126,11 @@ export default function Post({
 				</div>
 				<Popover open={popoverOpen} onOpenChange={setPopoverOpen}>
 					<PopoverTrigger
-						className={`btn-transparent w-fit px-2 py-3.5 ${
+						className={`btn-transparent w-fit px-2 py-2 ${
 							isChildren && "hidden"
 						}`}
 					>
-						<Glyph />
+						<Ellipsis className="size-5" />
 					</PopoverTrigger>
 					<PopoverContent
 						side="left"
@@ -123,7 +143,7 @@ export default function Post({
 								className="btn-transparent justify-start py-2 ps-3 text-nowrap gap-3"
 								onClick={handlePopupReport}
 							>
-								<ComplaintIcon /> Báo cáo
+								<MessageSquareWarning /> Báo cáo
 							</Button>
 						)}
 						{post.userId === user.userId && (
@@ -131,7 +151,7 @@ export default function Post({
 								className="btn-transparent justify-start text-nowrap py-2 ps-3 gap-3"
 								onClick={handlePopupEdit}
 							>
-								<PencilIcon /> Chỉnh sửa
+								<Pen className="size-5" strokeWidth={1.6} /> Chỉnh sửa
 							</Button>
 						)}
 						{post.userId === user.userId && (
@@ -149,13 +169,20 @@ export default function Post({
 			<div>
 				{/* post content */}
 				<div
-					className="px-4 mb-2"
-					dangerouslySetInnerHTML={{ __html: post.content.htmltext }}
+					className={cn("px-5 mb-1.5", isShared && "px-7")}
+					dangerouslySetInnerHTML={{ __html: post.content?.htmltext }}
 				/>
-				{/* assets post */}
-				{post.content.media.length > 0 && (
-					<GenerateMediaLayout medias={post.content.media} />
-				)}
+				{/* post medias */}
+				<GenerateMediaLayout
+					medias={processMedias(post)}
+					allowCarousel={allowCarousel}
+					// không mở comment popup nếu là bài repost khi "click vào media"
+					mediaCallback={() => {
+						if (!post.originPostId) showCommentPopup();
+					}}
+					store={store}
+					blockEvent={blockEvent}
+				/>
 			</div>
 
 			{showReact && (

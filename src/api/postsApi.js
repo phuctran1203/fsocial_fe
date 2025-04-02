@@ -17,6 +17,22 @@ export const getPosts = async (userId, controller) => {
 	}
 };
 
+export const getPost = async (userId, postId, controller) => {
+	try {
+		const resp = await API.get(
+			`/timeline/post/getpost_id?user_id=${userId}&post_id=${postId}`,
+			controller && { signal: controller.signal }
+		);
+		const data = resp.data;
+		console.log("Resp getPost: ", data);
+		return data;
+	} catch (error) {
+		if (error.name === "CanceledError") return null;
+		console.error("Error at getPost:", error);
+		return null;
+	}
+};
+
 export const likePost = async (postId) => {
 	const user = ownerAccountStore.getState().user;
 	const dataObj = {
@@ -69,6 +85,18 @@ export const deletePost = (id) =>
 		})
 		.catch((error) => {
 			console.error("Error at deletePost:", error);
+			return error.response?.data || null;
+		});
+
+export const repostPost = (data) =>
+	API.post(`/post/actions/share`, data)
+		.then((resp) => {
+			const data = resp.data;
+			console.log("Resp repostPost: ", data);
+			return data;
+		})
+		.catch((error) => {
+			console.error("Error at repostPost:", error);
 			return error.response?.data || null;
 		});
 

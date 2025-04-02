@@ -2,12 +2,12 @@ import { create } from "zustand";
 
 export const ownerAccountStore = create((set) => ({
 	user: {
-		id: "",
-		userId: "",
-		firstName: "",
-		lastName: "",
-		avatar: "",
-		banner: "./temp/banner.png",
+		// id: "",
+		// userId: "",
+		// firstName: "",
+		// lastName: "",
+		// avatar: "",
+		// banner: "./temp/banner.png",
 	},
 
 	setUser: (props) =>
@@ -17,4 +17,6 @@ export const ownerAccountStore = create((set) => ({
 				...props,
 			},
 		})),
+
+	cleanOwnerAccountStore: () => set({ user: {} }),
 }));

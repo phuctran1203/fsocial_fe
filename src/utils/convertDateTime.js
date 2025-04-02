@@ -62,7 +62,7 @@ export function dateTimeToPostTime(time) {
 	const yesterday = new Date();
 	yesterday.setDate(yesterday.getDate() - 1);
 	if (previousTime.toDateString() === yesterday.toDateString()) {
-		return `${previousTime.getHours()}:${addPadStart(
+		return `${addPadStart(previousTime.getHours())}:${addPadStart(
 			previousTime.getMinutes()
 		)} hôm qua`;
 	}
@@ -132,4 +132,15 @@ export function dateTimeToMessageTime(time) {
 		${addPadStart(previousTime.getDate())}/${addPadStart(
 		previousTime.getMonth() + 1
 	)}/${previousTime.getFullYear()}`;
+}
+
+export function dateClassToISO8601(date) {
+	return `${date.getFullYear()}-${addPadStart(
+		date.getMonth() + 1
+	)}-${addPadStart(date.getDate())}`;
+}
+
+export function dateTimeToReportsLabel(dateTime) {
+	const time = new Date(dateTime);
+	return `${addPadStart(time.getMonth() + 1)}/${addPadStart(time.getDate())}`;
 }

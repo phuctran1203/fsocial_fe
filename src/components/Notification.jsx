@@ -1,11 +1,9 @@
 import React, { useEffect, useState } from "react";
-import { Link, useLocation } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import {
-	Check,
 	Bell,
 	CloseCollapseIcon,
 	CommentNotiIcon,
-	Glyph,
 	HeartNotiIcon,
 	TrashCanIcon,
 	XMarkIcon,
@@ -16,26 +14,34 @@ import {
 	popupExpandNoti3DotStore,
 } from "../store/popupStore";
 import Button from "./Button";
-import { getNotification } from "@/api/notificationApi";
+import { getNotification, markReadNotification } from "@/api/notificationApi";
 import { ownerAccountStore } from "@/store/ownerAccountStore";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { combineIntoAvatarName } from "@/utils/combineName";
+import {
+	combineIntoAvatarName,
+	combineIntoDisplayName,
+} from "@/utils/combineName";
 import { Skeleton } from "./ui/skeleton";
+import useNotificationsStore from "@/store/notificationStore";
+import { regexInMessage, regexInSetting } from "@/config/regex";
+import { CheckCheck, EllipsisVertical, PawPrint, Rss } from "lucide-react";
+import { messageDontHaveNotification } from "@/config/globalVariables";
 
-const Noti = ({
-	id,
-	type,
-	name,
-	firstName,
-	lastName,
-	read,
-	textTime,
-	avatar,
-	setNotification,
-}) => {
+const Noti = (props) => {
+	const { id, postId, type, firstName, lastName, read, textTime, avatar } =
+		props;
+	const navigate = useNavigate();
+
 	const { idNotiShowing, setIdNotiShowing } = popupExpandNoti3DotStore();
 
 	const setVisible = popupNotificationtStore((state) => state.setIsVisible);
+
+	const {
+		deleteNotification,
+		updateNotification,
+		unreadCount,
+		setUnreadCount,
+	} = useNotificationsStore();
 
 	const open = () => {
 		setIdNotiShowing(id);
@@ -47,51 +53,44 @@ const Noti = ({
 
 	const deleteNoti = () => {
 		//call delete
-		setNotification((prev) => prev.filter((noti) => noti.id !== id));
+		deleteNotification(id);
 		close();
 	};
 
-	const markAsRead = () => {
+	const markAsRead = async () => {
 		//call mark this noti as read
-		setNotification((prev) =>
-			prev.map((noti) => (noti.id === id ? { ...noti, read: !read } : noti))
-		);
+		setUnreadCount(read ? unreadCount + 1 : unreadCount - 1);
+		updateNotification(id, { read: !read });
 		close();
+		markReadNotification(id);
 	};
 
 	const notiClicked = () => {
 		close();
+		if (!read) markAsRead();
 		setVisible(false);
+		navigate(`/post?id=${postId}`);
 	};
 
 	const notiMap = {
-		likePost: {
-			icon: <HeartNotiIcon />,
-			content: (
-				<>
-					<span className="fs-sm font-semibold">{name}</span>
-					<span>đã thả tim bài viết của bạn</span>
-				</>
-			),
+		LIKE: {
+			icon: <HeartNotiIcon className="size-5" />,
+			content: <span className="fs-sm">đã thả tim bài viết của bạn</span>,
 		},
-		likeComment: {
-			icon: <HeartNotiIcon />,
 
-			content: (
-				<>
-					<span className="fs-sm font-semibold">{name}</span>
-					<span>đã thả tim bình luận của bạn</span>
-				</>
-			),
+		likeComment: {
+			icon: <HeartNotiIcon className="size-5" />,
+			content: <span className="fs-sm">đã thả tim bình luận của bạn</span>,
 		},
+
 		COMMENT: {
-			icon: <CommentNotiIcon />,
-			content: (
-				<>
-					<span className="fs-sm font-semibold">{name}</span>
-					<span>đã bình luận về bài viết của bạn</span>
-				</>
-			),
+			icon: <CommentNotiIcon className="size-5" />,
+			content: <span className="fs-sm">đã bình luận về bài viết của bạn</span>,
+		},
+
+		FOLLOW: {
+			icon: <PawPrint className="fill-logo size-5 stroke-logo" />,
+			content: <span className="fs-sm">đã bắt đầu theo dõi bạn</span>,
 		},
 	};
 
@@ -103,7 +102,7 @@ const Noti = ({
 			transition`}
 		>
 			{/* direct đến thông báo */}
-			<Link to="" className="flex items-center gap-2" onClick={notiClicked}>
+			<button className="flex items-center gap-2" onClick={notiClicked}>
 				<div className={`relative ${read && "opacity-60"}`}>
 					<div className={`size-12 rounded-full overflow-hidden`}>
 						<Avatar className={`size-full`}>
@@ -114,13 +113,16 @@ const Noti = ({
 						</Avatar>
 					</div>
 					<div className="absolute size-fit -top-1 -left-0.5">
-						{notiMap[type].icon}
+						{notiMap[type]?.icon || "i"}
 					</div>
 				</div>
 
 				<div>
-					<p className={`fs-sm ${read && "opacity-60"}`}>
-						{notiMap[type].content}
+					<p className={`fs-sm text-left ${read && "opacity-60"}`}>
+						<span className="font-semibold me-1">
+							{combineIntoDisplayName(firstName, lastName)}
+						</span>
+						{notiMap[type]?.content || "i"}
 					</p>
 					<div className="flex items-center gap-2">
 						<span className={`fs-xs ${read && "opacity-60"} `}>{textTime}</span>
@@ -130,11 +132,9 @@ const Noti = ({
 						)}
 					</div>
 				</div>
-			</Link>
+			</button>
 			<button className="px-4" onClick={open}>
-				<div className="rotate-90">
-					<Glyph />
-				</div>
+				<EllipsisVertical className="size-5" />
 			</button>
 			<div
 				className={`flex absolute top-0 h-full left-full bg-secondary ${
@@ -153,7 +153,7 @@ const Noti = ({
 					onClick={markAsRead}
 					allowTab={idNotiShowing === id}
 				>
-					<Check />
+					<CheckCheck />
 				</Button>
 				<Button
 					className="btn-secondary !rounded-none px-3.5"
@@ -169,40 +169,44 @@ const Noti = ({
 
 export default function Notification() {
 	const location = useLocation();
-	const isInMessage = location.pathname === "/message";
+	const isNotificationSlide =
+		regexInMessage.test(location.pathname) ||
+		regexInSetting.test(location.pathname);
+
 	const user = ownerAccountStore((state) => state.user);
 
-	const [notification, setNotification] = useState(null);
+	const { notifications, setNotifications, unreadCount, setUnreadCount } =
+		useNotificationsStore();
 
-	const today = !notification
+	const today = !notifications
 		? []
-		: notification.filter((noti) => noti.labelType === 0);
+		: notifications.filter((noti) => noti.labelType === 0);
 
-	const last7days = !notification
+	const last7days = !notifications
 		? []
-		: notification.filter((noti) => noti.labelType === 1);
+		: notifications.filter((noti) => noti.labelType === 1);
 
-	const old = !notification
+	const old = !notifications
 		? []
-		: notification.filter((noti) => noti.labelType === 2);
+		: notifications.filter((noti) => noti.labelType === 2);
 
 	const { isVisible, setIsVisible } = popupNotificationtStore();
 
 	const handleGetNotification = async () => {
 		const resp = await getNotification(user.userId);
 		if (!resp || resp.statusCode !== 200) return;
-		const data = resp.data;
+		const data = resp.data.notifications;
+		setUnreadCount(resp.data.unreadCount);
 		const processData = data.map((noti) => {
 			const { textTime, labelType } = dateTimeToNotiTime(noti.createdAt);
 			return {
 				...noti,
 				textTime,
 				labelType,
-				setNotification,
 			};
 		});
 
-		setNotification(processData);
+		setNotifications(processData);
 	};
 
 	useEffect(() => {
@@ -215,7 +219,7 @@ export default function Notification() {
 			className={` 
 			z-0 bg-black h-screen overflow-hidden flex-shrink-0
 			lg:border-l-[1px] lg:block ${
-				!isInMessage
+				!isNotificationSlide
 					? `
 				lg:relative lg:left-auto lg:min-w-fit lg:max-w-fit lg:visible
 				md:left-[260px] md:w-[calc(100%-260px)]
@@ -234,7 +238,7 @@ export default function Notification() {
 			<div
 				className={`
 				h-full relative bg-background 
-				${!isInMessage ? "lg:translate-x-0 lg:drop-shadow-none" : ""}
+				${!isNotificationSlide ? "lg:translate-x-0 lg:drop-shadow-none" : ""}
 				lg:translate-y-0
 				md:w-[360px]
 				sm:w-[340px] sm:pb-0
@@ -248,7 +252,7 @@ export default function Notification() {
 			>
 				<CloseCollapseIcon
 					className={`absolute left-full top-1/2 -translate-x-[1px] -translate-y-1/2 cursor-pointer  ${
-						!isInMessage ? "lg:hidden" : ""
+						!isNotificationSlide ? "lg:hidden" : ""
 					} sm:block hidden
 						${isVisible ? "" : "-translate-x-full"}
 						will-change-transform`}
@@ -265,7 +269,7 @@ export default function Notification() {
 						<div className="relative">
 							<Bell active={true} />
 							<span className="absolute bottom-1/2 left-1/2 px-1 bg-primary font-bold rounded-full text-txtWhite text-[12px]">
-								99+
+								{unreadCount}
 							</span>
 						</div>
 						<h5>Thông báo</h5>
@@ -273,10 +277,10 @@ export default function Notification() {
 
 					<div
 						className={`flex-grow overflow-y-auto sm:pe-4 ${
-							!isInMessage ? "" : "scrollable-div"
+							!isNotificationSlide ? "" : "scrollable-div"
 						}`}
 					>
-						{!notification &&
+						{!notifications &&
 							[0, 2, 3, 4, 5, 6, 7, 8].map((i) => (
 								<div key={i} className="px-4 flex items-center gap-2 mb-5">
 									<Skeleton className="size-12 rounded-full" />
@@ -288,8 +292,8 @@ export default function Notification() {
 								</div>
 							))}
 
-						{notification?.length === 0 && (
-							<p className="p-4">Không có thông báo</p>
+						{notifications?.length === 0 && (
+							<p className="p-4">{messageDontHaveNotification}</p>
 						)}
 
 						{today.length > 0 && (

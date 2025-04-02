@@ -2,12 +2,9 @@ import React from "react";
 import Post from "./Post";
 import { Skeleton } from "./ui/skeleton";
 
-export default function RenderPosts({
-	store,
-	className,
-	emptyMessage = "Hãy theo dõi những người khác để xem những bài viết mới nhé",
-}) {
+export default function RenderPosts({ store, className }) {
 	const posts = store((state) => state.posts);
+
 	return (
 		<>
 			{!posts &&
@@ -29,12 +26,8 @@ export default function RenderPosts({
 					</div>
 				))}
 
-			{posts?.length === 0 && (
-				<p className="text-center text-gray">{emptyMessage}</p>
-			)}
-
-			{posts?.map((post) => (
-				<Post key={post.id} post={post} className={className} store={store} />
+			{posts?.map((post, index) => (
+				<Post key={index} post={post} className={className} store={store} />
 			))}
 		</>
 	);

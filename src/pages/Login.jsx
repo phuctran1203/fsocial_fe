@@ -1,19 +1,13 @@
-import React, { useEffect, useState } from "react";
-import { Field } from "../components/Field";
-import { useLoginStore } from "../store/loginStore";
-import {
-	EyeIcon,
-	EyeSplashIcon,
-	LoadingIcon,
-	UserIcon,
-	XMarkIcon,
-} from "../components/Icon";
+import React, { useState } from "react";
+import { JumpingInput } from "../components/Field";
+import { LoadingIcon, XMarkIcon } from "../components/Icon";
 import Button from "../components/Button";
 import { Link, useNavigate } from "react-router-dom";
 import { login } from "../api/loginApi";
-import { getCookie, setCookie } from "@/utils/cookie";
-import { ownerAccountStore } from "@/store/ownerAccountStore";
-import { jwtDecode } from "jwt-decode";
+import { setCookie } from "@/utils/cookie";
+import { useForm } from "react-hook-form";
+import { Eye, EyeOff, UserRoundIcon } from "lucide-react";
+import { useValidRefreshTokenStore } from "@/store/validRefreshTokenStore";
 
 const list = [
 	{
@@ -28,55 +22,50 @@ const list = [
 
 export default function Login() {
 	const navigate = useNavigate();
+	const { setRefreshToken } = useValidRefreshTokenStore();
 
-	const setUser = ownerAccountStore((state) => state.setUser);
-
-	const form = useLoginStore((state) => state.form);
+	const {
+		register,
+		formState: { errors, isValid },
+		trigger,
+		getValues,
+	} = useForm({ mode: "all" });
 
 	// Handle ẩn hiện mật khẩu
 	const [isShowPassword, setIsShowPassword] = useState(false);
 
-	//handle click submit button
-	const [isDisable, setIsDisable] = useState(true);
-
-	const handleValidate = () => {
-		setIsDisable(!(form.loginName.isValid && form.password.isValid));
-	};
-
 	const [submitClicked, setSubmitClicked] = useState(false);
-
-	useEffect(() => {
-		handleValidate();
-	}, [form.loginName.isValid, form.password.isValid]);
 
 	const [loginErr, setLoginErr] = useState("");
 
 	const handleSubmitLogin = async () => {
+		trigger();
+		if (!isValid) return;
 		setSubmitClicked(true);
-		const data = {
-			username: form.loginName.value.trim(),
-			password: form.password.value.trim(),
+		const data = getValues();
+		const sending = {
+			username: data.loginName.trim(),
+			password: data.password.trim(),
 		};
 
-		const result = await login(data);
+		const result = await login(sending);
+		setSubmitClicked(false);
 
-		if (result.statusCode === 200) {
-			// save token and refresh token
-			setCookie("access-token", result.data.accessToken, 360 * 10); // 10 năm
-			setCookie("refresh-token", result.data.refreshToken, 360 * 10); // 10 năm
-			navigate("/home");
-		} else {
-			setLoginErr(result.message);
+		if (!result || result.statusCode !== 200) {
+			setLoginErr(
+				result?.message ||
+					"Có lỗi xảy ra trong quá trình login, FSocial sẽ sớm khắc phục"
+			);
 		}
 
-		setSubmitClicked(false);
+		// save token and refresh token
+		setCookie("access-token", result.data.accessToken, 360 * 10); // 10 năm
+		setCookie("refresh-token", result.data.refreshToken, 360 * 10); // 10 năm
+		setRefreshToken(result.data.refreshToken);
+		navigate("/home");
 	};
 
 	const handleRemoveSavedAccount = () => {};
-
-	useEffect(() => {
-		if (getCookie("refresh-token")) navigate("/home");
-	}, []);
 
 	return (
 		<div
@@ -99,37 +88,41 @@ export default function Login() {
 					<span>Nền tảng mạng xã hội giới trẻ mới</span>
 				</div>
 				<div className="mb-4">
-					<Field
-						type="text"
-						name="loginName"
-						id="loginName"
+					<JumpingInput
 						label="Tên đăng nhập/Email"
-						store={useLoginStore}
-						required={true}
-						errorMessage="Không được để trống"
-					>
-						<UserIcon />
-					</Field>
+						name="loginName"
+						register={register}
+						errors={errors}
+						validateOptions={{
+							required: "Tên đăng nhập/email không được để trống",
+						}}
+						icon={<UserRoundIcon className="size-5" />}
+					/>
 				</div>
 				<div className="mb-4">
-					<Field
+					<JumpingInput
 						type={isShowPassword ? "text" : "password"}
-						name="password"
-						id="password"
 						label="Mật khẩu"
-						store={useLoginStore}
-						required={true}
-						errorMessage="Không được để trống"
-					>
-						<div onClick={() => setIsShowPassword(!isShowPassword)}>
-							<EyeIcon
-								className={`w-full ${isShowPassword ? "hidden" : "block"}`}
-							/>
-							<EyeSplashIcon
-								className={`w-full ${!isShowPassword ? "hidden" : "block"}`}
-							/>
-						</div>
-					</Field>
+						name="password"
+						register={register}
+						errors={errors}
+						validateOptions={{
+							required: "Mật khẩu không được để trống",
+						}}
+						icon={
+							!isShowPassword ? (
+								<Eye
+									className="size-5"
+									onClick={() => setIsShowPassword(true)}
+								/>
+							) : (
+								<EyeOff
+									className="size-5"
+									onClick={() => setIsShowPassword(false)}
+								/>
+							)
+						}
+					/>
 				</div>
 
 				<div className="flex justify-between mb-2">
@@ -150,14 +143,7 @@ export default function Login() {
 				</div>
 				<div className="mb-4">
 					{!submitClicked && <p className="text-red-600">{loginErr}</p>}
-					<Button
-						className={`btn-primary py-3 ${
-							(isDisable || submitClicked) && "disable-btn"
-						}`}
-						onClick={() =>
-							isDisable || submitClicked ? "" : handleSubmitLogin()
-						}
-					>
+					<Button className={`btn-primary py-3`} onClick={handleSubmitLogin}>
 						{submitClicked ? <LoadingIcon /> : "Đăng nhập"}
 					</Button>
 				</div>
@@ -167,7 +153,7 @@ export default function Login() {
 					<div className="border-t border-gray-light flex-grow"></div>
 				</div>
 				<div className="mb-4">
-					<Button className="btn-transparent border mb-5 gap-3 py-3">
+					<Button className="btn-outline mb-5 gap-3 py-3">
 						<img className="size-6" src="./decor/google_icon.svg" alt="" />
 						Đăng nhập với Google
 					</Button>
@@ -200,7 +186,7 @@ export default function Login() {
 					{list.map((user, index) => (
 						<div
 							key={index}
-							className="group relative max-w-52 border rounded cursor-pointer overflow-hidden"
+							className="group relative max-w-52 border border-field rounded cursor-pointer overflow-hidden"
 						>
 							<div className="aspect-square border-b">
 								<img
@@ -213,16 +199,16 @@ export default function Login() {
 							<p className="text-center py-2.5 font-semibold">{user.name}</p>
 
 							<Button
-								className="absolute right-1 top-1 btn-secondary border !size-7 sm:opacity-0 group-hover:opacity-100 !rounded-full transition"
+								className="absolute right-1 top-1 btn-secondary border border-field size-7 sm:opacity-0 group-hover:opacity-100 rounded-full transition"
 								onClick={handleRemoveSavedAccount}
 							>
-								<XMarkIcon />
+								<XMarkIcon className="size-5" strokeWidth={3} />
 							</Button>
 						</div>
 					))}
 
-					<div className="overflow-hidden max-w-52 border rounded cursor-pointer">
-						<div className=" aspect-square grid place-content-center border-b">
+					<div className="overflow-hidden max-w-52 border border-field rounded cursor-pointer">
+						<div className=" aspect-square grid place-content-center border-b border-field">
 							<div className="bg-primary-gradient lg:size-12 size-10 rounded-full">
 								<svg fill="none" viewBox="0 0 24 24">
 									<path

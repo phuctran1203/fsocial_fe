@@ -1,292 +1,316 @@
-import React, { useState, useRef } from "react";
-import { Field, Select } from "../components/Field";
+import React, { useEffect, useState } from "react";
+import { JumpingInput, JumpingSelect } from "../components/Field";
 import Button from "../components/Button";
 
 import { adminStore } from "../store/adminStore";
 
-const currentYear = new Date().getFullYear(); // 🔹 Định nghĩa biến năm hiện tại
+import { LogoNoBG } from "../components/Icon";
 import {
-  EyeIcon,
-  EyeSplashIcon,
-  LoadingIcon,
-  UserIcon,
-  XMarkIcon,
-  AtIcon,
-} from "../components/Icon";
+	combineIntoAvatarName,
+	combineIntoDisplayName,
+} from "@/utils/combineName";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { useForm } from "react-hook-form";
+import { regexEmail, regexName, regexPassword } from "@/config/regex";
+import { AtSign, ChevronDown, Eye, EyeOff, UserRoundIcon } from "lucide-react";
+import {
+	dayOptions,
+	monthOptions,
+	yearOptions,
+} from "@/config/globalVariables";
 
 const AdminProfile = () => {
-  const form = adminStore((state) => state.form) || {};
+	const { user } = adminStore();
+	const {
+		register,
+		formState: { errors, isValid },
+		reset,
+		getValues,
+		watch,
+	} = useForm({ mode: "all" });
+	const newPassword = watch("newPassword");
 
-  // Handle ẩn hiện mật khẩu
-  const [isShowPassword, setIsShowPassword] = useState(false);
-  const [showOldPassword, setShowOldPassword] = useState(false);
-  const [showNewPassword, setShowNewPassword] = useState(false);
-  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+	useEffect(() => {
+		reset({
+			firstName: user.firstName,
+			lastName: user.lastName,
+			day: user.day,
+			month: user.month,
+			year: user.year,
+			gender: user.gender,
+			username: user.username,
+			email: user.email,
+		});
+	}, []);
 
-  const [userData, setUserData] = useState({
-    ten: form.ten?.value || "",
-    ho: form.ho?.value || "",
-    day: form.day?.value || "",
-    month: form.month?.value || "",
-    year: form.year?.value || "",
-    gender: form.gender?.value || "",
-    username: form.username?.value || "",
-    email: form.email?.value || "",
-    oldPassword: "",
-    newPassword: "",
-    confirmPassword: "",
-    avatar: form.avatar?.value || "../temp/default_avatar.svg",
-  });
+	// Handle ẩn hiện mật khẩu
+	const [isShowOldPassword, setIsShowOldPassword] = useState(false);
+	const [isShowNewPassword, setIsShowNewPassword] = useState(false);
+	const [isShowReNewPassword, setIsShowReNewPassword] = useState(false);
 
-  const fileInputRef = useRef(null);
+	const handleImageUpload = (event) => {
+		const file = event.target.files[0];
+		if (file) {
+			const imageUrl = URL.createObjectURL(file);
+			updateField("avatar", { value: imageUrl });
+		}
+	};
 
-  // Xử lý thay đổi dữ liệu nhập vào
-  const handleChange = (field, value) => {
-    setUserData((prev) => ({ ...prev, [field]: value }));
-  };
+	// **🔹 Hàm xử lý cập nhật thông tin vào store**
+	const handleUpdateProfile = () => {};
 
-  const handleImageUpload = (event) => {
-    const file = event.target.files[0];
-    if (file) {
-      const imageUrl = URL.createObjectURL(file);
+	const hours = new Date().getHours();
 
-      adminStore.setState((state) => ({
-        form: {
-          ...state.form,
-          avatar: { ...state.form.avatar, value: imageUrl },
-        },
-      }));
-    }
-  };
+	return (
+		<div className="relative overflow-hidden bg-background shadow border rounded-lg flex-grow p-10">
+			<LogoNoBG
+				className="absolute left-0 bottom-0 translate-y-1/3 -rotate-12 size-56"
+				fill="fill-gray-3light"
+			/>
+			{/* Tiêu đề */}
+			<h5>
+				{hours < 12 && "Chào buổi sáng"}
+				{hours <= 18 && "Chào buổi chiều"}
+				{hours > 18 && "Chào buổi tối"},{" "}
+				<font className="text-primary-gradient">
+					{combineIntoDisplayName(user.firstName, user.lastName)}
+				</font>
+				👋
+			</h5>
+			<p className="text-gray fs-sm">
+				Cập nhật thông tin của bạn tại đây. Không chia sẻ thông tin để tránh rủi
+				ro phát sinh.
+			</p>
 
-  // **🔹 Hàm xử lý cập nhật thông tin vào store**
-  const handleUpdateProfile = () => {
-    // Kiểm tra mật khẩu trước khi cập nhật
-    if (
-      userData.newPassword &&
-      userData.newPassword !== userData.confirmPassword
-    ) {
-      alert("Mật khẩu mới không khớp!");
-      return;
-    }
+			{/* Form chỉnh sửa */}
+			<div className="max-w-[1080px] mx-auto grid grid-cols-2 gap-10 mt-12">
+				{/* thông tin cá nhân */}
+				<div className="space-y-5">
+					<p className="font-medium">Thông tin cá nhân</p>
 
-    // Cập nhật dữ liệu vào Zustand store
-    adminStore.setState((state) => ({
-      form: {
-        ...state.form,
-        ten: { ...state.form.ten, value: userData.ten },
-        ho: { ...state.form.ho, value: userData.ho },
-        day: { ...state.form.day, value: userData.day },
-        month: { ...state.form.month, value: userData.month },
-        year: { ...state.form.year, value: userData.year },
-        gender: { ...state.form.gender, value: userData.gender },
-        username: { ...state.form.username, value: userData.username },
-        email: { ...state.form.email, value: userData.email },
-        avatar: { ...state.form.avatar, value: userData.avatar },
-      },
-    }));
+					<div className="grid grid-cols-2 gap-2">
+						<JumpingInput
+							label="Tên"
+							name="firstName"
+							register={register}
+							errors={errors}
+							validateOptions={{
+								required: "Tên không được để trống",
+								pattern: {
+									value: regexName,
+									message: "Tên không được chứa số và ký tự đặc biệt",
+								},
+							}}
+						/>
+						<JumpingInput
+							label="Họ"
+							name="lastName"
+							register={register}
+							errors={errors}
+							validateOptions={{
+								required: "Họ không được để trống",
+								pattern: {
+									value: regexName,
+									message: "Họ không được chứa số và ký tự đặc biệt",
+								},
+							}}
+						/>
+					</div>
 
-    alert("Cập nhật thông tin thành công!");
-  };
+					<div className="grid grid-cols-3 gap-2">
+						<JumpingSelect
+							label="Ngày"
+							name="day"
+							register={register}
+							errors={errors}
+							options={dayOptions}
+							disabled={true}
+							icon={<ChevronDown />}
+						/>
+						<JumpingSelect
+							label="Tháng"
+							name="month"
+							register={register}
+							errors={errors}
+							options={monthOptions}
+							disabled={true}
+							icon={<ChevronDown />}
+						/>
+						<JumpingSelect
+							label="Năm"
+							name="year"
+							register={register}
+							errors={errors}
+							options={yearOptions}
+							disabled={true}
+							icon={<ChevronDown />}
+						/>
+					</div>
 
-  return (
-    <div className="bg-white shadow-lg border border-gray-200 rounded-lg mx-6 flex flex-col flex-grow p-10">
-      {/* Tiêu đề */}
-      <h1 className="text-2xl font-bold">
-        Chào buổi tối, <span className="text-orange-500">{form.ten.value}</span>
-      </h1>
-      <p className="text-gray-600 text-sm">
-        Cập nhật thông tin của bạn tại đây. Không chia sẻ thông tin để tránh rủi
-        ro phát sinh.
-      </p>
+					<JumpingSelect
+						label="Giới tính"
+						name="gender"
+						register={register}
+						errors={errors}
+						options={{
+							0: "Nam",
+							1: "Nữ",
+							2: "Khác",
+							3: "Không muốn tiết lộ",
+						}}
+						icon={<ChevronDown />}
+					/>
 
-      {/* Form chỉnh sửa */}
-      <div className="flex flex-grow gap-10 mt-12">
-        <div className="w-1/2 flex flex-col gap-4 pl-24">
-          <h2 className="text-lg font-semibold">Thông tin cá nhân</h2>
+					{/* Avatar + Button thay ảnh đại diện */}
+					<div className="p-6 flex items-center gap-6">
+						<div className="ring-4 ring-offset-4 rounded-full ring-gray-2light">
+							<Avatar className="size-32">
+								<AvatarImage src={user.avatar} />
+								<AvatarFallback>
+									{combineIntoAvatarName(user.firstName, user.lastName)}
+								</AvatarFallback>
+							</Avatar>
+						</div>
 
-          <div className="grid grid-cols-2 gap-2 w-[480px]">
-            <Field
-              label="Tên"
-              id="ten"
-              required={true}
-              pattern="^[A-Za-zÀ-ỹ\s]+$"
-              errorMessage="Tên không được để trống và chỉ chứa chữ cái."
-              store={adminStore}
-            />
-            <Field
-              label="Họ"
-              id="ho"
-              required={true}
-              pattern="^[A-Za-zÀ-ỹ\s]+$"
-              errorMessage="Họ không được để trống và chỉ chứa chữ cái."
-              store={adminStore}
-            />
-          </div>
+						<label className="btn-secondary w-fit px-8 py-3 cursor-pointer">
+							Thay ảnh đại diện
+							<input
+								type="file"
+								className="hidden"
+								onChange={handleImageUpload} //  Cập nhật avatar khi chọn ảnh mới
+							/>
+						</label>
+					</div>
+				</div>
 
-          <div className="grid grid-cols-3 gap-2 w-[480px]">
-            <Field
-              label="Ngày sinh"
-              id="day"
-              required={true}
-              pattern="^(0?[1-9]|[12][0-9]|3[01])$"
-              errorMessage="Ngày sinh phải từ 1 - 31."
-              store={adminStore}
-            />
-            <Field
-              label="Tháng sinh"
-              id="month"
-              required={true}
-              pattern="^(0?[1-9]|1[0-2])$"
-              errorMessage="Tháng sinh phải từ 1 - 12."
-              store={adminStore}
-            />
-            <Field
-              label="Năm sinh"
-              id="year"
-              required={true}
-              pattern={`^(19[0-9]{2}|20[0-${currentYear % 10}][0-9])$`}
-              errorMessage={`Năm sinh phải từ 1900 đến ${currentYear}.`}
-              store={adminStore}
-            />
-          </div>
+				<div className="space-y-8">
+					{/* thông tin đăng nhập */}
+					<div className="space-y-5">
+						<p className="font-medium">Thông tin đăng nhập</p>
+						<JumpingInput
+							label="Tên đăng nhập"
+							name="username"
+							register={register}
+							errors={errors}
+							validateOptions={{
+								required: "Tên đăng nhập không được để trống",
+							}}
+							icon={<UserRoundIcon className="size-5" />}
+						/>
 
-          <Select
-            store={adminStore}
-            id="gender"
-            label="Giới tính"
-            name="gender"
-            options={{ male: "nam", female: "nu" }}
-            className="w-[480px]"
-          />
+						<JumpingInput
+							label="Email"
+							name="email"
+							register={register}
+							errors={errors}
+							validateOptions={{
+								required: "Email không được để trống",
+								pattern: {
+									value: regexEmail,
+									message: "Email không hợp lệ",
+								},
+							}}
+							icon={<AtSign className="size-5" />}
+						/>
+					</div>
+					{/* Đổi mật khẩu */}
+					<div className="space-y-5">
+						{/* Đổi mật khẩu */}
+						<p className="font-medium">Đổi mật khẩu</p>
+						<JumpingInput
+							type={isShowOldPassword ? "text" : "password"}
+							label="Mật khẩu cũ"
+							name="oldPassword"
+							register={register}
+							errors={errors}
+							validateOptions={{
+								required: "Mật khẩu không được để trống",
+							}}
+							icon={
+								<div
+									className="cursor-pointer"
+									onClick={() => setIsShowOldPassword(!isShowOldPassword)}
+								>
+									{!isShowOldPassword ? (
+										<Eye className="size-5" />
+									) : (
+										<EyeOff className="size-5" />
+									)}
+								</div>
+							}
+						/>
 
-          {/* Avatar + Button thay ảnh đại diện */}
-          <div className="flex items-center gap-6 mt-4">
-            <img
-              src={form.avatar?.value || "../temp/default_avatar.svg"}
-              alt="Avatar"
-              className="w-60 h-60 rounded-full object-cover border"
-            />
+						<JumpingInput
+							type={isShowNewPassword ? "text" : "password"}
+							label="Mật khẩu mới"
+							name="newPassword"
+							register={register}
+							errors={errors}
+							validateOptions={{
+								required: "Mật khẩu không được để trống",
+								pattern: {
+									value: regexPassword,
+									message: "Mật khẩu từ 8-20 kí tự, bao gồm cả chữ và số",
+								},
+							}}
+							icon={
+								<div
+									className="cursor-pointer"
+									onClick={() => setIsShowNewPassword(!isShowNewPassword)}
+								>
+									{!isShowNewPassword ? (
+										<Eye className="size-5" />
+									) : (
+										<EyeOff className="size-5" />
+									)}
+								</div>
+							}
+						/>
 
-            <label className="bg-gray-200 text-gray-700 px-4 py-2 rounded-md hover:bg-gray-300 transition cursor-pointer">
-              Thay ảnh đại diện
-              <input
-                type="file"
-                className="hidden"
-                accept="image/*"
-                onChange={handleImageUpload} //  Cập nhật avatar khi chọn ảnh mới
-              />
-            </label>
-          </div>
-        </div>
+						<JumpingInput
+							type={isShowReNewPassword ? "text" : "password"}
+							label="Nhập lại mật khẩu mới"
+							name="reNewPassword"
+							register={register}
+							errors={errors}
+							validateOptions={{
+								required: "Mật khẩu không được để trống",
+								pattern: {
+									value: regexPassword,
+									message: "Mật khẩu từ 8-20 kí tự, bao gồm cả chữ và số",
+								},
+								validate: (value) =>
+									value === newPassword ||
+									"Mật khẩu nhập lại không khớp với mật khẩu mới",
+							}}
+							icon={
+								<div
+									className="cursor-pointer"
+									onClick={() => setIsShowReNewPassword(!isShowReNewPassword)}
+								>
+									{!isShowReNewPassword ? (
+										<Eye className="size-5" />
+									) : (
+										<EyeOff className="size-5" />
+									)}
+								</div>
+							}
+						/>
+					</div>
+				</div>
+			</div>
 
-        {/* Thông tin đăng nhập */}
-        <form action="">
-          <div className="flex-grow flex flex-col gap-4 -translate-x-3">
-            <h2 className="text-lg font-semibold">Thông tin đăng nhập</h2>
-            <Field
-              store={adminStore}
-              id="username"
-              label="Tên đăng nhập"
-              name="username"
-              className="w-[480px]"
-            >
-              <UserIcon />
-            </Field>
-
-            <Field
-              label="Email"
-              id="email"
-              type="email"
-              required={true}
-              pattern="^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$"
-              //  compareFunction={async (value) => !(await checkDuplicate(value))} // phúc kt chỗ này nhé hihi (kt email đã tồn tại chưa)
-              errorMessage="Email không hợp lệ hoặc đã tồn tại."
-              store={adminStore}
-            >
-              <AtIcon />
-            </Field>
-
-            {/* Đổi mật khẩu */}
-            <h2 className="text-lg font-semibold mt-4">Đổi mật khẩu</h2>
-            <Field
-              type={showOldPassword ? "text" : "password"}
-              store={adminStore}
-              id="oldPassword"
-              label="Mật khẩu cũ"
-              name="oldPassword"
-              className="w-[480px]"
-            >
-              <div
-                onClick={() => setShowOldPassword(!showOldPassword)}
-                className="cursor-pointer"
-              >
-                {showOldPassword ? (
-                  <EyeSplashIcon className="w-5 h-5" />
-                ) : (
-                  <EyeIcon className="w-5 h-5" />
-                )}
-              </div>
-            </Field>
-
-            <Field
-              type={showNewPassword ? "text" : "password"}
-              store={adminStore}
-              id="newPassword"
-              label="Mật khẩu mới"
-              required={true}
-              pattern="^(?=.*[A-Z])(?=.*[a-z])(?=.*[0-9]).{8,}$"
-              errorMessage="Mật khẩu mới phải có ít nhất 8 ký tự, bao gồm chữ hoa, chữ thường và số."
-              className="w-[480px]"
-            >
-              <div
-                onClick={() => setShowNewPassword(!showNewPassword)}
-                className="cursor-pointer"
-              >
-                {showNewPassword ? (
-                  <EyeSplashIcon className="w-5 h-5" />
-                ) : (
-                  <EyeIcon className="w-5 h-5" />
-                )}
-              </div>
-            </Field>
-
-            <Field
-              type={showConfirmPassword ? "text" : "password"}
-              store={adminStore}
-              id="confirmPassword"
-              label="Nhập lại mật khẩu mới"
-              required={true}
-              compareFunction={(value) => value === form.newPassword.value}
-              errorMessage="Mật khẩu xác nhận không khớp."
-              className="w-[480px]"
-            >
-              <div
-                onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                className="cursor-pointer"
-              >
-                {showConfirmPassword ? (
-                  <EyeSplashIcon className="w-5 h-5" />
-                ) : (
-                  <EyeIcon className="w-5 h-5" />
-                )}
-              </div>
-            </Field>
-          </div>
-        </form>
-      </div>
-
-      {/* 🔹 Cập nhật thông tin khi ấn nút */}
-      <div className="mt-6 flex justify-center">
-        <Button
-          onClick={handleUpdateProfile}
-          className="btn-primary px-6 py-2 max-w-fit rounded-lg bg-orange-500 hover:bg-orange-600 text-white transition-all"
-        >
-          Cập nhật thay đổi
-        </Button>
-      </div>
-    </div>
-  );
+			{/* 🔹 Cập nhật thông tin khi ấn nút */}
+			<div className="mt-6 flex justify-center">
+				<Button
+					onClick={handleUpdateProfile}
+					className="btn-primary px-8 py-3 w-fit"
+				>
+					Cập nhật thay đổi
+				</Button>
+			</div>
+		</div>
+	);
 };
 
 export default AdminProfile;

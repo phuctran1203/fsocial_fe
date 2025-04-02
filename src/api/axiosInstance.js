@@ -39,24 +39,24 @@ API.interceptors.request.use(
 API.interceptors.response.use(
 	(response) => response,
 	async (error) => {
-		const path = new URL(error.config.url, API.defaults.baseURL).pathname;
+		console.error("Axios error: ", error);
 
 		// Nếu lỗi từ request refresh-token thì không gọi lại refreshToken nữa
+		const path = new URL(error.config.url, API.defaults.baseURL).pathname;
 		if (path === "/account/refresh-token") {
 			return Promise.reject(error);
 		}
 
 		// Nếu lỗi 401 từ các API khác, thử refresh token
-		if (error.response?.status === 401) {
-			console.log("Token hết hạn, làm mới token...");
+		// Nếu lỗi 400 và có statusCode = [mã acc bị ban]
+		const status = error.response?.status;
+		const statusCode = error.response?.data.statusCode;
+		if (status === 401 || (status === 400 && statusCode === 601)) {
+			status === 401 && console.log("Token hết hạn, làm mới token...");
 			const resp = await refreshToken();
-			// đoạn này không bắt statusCode, ko check resp nữa
-			// vì refreshToken sẽ gọi lại API axiosInstance này,
-			// nếu response của refreshToken có lỗi
-			// thì sẽ bị axiosInstance này tóm từ bên trên -> "if (path === "/account/refresh-token"){}"
-			// nếu không bị tóm thì sẽ chạy được xuống dưới này
-			console.log("Làm mới token thành công, thử gửi lại request...");
+			if (!resp || resp.statusCode !== 200) return Promise.reject(error);
 			error.config.headers["Authorization"] = `Bearer ${resp.data.accessToken}`;
+			console.log("Làm mới token thành công, thử gửi lại request...");
 			return API(error.config);
 		}
 

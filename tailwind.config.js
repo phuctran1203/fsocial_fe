@@ -81,11 +81,14 @@ export default {
 			},
 			borderColor: {
 				DEFAULT: "var(--border-clr)",
+				field: "var(--border-field)",
 				hover: "var(--border-hover-clr)",
+				outline: "var(--border-outline)",
 			},
 			ringColor: {
 				DEFAULT: "var(--border-clr)",
 				hover: "var(--border-hover-clr)",
+				outline: "var(--border-outline)",
 			},
 			boxShadow: {
 				DEFAULT: "0px 0 3px 0 var(--shadow-clr)",

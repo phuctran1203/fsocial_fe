@@ -60,14 +60,14 @@ $fs-5xl: clamp-font-size(6);
 		--primary-active-clr: hsl(23, 80%, 44%);
 		--primary-ghost-clr: hsl(22, 70%, 95%);
 		--primary-gradient-start: hsl(31, 100%, 50%);
-		--primary-gradient-end: hsl(19, 100%, 50%);
+		--primary-gradient-end: hsl(21, 100%, 50%);
 		--primary-gradient-clr: linear-gradient(
 			to bottom right,
 			var(--primary-gradient-start),
 			var(--primary-gradient-end)
 		);
 		// secondary clr
-		--secondary-clr: hsl(0, 0%, 91%);
+		--secondary-clr: hsl(0, 0%, 96%);
 		--secondary-hover-clr: hsl(0, 0%, 86%);
 		--secondary-active-clr: hsl(0, 0%, 82%);
 		// background color
@@ -77,16 +77,14 @@ $fs-5xl: clamp-font-size(6);
 		--muted-clr: hsl(0, 0%, 92%);
 		// addition color support
 		--gray-clr: hsl(0, 0%, 45%);
-		--gray-light-clr: hsl(
-			0,
-			0%,
-			68%
-		); //for field border or st in slighly bright
+		--gray-light-clr: #adadad; //for field border or st in slighly bright
 		--gray-2light-clr: hsl(0, 0%, 90%); //for others hover
 		--gray-3light-clr: hsl(0, 0%, 96%); //for others active
 		// border, shadow
-		--border-clr: hsl(0, 0%, 89%);
-		--border-hover-clr: hsl(0, 0%, 88%);
+		--border-field: hsl(0, 0%, 78%);
+		--border-outline: hsl(0, 0%, 86%);
+		--border-clr: hsl(0, 0%, 92%);
+		--border-hover-clr: hsl(0, 0%, 28%);
 		--shadow-clr: hsla(0, 0%, 91%);
 		--drop-shadow: hsla(0, 0%, 0%, 0.15);
 		// text color
@@ -133,6 +131,8 @@ $fs-5xl: clamp-font-size(6);
 		--gray-2light-clr: hsl(0, 0%, 25%); //for others hover
 		--gray-3light-clr: hsl(0, 0%, 12%); //for others active
 
+		--border-field: hsl(0, 0%, 22%);
+		--border-outline: hsl(0, 0%, 22%);
 		--border-clr: hsl(0, 0%, 14%);
 		--border-hover-clr: hsl(0, 0%, 80%);
 		--shadow-clr: hsla(0, 0%, 12%);

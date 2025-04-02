@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
 	ChartContainer,
 	ChartLegend,
@@ -17,14 +17,12 @@ import {
 	PieChart,
 } from "recharts";
 import {
-	ComplaintIcon,
 	CrownTop1Icon,
 	CrownTop2Icon,
 	CrownTop3Icon,
 	GenderIcon,
 	NewCreatedAccountIcon,
 	PostProfileTabIcon,
-	StarIcon,
 } from "@/components/Icon";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Calendar } from "@/components/ui/calendar";
@@ -42,6 +40,16 @@ import {
 	combineIntoAvatarName,
 	combineIntoDisplayName,
 } from "@/utils/combineName";
+import { MessageSquareWarning, Star } from "lucide-react";
+import {
+	dateClassToISO8601,
+	dateTimeToReportsLabel,
+} from "@/utils/convertDateTime";
+import {
+	getNumberOfComplaint,
+	getNumberOfNewRegistration,
+	getNumberOfPost,
+} from "@/api/adminReportApi";
 
 const RenderLineChart = (props) => {
 	const {
@@ -233,11 +241,13 @@ export default function AdminReports() {
 		setDate(data);
 	};
 
-	const handleAcceptDate = () => {};
+	const handleAcceptDate = () => {
+		fetchReports();
+	};
 
 	const handleCancleDate = () => {
 		setTemplateSelect(-1);
-		setDate({ from: undefined, to: undefined });
+		setDate({ from: new Date(), to: new Date() });
 	};
 
 	const handleSetTemplate = (template, index) => {
@@ -245,12 +255,56 @@ export default function AdminReports() {
 		setDate({ from: template.from, to: template.to });
 	};
 
-	useEffect(() => {
-		// get data
-		setChartDataPosts(fakeChartDataPosts);
-		setChartDataNumberCreatedAccounts(fakeChartDataNumberCreatedAccounts);
-		setChartDataNumberComplaints(fakeChartDataNumberComplaints);
+	const reFormatDataReports = (data) => {
+		return data.map((item) => {
+			let label;
+			if (item.hour) label = item.hour.toString().padStart(2, "0") + ":00";
+			else label = dateTimeToReportsLabel(item.date);
+			return {
+				label: label,
+				value: item.count,
+			};
+		});
+	};
+
+	const fetchReports = async () => {
+		const start = dateClassToISO8601(date?.from ? date.from : new Date());
+		const end =
+			date?.from &&
+			date?.to &&
+			date.from.toDateString() !== date.to.toDateString()
+				? dateClassToISO8601(date.to)
+				: null;
+
+		console.log("start: ", start, "end: ", end);
+
+		const [respPostCreated, respRegistration, respComplaint] =
+			await Promise.all([
+				getNumberOfPost(start, end),
+				getNumberOfNewRegistration(start, end),
+				getNumberOfComplaint(start, end),
+			]);
+
+		if (respPostCreated && respPostCreated.statusCode === 200) {
+			const processData = reFormatDataReports(respComplaint.data);
+			setChartDataPosts(processData);
+		}
+
+		if (respRegistration && respRegistration.statusCode === 200) {
+			const processData = reFormatDataReports(respRegistration.data);
+			setChartDataNumberCreatedAccounts(processData);
+		}
+
+		if (respComplaint && respComplaint.statusCode === 200) {
+			const processData = reFormatDataReports(respComplaint.data);
+			setChartDataNumberComplaints(processData);
+		}
+
 		setTopKOL(fakeTopKOL);
+	};
+
+	useEffect(() => {
+		fetchReports();
 	}, []);
 
 	return (
@@ -273,6 +327,7 @@ export default function AdminReports() {
 				<div className="flex-grow space-y-1">
 					{analyzeTemplate.map((templatePicker, index) => (
 						<button
+							key={index}
 							className={`w-full text-left p-2 rounded-md hover:bg-gray-3light font-medium text-gray fs-xs ${
 								templateSelect === index && "bg-gray-2light text-primary-text"
 							}`}
@@ -323,13 +378,7 @@ export default function AdminReports() {
 				</div>
 				<div className="flex flex-col">
 					<RenderLineChart
-						icon={
-							<ComplaintIcon
-								className="size-3.5"
-								strokeClass="stroke-gray"
-								fillClass="fill-gray"
-							/>
-						}
+						icon={<MessageSquareWarning className="size-4 stroke-gray" />}
 						label="Lượt khiếu nại"
 						total={totalComplaint}
 						idFill="numberComplaints"
@@ -396,8 +445,8 @@ export default function AdminReports() {
 			{/* top KOL */}
 			<div className="pb-1 col-span-3 bg-background rounded-lg border shadow flex flex-col">
 				<div className="p-3 flex items-center gap-3">
-					<span className="border shadow rounded-full size-8 grid place-content-center fill-gray">
-						<StarIcon />
+					<span className="border shadow rounded-full size-8 grid place-content-center">
+						<Star className="size-4 stroke-gray" />
 					</span>
 					<span className="flex-grow fs-xs text-gray">Bảng xếp hạng KOL</span>
 				</div>
