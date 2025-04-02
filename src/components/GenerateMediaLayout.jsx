@@ -122,7 +122,7 @@ export default function GenerateMediaLayout({
 	// navigate về post gốc nếu là repost
 	const navigate = useNavigate();
 	const handleToOriginPost = () => {
-		navigate(`/post?id=${post.id}`);
+		!blockEvent && navigate(`/post?id=${post.id}`);
 	};
 
 	// handle carousel khi mở comment modal
@@ -230,6 +230,7 @@ export default function GenerateMediaLayout({
 							className="border-t rounded-lg overflow-hidden pointer-events-none"
 							isShared={true}
 							store={store}
+							blockEvent={blockEvent}
 						/>
 					</div>
 				)}

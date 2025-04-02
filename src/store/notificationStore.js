@@ -39,11 +39,15 @@ const useNotificationsStore = create((set, get) => ({
 
 	cleanNotificationWebSocket: () => {
 		const { stompClientNotification } = get();
-		if (stompClientNotification)
-			return stompClientNotification.deactivate().then(() => {
-				console.log("Disconnected notification socket server");
-				set({ notifications: null, stompClientNotification: null });
+		if (!stompClientNotification) return;
+		stompClientNotification.deactivate().then(() => {
+			console.log("🚫 Disconnected notification socket server");
+			set({
+				unreadCount: 0,
+				notifications: null,
+				stompClientNotification: null,
 			});
+		});
 	},
 
 	setNotifications: (allNotifications) =>

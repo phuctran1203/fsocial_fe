@@ -555,7 +555,7 @@ export const GenderIcon = () => (
 
 export const CrownTop1Icon = () => (
 	<svg width="23" height="23" viewBox="0 0 23 23" fill="none">
-		<g clip-path="url(#clip0_1349_10618)">
+		<g clipPath="url(#clip0_1349_10618)">
 			<path
 				d="M10.2478 9.86193L10.4639 4.51438L6.47399 6.65286L10.2478 9.86193Z"
 				fill="#F4900C"
@@ -640,7 +640,7 @@ export const CrownTop1Icon = () => (
 
 export const CrownTop2Icon = () => (
 	<svg width="23" height="23" viewBox="0 0 23 23" fill="none">
-		<g clip-path="url(#clip0_1349_10638)">
+		<g clipPath="url(#clip0_1349_10638)">
 			<path
 				d="M13.7966 20.6173L3.03685 13.5565C2.79589 13.3984 2.72877 13.075 2.88689 12.834L4.03187 11.0892C4.19 10.8483 4.51337 10.7812 4.75434 10.9393L15.514 18C15.755 18.1582 15.8221 18.4815 15.664 18.7225L14.519 20.4673C14.3609 20.7083 14.0375 20.7754 13.7966 20.6173Z"
 				fill="#FFC033"
@@ -689,7 +689,7 @@ export const CrownTop2Icon = () => (
 
 export const CrownTop3Icon = () => (
 	<svg width="22" height="22" viewBox="0 0 22 22" fill="none">
-		<g clip-path="url(#clip0_1349_10575)">
+		<g clipPath="url(#clip0_1349_10575)">
 			<path
 				d="M14.7969 11.6372L18.3878 11.6054L16.8832 8.68953L13.2924 8.72137L14.7969 11.6372Z"
 				fill="#FFD102"

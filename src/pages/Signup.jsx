@@ -321,7 +321,8 @@ export default function Signup() {
 											required: "Tên không được để trống",
 											pattern: {
 												value: regexName,
-												message: "Tên không được chứa số và ký tự đặc biệt",
+												message:
+													"Tên tối đa 13 kí tự, không chứa số và ký tự đặc biệt",
 											},
 										}}
 									/>
@@ -334,7 +335,8 @@ export default function Signup() {
 											required: "Họ không được để trống",
 											pattern: {
 												value: regexName,
-												message: "Họ không được chứa số và ký tự đặc biệt",
+												message:
+													"Họ tối đa 13 kí tự, không chứa số và ký tự đặc biệt",
 											},
 										}}
 									/>

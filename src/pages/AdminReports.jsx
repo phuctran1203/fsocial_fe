@@ -41,8 +41,15 @@ import {
 	combineIntoDisplayName,
 } from "@/utils/combineName";
 import { MessageSquareWarning, Star } from "lucide-react";
-import { dateClassToISO8601 } from "@/utils/convertDateTime";
-import { getNumberOfComplaint } from "@/api/adminReportApi";
+import {
+	dateClassToISO8601,
+	dateTimeToReportsLabel,
+} from "@/utils/convertDateTime";
+import {
+	getNumberOfComplaint,
+	getNumberOfNewRegistration,
+	getNumberOfPost,
+} from "@/api/adminReportApi";
 
 const RenderLineChart = (props) => {
 	const {
@@ -234,11 +241,13 @@ export default function AdminReports() {
 		setDate(data);
 	};
 
-	const handleAcceptDate = () => {};
+	const handleAcceptDate = () => {
+		fetchReports();
+	};
 
 	const handleCancleDate = () => {
 		setTemplateSelect(-1);
-		setDate({ from: undefined, to: undefined });
+		setDate({ from: new Date(), to: new Date() });
 	};
 
 	const handleSetTemplate = (template, index) => {
@@ -246,25 +255,51 @@ export default function AdminReports() {
 		setDate({ from: template.from, to: template.to });
 	};
 
+	const reFormatDataReports = (data) => {
+		return data.map((item) => {
+			let label;
+			if (item.hour) label = item.hour.toString().padStart(2, "0") + ":00";
+			else label = dateTimeToReportsLabel(item.date);
+			return {
+				label: label,
+				value: item.count,
+			};
+		});
+	};
+
 	const fetchReports = async () => {
-		console.log("current date: ", date);
-		console.log("Start date: ", dateClassToISO8601(date.from));
-		console.log("end date: ", dateClassToISO8601(date.to));
-		const start = dateClassToISO8601(date.from);
+		const start = dateClassToISO8601(date?.from ? date.from : new Date());
 		const end =
-			date.from.getTime() !== date.to.getTime()
+			date?.from &&
+			date?.to &&
+			date.from.toDateString() !== date.to.toDateString()
 				? dateClassToISO8601(date.to)
 				: null;
 
-		const [respComplaint] = await Promise.all([
-			getNumberOfComplaint(start, end),
-		]);
+		console.log("start: ", start, "end: ", end);
 
-		console.log("respComplaint: ", respComplaint);
+		const [respPostCreated, respRegistration, respComplaint] =
+			await Promise.all([
+				getNumberOfPost(start, end),
+				getNumberOfNewRegistration(start, end),
+				getNumberOfComplaint(start, end),
+			]);
 
-		setChartDataPosts(fakeChartDataPosts);
-		setChartDataNumberCreatedAccounts(fakeChartDataNumberCreatedAccounts);
-		setChartDataNumberComplaints(fakeChartDataNumberComplaints);
+		if (respPostCreated && respPostCreated.statusCode === 200) {
+			const processData = reFormatDataReports(respComplaint.data);
+			setChartDataPosts(processData);
+		}
+
+		if (respRegistration && respRegistration.statusCode === 200) {
+			const processData = reFormatDataReports(respRegistration.data);
+			setChartDataNumberCreatedAccounts(processData);
+		}
+
+		if (respComplaint && respComplaint.statusCode === 200) {
+			const processData = reFormatDataReports(respComplaint.data);
+			setChartDataNumberComplaints(processData);
+		}
+
 		setTopKOL(fakeTopKOL);
 	};
 

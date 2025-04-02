@@ -139,3 +139,8 @@ export function dateClassToISO8601(date) {
 		date.getMonth() + 1
 	)}-${addPadStart(date.getDate())}`;
 }
+
+export function dateTimeToReportsLabel(dateTime) {
+	const time = new Date(dateTime);
+	return `${addPadStart(time.getMonth() + 1)}/${addPadStart(time.getDate())}`;
+}

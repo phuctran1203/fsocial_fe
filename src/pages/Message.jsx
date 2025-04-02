@@ -37,7 +37,7 @@ export default function Message() {
 		setContentActive(1);
 	};
 
-	// LOAD TẤT CẢ CUỘC TRÒ CHUYỆN
+	// LOAD TẤT CẢ CUỘC TRÒ CHUYỆNvscode-webview://18spd446laa67tsflmn3g0pag0pc42n80cgt1i8bt0597anvoig9/workspace/7899f602-055b-4626-8c9c-d23dd56382c3/request/34412242-92cccfdf-1214-4c84-a181-21963067a08e
 	const [conversations, setConversations] = useState(null);
 
 	const handleGetAllConversation = async () => {

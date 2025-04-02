@@ -55,7 +55,7 @@ export default function ReportModal({ id }) {
 	}, []);
 
 	return (
-		<div className="relative flex-grow flex flex-col sm:w-[550px] sm:min-h-[50dvh] sm:h-fit sm:max-h-[90dvh] w-screen h-[100dvh]">
+		<div className="relative pt-11 flex flex-col sm:w-[550px] sm:min-h-[50dvh] sm:h-fit sm:max-h-[90dvh] w-screen h-[100dvh]">
 			<div className="px-4 flex-grow space-y-3 pt-3 overflow-y-auto">
 				{reportOptions.map((option) => (
 					<label

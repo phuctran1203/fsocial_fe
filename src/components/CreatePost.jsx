@@ -4,7 +4,6 @@ import {
 	LoadingIcon,
 	PencilChangeImageIcon,
 	UploadDecorIcon,
-	XMarkIcon,
 } from "./Icon";
 import Button from "./Button";
 import { usePopupStore } from "../store/popupStore";
@@ -26,7 +25,7 @@ import {
 
 import { X } from "lucide-react";
 import GenerateMediaLayout from "./GenerateMediaLayout";
-import useEmblaCarousel from "embla-carousel-react";
+import { cn } from "@/lib/utils";
 
 export default function CreatePost() {
 	const hidePopup = usePopupStore((state) => state.hidePopup);
@@ -115,7 +114,7 @@ export default function CreatePost() {
 			<Carousel setApi={setApi}>
 				<CarouselContent>
 					<CarouselItem>
-						<div className="pt-11 sm:max-h-[80dvh] sm:h-full h-[100dvh] overflow-y-auto scrollable-div space-y-2">
+						<div className="relative pt-11 sm:max-h-[80dvh] sm:h-full h-[100dvh] overflow-y-auto scrollable-div space-y-2">
 							<div className="flex space-x-2 px-4 pt-3">
 								<Avatar className={`size-9 grid`}>
 									<AvatarImage src={user.avatar} />
@@ -138,53 +137,63 @@ export default function CreatePost() {
 								className="px-4"
 							/>
 
-							<label
-								htmlFor="file-upload"
-								className={`mx-3 rounded-md aspect-video cursor-pointer flex items-center justify-center bg-gray-3light ${
-									fileUploads.length > 0 ? "hidden" : ""
-								}`}
-								onDragOver={(e) => {
-									e.preventDefault(); // Chặn hành động mặc định để không mở tệp
-									e.stopPropagation();
-									e.currentTarget.style = `background-color: var(--gray-2light-clr); opacity: 20%;`;
-								}}
-								onDragLeave={(e) => {
-									e.currentTarget.style = "";
-								}}
-								onDrop={(e) => {
-									e.preventDefault();
-									e.stopPropagation();
-									e.currentTarget.style = "";
-									const files = e.dataTransfer.files;
-									if (files.length > 0) {
-										handleOnFileChange({ target: { files } }); // Gọi hàm xử lý tệp
-									}
-								}}
-							>
-								<div className="flex flex-col items-center pointer-events-none">
-									<UploadDecorIcon className="size-24" />
-									<span>Chọn hoặc kéo thả ảnh/video vào đây</span>
-								</div>
-								<input
-									type="file"
-									id="file-upload"
-									onChange={handleOnFileChange}
-									hidden
-									multiple
-								/>
-							</label>
-
-							{filePreviews.length > 0 && (
-								<div className="relative">
+							<div className="relative">
+								{filePreviews.length > 0 && (
 									<GenerateMediaLayout medias={filePreviews} />
+								)}
+
+								<label
+									htmlFor="file-upload"
+									className={cn(
+										"rounded-md flex items-center justify-center bg-gray-3light",
+										fileUploads.length === 0
+											? "mx-3 cursor-pointer aspect-video"
+											: "opacity-0 absolute inset-0"
+									)}
+									onDragOver={(e) => {
+										e.preventDefault(); // Chặn hành động mặc định để không mở tệp
+										e.stopPropagation();
+										e.currentTarget.style = `background-color: var(--gray-2light-clr); ${
+											fileUploads.length === 0
+												? "opacity: 20%;"
+												: "opacity: 70%;"
+										}`;
+									}}
+									onDragLeave={(e) => {
+										e.currentTarget.style = "";
+									}}
+									onDrop={(e) => {
+										e.preventDefault();
+										e.stopPropagation();
+										e.currentTarget.style = "";
+										const files = e.dataTransfer.files;
+										if (files.length > 0) {
+											handleOnFileChange({ target: { files } }); // Gọi hàm xử lý tệp
+										}
+									}}
+								>
+									<div className="flex flex-col items-center pointer-events-none">
+										<UploadDecorIcon className="size-24" />
+										<span>Chọn hoặc kéo thả ảnh/video vào đây</span>
+									</div>
+									<input
+										type="file"
+										id="file-upload"
+										onChange={handleOnFileChange}
+										hidden
+										multiple
+									/>
+								</label>
+
+								{filePreviews.length > 0 && (
 									<button
 										className="btn-secondary h-fit w-fit px-3 py-1 absolute top-2 left-2 z-10 shadow-md border"
 										onClick={() => scrollToItem(1)}
 									>
 										<PencilChangeImageIcon /> Chỉnh sửa
 									</button>
-								</div>
-							)}
+								)}
+							</div>
 						</div>
 
 						<div className="bg-background sticky bottom-0 flex gap-3 p-3">

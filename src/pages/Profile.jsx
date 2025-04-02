@@ -84,13 +84,11 @@ export default function Profile() {
 	// handle click follow, hủy follow
 	const handleRequestFollow = () => {
 		requestFollow(queryParams.get("id"));
-		console.log("current account is: ", accountInfo);
 		setAccountInfo({ ...accountInfo, relationship: true });
 	};
 
 	const handleUnfollow = () => {
 		unfollow(queryParams.get("id"));
-		console.log("current account is: ", accountInfo);
 		setAccountInfo({ ...accountInfo, relationship: false });
 	};
 
@@ -304,7 +302,7 @@ export default function Profile() {
 				<div className="sm:-mt-6 -mt-4 mx-auto lg:max-w-[630px] ">
 					{/* profile detail */}
 					<div className="flex sm:flex-row sm:items-start flex-col items-center gap-4 sm:px-3 px-1">
-						<div className="relative bg-background border-4 rounded-full p-1 w-fit transition">
+						<div className="relative bg-background border-4 rounded-full p-1 mt-3 w-fit transition">
 							<Avatar className={`size-[120px]`}>
 								<AvatarImage src={accountInfo.avatar} />
 								<AvatarFallback className="text-[40px] transition">
@@ -314,6 +312,7 @@ export default function Profile() {
 									)}
 								</AvatarFallback>
 							</Avatar>
+
 							{isOwner && (
 								<label className="btn-secondary w-fit absolute bottom-0 right-0 p-1 rounded-full shadow border cursor-pointer">
 									<input
@@ -329,14 +328,16 @@ export default function Profile() {
 							)}
 						</div>
 
-						<div className="sm:self-end sm:block flex flex-col items-center flex-grow sm:mb-2">
-							<h3>
+						<div className="flex-grow sm:self-center sm:block sm:px-0 sm:pt-5 px-4  flex flex-col items-center">
+							<h3 className="line-clamp-2">
 								{combineIntoDisplayName(
 									accountInfo.firstName,
 									accountInfo.lastName
 								)}
 							</h3>
+
 							<p>{accountInfo.followers?.length} người theo dõi</p>
+
 							<div className="mt-1 flex -space-x-2">
 								{accountInfo.followers
 									?.slice(0, maxPreviewFriendsAvatar.current)
@@ -363,7 +364,6 @@ export default function Profile() {
 													onClick={() => clickChangeTab(3)}
 												>
 													<Ellipsis className="size-4 text-txtWhite" />
-													{/* <Glyph color="fill-txtWhite" /> */}
 												</button>
 											)}
 										</div>
@@ -403,7 +403,7 @@ export default function Profile() {
 
 							{!isOwner && accountInfo.relationship === true && (
 								<Button
-									className="btn-secondary px-8 text-nowrap h-10"
+									className="btn-secondary px-5 text-nowrap h-10"
 									onClick={handleUnfollow}
 								>
 									Đang theo dõi

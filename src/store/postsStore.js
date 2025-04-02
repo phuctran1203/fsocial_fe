@@ -47,7 +47,7 @@ class PostsStore {
 		});
 	};
 	// tìm post
-	findPost = (id, get) => get().posts.find((post) => post.id === id);
+	findPost = (id, get) => get().posts?.find((post) => post.id === id) || null;
 	// xóa post
 	deletePost = (id) =>
 		this.set((state) => ({
@@ -183,7 +183,7 @@ export const useProfilePostsStore = create((set, get) => {
 	};
 });
 
-export const useSinglePostStore = create((set) => {
+export const useSinglePostStore = create((set, get) => {
 	const store = new PostsStore(set);
 	return {
 		posts: null,
@@ -193,6 +193,8 @@ export const useSinglePostStore = create((set) => {
 		updatePost: store.updatePost,
 
 		setPosts: store.setPosts,
+
+		findPost: (id) => store.findPost(id, get),
 
 		deletePost: store.deletePost,
 	};
