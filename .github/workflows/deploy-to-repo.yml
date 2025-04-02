@@ -15,7 +15,7 @@ jobs:
       - name: Checkout target repo
         uses: actions/checkout@v4
         with:
-          repository: your-username/your-target-repo
+          repository: phuctran1203/fsocial_production
           token: ${{ secrets.PAT }}
           path: target-repo
 
