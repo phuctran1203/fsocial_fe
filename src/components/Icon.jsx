@@ -363,8 +363,12 @@ export const ImageIcon = ({ width = 24, height = 24, ...props }) => (
 			ry="5"
 			strokeWidth={0}
 		/>
-		<circle cx="7" cy="9" r="2" />
-		<path d="m21 15-3.086-3.086a2 2 0 0 0-2.828 0L5 21" strokeWidth={2} />
+		<circle cx="7" cy="9" r="2" className="stroke-txtWhite" />
+		<path
+			className="stroke-txtWhite"
+			d="m21 15-3.086-3.086a2 2 0 0 0-2.828 0L5 21"
+			strokeWidth={2}
+		/>
 		<defs>
 			<linearGradient id="primary-gradient" x1="0%" y1="0%" x2="100%" y2="100%">
 				<stop offset="0%" stopColor="var(--primary-gradient-start)" />
