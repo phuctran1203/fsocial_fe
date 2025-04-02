@@ -1,0 +1,40 @@
+name: Deploy to Another Repo
+
+on:
+  workflow_run:
+    workflows: ["Deploy"]
+    types:
+      - completed
+
+jobs:
+  deploy:
+    name: Deploy to Another Repo
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout target repo
+        uses: actions/checkout@v4
+        with:
+          repository: your-username/your-target-repo
+          token: ${{ secrets.PAT }}
+          path: target-repo
+
+      - name: Download artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: production-files
+          path: ./dist
+
+      - name: Copy build files
+        run: |
+          rm -rf target-repo/*
+          cp -r dist/* target-repo/
+
+      - name: Commit and push changes
+        run: |
+          cd target-repo
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add .
+          git commit -m "Deploy production build" || echo "No changes to commit"
+          git push origin main
