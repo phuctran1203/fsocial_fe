@@ -14,9 +14,12 @@ import MessageHandleMessages from "@/components/MessageHandleMessages";
 import MessageHandleCreateConversation from "@/components/MessageHandleCreateConversation";
 import { cn } from "@/lib/utils";
 import { CirclePlus, SearchIcon } from "lucide-react";
+import { regexInMessage } from "@/config/regex";
+import { useLocation } from "react-router-dom";
 
 export default function Message() {
 	const user = ownerAccountStore((state) => state.user);
+	const location = useLocation();
 	// message socket
 	const {
 		setMessages,
@@ -75,13 +78,16 @@ export default function Message() {
 	};
 
 	useEffect(() => {
-		// Nếu user đang mở cuộc trò chuyện trùng với global message trigger
-		if (
-			!newMessage ||
-			!conversation ||
-			newMessage.conversationId === conversation.id
-		) {
+		if (!newMessage || !conversation || !conversations) {
 			return;
+		}
+		// Nếu user đang mở cuộc trò chuyện trùng với global message trigger
+		// tự set đã đọc thành true
+		if (
+			newMessage.conversationId === conversation.id &&
+			regexInMessage.test(location.pathname)
+		) {
+			newMessage.read = true;
 		}
 
 		const baseConversation = {

@@ -79,29 +79,30 @@ export default function MessageHandleCreateConversation({
 								<LoadingIcon />
 							</div>
 						)}
-						{friendsList && friendsList.length === 0 && (
+
+						{friendsList?.length === 0 && (
 							<p className="text-center p-2">
 								Hãy theo dõi ai đó để bắt đầu cuộc trò chuyện mới nhé
 							</p>
 						)}
-						{friendsList &&
-							friendsList.map((friend) => (
-								<Button
-									key={friend.userId}
-									className="btn-transparent p-2 !justify-start"
-									onClick={() => handleSelectFriend(friend)}
-								>
-									<Avatar className={`size-9 me-2`}>
-										<AvatarImage src={friend.avatar} />
-										<AvatarFallback className="fs-xs">
-											{friend.firstName.charAt(0) ?? "?"}
-										</AvatarFallback>
-									</Avatar>
-									<p className="font-semibold">
-										{combineIntoDisplayName(friend.firstName, friend.lastName)}
-									</p>
-								</Button>
-							))}
+
+						{friendsList?.map((friend) => (
+							<Button
+								key={friend.userId}
+								className="btn-transparent p-2 !justify-start"
+								onClick={() => handleSelectFriend(friend)}
+							>
+								<Avatar className={`size-9 me-2`}>
+									<AvatarImage src={friend.avatar} />
+									<AvatarFallback className="fs-xs">
+										{friend.firstName.charAt(0) ?? "?"}
+									</AvatarFallback>
+								</Avatar>
+								<p className="font-medium">
+									{combineIntoDisplayName(friend.firstName, friend.lastName)}
+								</p>
+							</Button>
+						))}
 					</ScrollArea>
 				</div>
 			</div>
