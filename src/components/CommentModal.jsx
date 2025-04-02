@@ -135,13 +135,13 @@ function RenderComment({ ...props }) {
 export default function CommentModal({ id, store }) {
 	const user = ownerAccountStore((state) => state.user);
 	const textbox = useRef(null);
-	const { posts, updatePost } = store();
+	const { updatePost, findPost } = store();
 
-	// chuẩn bị data
+	// chuẩn bị data, trường hợp tìm trong 1 store mà chưa có post đó, tự call api lấy về
 	const [post, setPost] = useState(null);
 
 	const handleGetPost = async () => {
-		const found = posts?.find((p) => p.id == id);
+		const found = findPost(id);
 		if (found) {
 			setPost(found);
 			getComment(id);
@@ -319,9 +319,9 @@ export default function CommentModal({ id, store }) {
 				{post && (
 					<Post
 						post={post}
-						setPost={setPost}
+						setPost={setPost} //post update lên store và lên cả CommentModal này
 						isChildren={true}
-						className="border-b "
+						className="border-b"
 						store={store}
 						allowCarousel={true}
 					/>

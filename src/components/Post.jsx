@@ -39,6 +39,7 @@ export default function Post({
 	store,
 	isShared = false,
 	allowCarousel = false,
+	blockEvent,
 }) {
 	const { showPopup } = usePopupStore();
 	const [popoverOpen, setPopoverOpen] = useState(false);
@@ -180,6 +181,7 @@ export default function Post({
 						if (!post.originPostId) showCommentPopup();
 					}}
 					store={store}
+					blockEvent={blockEvent}
 				/>
 			</div>
 

@@ -14,12 +14,14 @@ import { useValidRefreshTokenStore } from "@/store/validRefreshTokenStore";
 import ExpiredDialog from "@/components/ExpiredDialog";
 import useNotificationsStore from "@/store/notificationStore";
 import cleanupStore from "@/utils/cleanupStore";
+import useSideActionMessageStore from "@/store/sideActionMessageStore";
 
 export default function UserLayout() {
 	const { setUser } = ownerAccountStore();
 	const { refreshToken } = useValidRefreshTokenStore();
 	const { connectNotificationWebSocket } = useNotificationsStore();
 	const { connectMessageWebSocket } = useMessageStore();
+	const { connectSideActionMessageWebSocket } = useSideActionMessageStore();
 
 	const getUserDetail = async () => {
 		const resp = await getOwnerProfile();
@@ -35,6 +37,7 @@ export default function UserLayout() {
 		setUser({ userId, ...resp.data });
 		connectNotificationWebSocket(userId);
 		connectMessageWebSocket(userId);
+		connectSideActionMessageWebSocket();
 	};
 
 	useEffect(() => {

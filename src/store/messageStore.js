@@ -55,17 +55,17 @@ const useMessageStore = create((set, get) => ({
 
 	cleanMessageWebSocket: async () => {
 		const { stompClientMessage } = get();
-		if (stompClientMessage)
-			return stompClientMessage.deactivate().then(() => {
-				console.log("🚫 Disconnected message socket server");
-				set({
-					messages: [],
-					conversation: null,
-					stompClientMessage: null,
-					subscription: null,
-					newMessage: null,
-				});
+		if (!stompClientMessage) return;
+		stompClientMessage.deactivate().then(() => {
+			console.log("🚫 Disconnected message socket server");
+			set({
+				messages: [],
+				conversation: null,
+				stompClientMessage: null,
+				subscription: null,
+				newMessage: null,
 			});
+		});
 	},
 
 	sendMessage: (content, id) => {
