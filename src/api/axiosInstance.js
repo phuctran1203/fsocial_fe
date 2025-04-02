@@ -48,7 +48,7 @@ API.interceptors.response.use(
 			return Promise.reject(error);
 		}
 
-		// Nếu lỗi 401 từ các API khác, thử refresh token
+		// Nếu lỗi 400, 401 từ các API khác, thử refresh token
 		if ([401, 400].includes(error.response?.status)) {
 			if (error.response?.status === 401)
 				console.log("Token hết hạn, làm mới token...");

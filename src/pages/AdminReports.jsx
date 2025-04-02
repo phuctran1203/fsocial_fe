@@ -234,7 +234,9 @@ export default function AdminReports() {
 		setDate(data);
 	};
 
-	const handleAcceptDate = () => {};
+	const handleAcceptDate = () => {
+		fetchReports();
+	};
 
 	const handleCancleDate = () => {
 		setTemplateSelect(-1);
@@ -247,7 +249,6 @@ export default function AdminReports() {
 	};
 
 	const fetchReports = async () => {
-		console.log("current date: ", date);
 		console.log("Start date: ", dateClassToISO8601(date.from));
 		console.log("end date: ", dateClassToISO8601(date.to));
 		const start = dateClassToISO8601(date.from);
@@ -260,11 +261,16 @@ export default function AdminReports() {
 			getNumberOfComplaint(start, end),
 		]);
 
-		console.log("respComplaint: ", respComplaint);
+		if (respComplaint && respComplaint.statusCode === 200) {
+			const dataComplaintReports = respComplaint.data.map((item) => ({
+				label: item.hour.toString().padStart(2, "0") + ":00",
+				value: item.count,
+			}));
+			setChartDataNumberComplaints(dataComplaintReports);
+		}
 
 		setChartDataPosts(fakeChartDataPosts);
 		setChartDataNumberCreatedAccounts(fakeChartDataNumberCreatedAccounts);
-		setChartDataNumberComplaints(fakeChartDataNumberComplaints);
 		setTopKOL(fakeTopKOL);
 	};
 
