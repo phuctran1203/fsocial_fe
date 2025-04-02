@@ -1,40 +1,45 @@
 name: Deploy to Another Repo
 
 on:
-  workflow_run:
-    workflows: ["Deploy"]
-    types:
-      - completed
+  push:
+    branches:
+      - main # Chạy khi có push lên nhánh main
 
 jobs:
-  deploy:
-    name: Deploy to Another Repo
+  build_and_deploy:
+    name: Build and Deploy
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout target repo
+      - name: Checkout repo
         uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
         with:
-          repository: phuctran1203/fsocial_production
-          token: ${{ secrets.PAT }}
-          path: target-repo
+          node-version: 18
 
-      - name: Download artifact
-        uses: actions/download-artifact@v4
-        with:
-          name: production-files
-          path: ./dist
+      - name: Install dependencies
+        uses: bahmutov/npm-install@v1
 
-      - name: Copy build files
+      - name: Build project
+        run: npm run build
+
+      - name: Upload build files to target repo
         run: |
-          rm -rf target-repo/*
-          cp -r dist/* target-repo/
-
-      - name: Commit and push changes
-        run: |
+          # Checkout target repo
+          git clone https://github.com/phuctran1203/fsocial_production target-repo
           cd target-repo
+
+          # Tạo môi trường Git
           git config --global user.name "github-actions[bot]"
           git config --global user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+          # Xóa hết các file cũ và copy build files vào target repo
+          rm -rf *
+          cp -r ../dist/* .
+
+          # Commit và đẩy lên target repo
           git add .
-          git commit -m "Deploy production build" || echo "No changes to commit"
+          git commit -m "Deploy production build"
           git push origin main
