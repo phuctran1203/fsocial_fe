@@ -8,12 +8,10 @@ import {
 	useSearchPostsStore,
 	useSinglePostStore,
 } from "@/store/postsStore";
-import useSideActionMessageStore from "@/store/sideActionMessageStore";
 
 export default function cleanupStore() {
 	ownerAccountStore.getState().cleanOwnerAccountStore();
 	useMessageStore.getState().cleanMessageWebSocket();
-	useSideActionMessageStore.getState().cleanSideActionMessageWebSocket();
 	useNotificationsStore.getState().cleanNotificationWebSocket();
 	useHomePostsStore.getState().cleanPostsStore();
 	useFollowPostsStore.getState().cleanPostsStore();

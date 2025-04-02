@@ -11,22 +11,6 @@ const useMessageStore = create((set, get) => ({
 
 	setMessages: (messages) => set({ messages }),
 
-	setSubscription: (conversationId) => {
-		const userId = ownerAccountStore.getState().user.userId;
-		const { subscription, stompClientMessage, setMessages } = get();
-		if (subscription) subscription.unsubscribe();
-		set({
-			subscription: stompClientMessage.subscribe(
-				`/queue/private-${conversationId}`,
-				(message) => {
-					const receivedMessage = JSON.parse(message.body);
-					if (receivedMessage.receiverId !== userId) return;
-					setMessages([...get().messages, receivedMessage]);
-				}
-			),
-		});
-	},
-
 	setConversation: (conversation) => set({ conversation }),
 
 	connectMessageWebSocket: (userId) => {
@@ -53,13 +37,41 @@ const useMessageStore = create((set, get) => ({
 		client.activate();
 	},
 
+	setSubscription: (conversationId) => {
+		const userId = ownerAccountStore.getState().user.userId;
+		const { subscription, stompClientMessage, setMessages } = get();
+		if (subscription) subscription.forEach((sub) => sub.unsubscribe());
+
+		const subTriggerMessage = stompClientMessage.subscribe(
+			`/queue/private-${conversationId}`,
+			(message) => {
+				const receivedMessage = JSON.parse(message.body);
+				if (receivedMessage.receiverId !== userId) return;
+				console.log("Trigger message: ", receivedMessage);
+				setMessages([...get().messages, receivedMessage]);
+			}
+		);
+
+		const subTriggerSideAction = stompClientMessage.subscribe(
+			`/queue/actions-${conversationId}`,
+			(message) => {
+				const receivedMessage = JSON.parse(message.body);
+				console.log("Trigger side action: ", receivedMessage);
+			}
+		);
+
+		set({
+			subscription: [subTriggerMessage, subTriggerSideAction],
+		});
+	},
+
 	cleanMessageWebSocket: async () => {
 		const { stompClientMessage } = get();
 		if (!stompClientMessage) return;
 		stompClientMessage.deactivate().then(() => {
 			console.log("🚫 Disconnected message socket server");
 			set({
-				messages: [],
+				messages: null,
 				conversation: null,
 				stompClientMessage: null,
 				subscription: null,
@@ -81,6 +93,9 @@ const useMessageStore = create((set, get) => ({
 			}),
 		});
 	},
+
+	sendSideAction: () => {},
+
 	setNewMessage: (newMessage) => set({ newMessage }),
 }));
 

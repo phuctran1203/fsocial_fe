@@ -41,8 +41,12 @@ const useNotificationsStore = create((set, get) => ({
 		const { stompClientNotification } = get();
 		if (!stompClientNotification) return;
 		stompClientNotification.deactivate().then(() => {
-			console.log("Disconnected notification socket server");
-			set({ notifications: null, stompClientNotification: null });
+			console.log("🚫 Disconnected notification socket server");
+			set({
+				unreadCount: 0,
+				notifications: null,
+				stompClientNotification: null,
+			});
 		});
 	},
 
