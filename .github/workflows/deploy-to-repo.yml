@@ -25,10 +25,15 @@ jobs:
       - name: Build project
         run: npm run build
 
-      - name: Upload build files to target repo
+      - name: Checkout target repo
+        uses: actions/checkout@v4
+        with:
+          repository: phuctran1203/fsocial_production
+          token: ${{ secrets.PAT }} # Đảm bảo bạn có PAT trong Secrets
+          path: target-repo
+
+      - name: Copy build files
         run: |
-          # Checkout target repo
-          git clone https://github.com/phuctran1203/fsocial_production target-repo
           cd target-repo
 
           # Tạo môi trường Git
@@ -39,7 +44,9 @@ jobs:
           rm -rf *
           cp -r ../dist/* .
 
-          # Commit và đẩy lên target repo
+      - name: Commit and push changes
+        run: |
+          cd target-repo
           git add .
           git commit -m "Deploy production build"
           git push origin main
