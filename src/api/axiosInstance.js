@@ -52,7 +52,7 @@ API.interceptors.response.use(
 		const status = error.response?.status;
 		const statusCode = error.response?.data.statusCode;
 		if (status === 401 || (status === 400 && statusCode === 601)) {
-			status === 401 && console.log("Token hết hạn, làm mới token...");
+			if (status === 401) console.log("Token hết hạn, làm mới token...");
 			const resp = await refreshToken();
 			if (!resp || resp.statusCode !== 200) return Promise.reject(error);
 			error.config.headers["Authorization"] = `Bearer ${resp.data.accessToken}`;
