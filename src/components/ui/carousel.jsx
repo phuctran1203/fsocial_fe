@@ -110,7 +110,7 @@ Carousel.displayName = "Carousel";
 const CarouselContent = forwardRef(({ className, ...props }, ref) => {
 	const { carouselRef, orientation } = useCarousel();
 	return (
-		<div ref={carouselRef} className="overflow-hidden h-full">
+		<div ref={carouselRef} className="h-full">
 			<div
 				ref={ref}
 				className={cn(

@@ -12,6 +12,7 @@ import {
 	combineIntoDisplayName,
 } from "@/utils/combineName";
 import GenerateMediaLayout from "./GenerateMediaLayout";
+import { processMedias } from "@/utils/processMedia";
 
 export default function EditPostModal({ id, store }) {
 	const hidePopup = usePopupStore((state) => state.hidePopup);
@@ -44,7 +45,7 @@ export default function EditPostModal({ id, store }) {
 	};
 
 	return (
-		<div className="relative flex-grow flex flex-col sm:w-[550px] sm:h-fit sm:max-h-[90dvh] h-[100dvh]">
+		<div className="relative pt-10 flex flex-col sm:w-[550px] sm:h-fit sm:max-h-[90dvh] h-[100dvh]">
 			<div className="flex-grow pt-3 space-y-2 overflow-y-auto scrollable-div">
 				<div className="flex space-x-2 px-4">
 					<Avatar className={`size-9`}>
@@ -71,14 +72,8 @@ export default function EditPostModal({ id, store }) {
 					autoFocus={true}
 				/>
 				{/* assets post */}
-				<div>
-					<GenerateMediaLayout
-						medias={
-							post.content.media ||
-							(post.originPostId ? [post.originPostId] : [])
-						}
-					/>
-				</div>
+
+				<GenerateMediaLayout medias={processMedias(post)} />
 			</div>
 
 			<div className="sticky bottom-0 p-3 bg-background">

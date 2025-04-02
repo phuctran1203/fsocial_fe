@@ -3,7 +3,11 @@ import Post from "./Post";
 import { Skeleton } from "./ui/skeleton";
 
 export default function RenderPosts({ store, className }) {
+	console.log("vào được render post");
+
 	const posts = store((state) => state.posts);
+	console.log("posts: ", posts);
+
 	return (
 		<>
 			{!posts &&

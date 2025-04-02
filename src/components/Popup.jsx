@@ -18,16 +18,15 @@ export default function Popup() {
 			onClick={() => hidePopup()}
 		>
 			<div
-				className={`
-				flex flex-col bg-background max-h-screen rounded-lg overflow-hidden ${
-					theme === "dark" && "border"
-				}
-				${isOpen ? "translate-y-0" : "translate-y-[100dvh]"}
-				transition`}
+				className={cn(
+					"bg-background max-h-screen rounded-lg overflow-hidden transition",
+					theme === "dark" && "border",
+					isOpen ? "translate-y-0" : "translate-y-[100dvh]"
+				)}
 				onClick={(e) => e.stopPropagation()}
 			>
 				<div
-					className={`relative ${
+					className={`absolute z-20 bg-background w-full ${
 						heading ? "border-b py-2" : "flex justify-end"
 					}`}
 				>

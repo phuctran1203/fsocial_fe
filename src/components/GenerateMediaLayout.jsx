@@ -6,9 +6,13 @@ import { useNavigate } from "react-router-dom";
 import { cn } from "@/lib/utils";
 import { getImageSize, getVideoSize } from "@/utils/getSizeElement";
 import { Plus } from "lucide-react";
-import { usePopupStore } from "@/store/popupStore";
-import ModalCarouel from "./ModalCarouel";
-import { PencilChangeImageIcon } from "./Icon";
+import {
+	Carousel,
+	CarouselContent,
+	CarouselItem,
+	CarouselNext,
+	CarouselPrevious,
+} from "./ui/carousel";
 
 const calculateNumberOfScales = (dimensions) => {
 	const numberSquare = dimensions.reduce(
@@ -48,7 +52,6 @@ const genClassLayout = async (medias) => {
 		case 2:
 			var { numberSquare, numberHorizontal, numberVertical } =
 				calculateNumberOfScales(dimensions);
-			console.log(numberSquare, numberHorizontal, numberVertical);
 			if (numberHorizontal === 2)
 				return "gap-0.5 aspect-square grid grid-rows-2";
 			if (numberVertical === 2) return "gap-0.5 aspect-square grid grid-cols-2";
@@ -57,11 +60,8 @@ const genClassLayout = async (medias) => {
 		case 3:
 			var { numberSquare, numberHorizontal, numberVertical } =
 				calculateNumberOfScales(dimensions);
-			console.log(numberSquare, numberHorizontal, numberVertical);
-
 			numberHorizontal += numberSquare;
 			if (numberHorizontal > numberVertical) {
-				console.log("Horizontal > ver");
 				return "grid gap-0.5 grid-cols-2 aspect-square [&>:nth-child(1)]:col-span-2 ";
 			}
 			return "grid gap-0.5 grid-cols-[auto_auto] aspect-square [&>:nth-child(1)]:row-span-2 [&>:nth-child(1)]:w-full [&>:not(:nth-child(1))]:w-full";
@@ -74,6 +74,7 @@ const genClassLayout = async (medias) => {
 				return "grid gap-0.5 grid-cols-2 grid-rows-2 aspect-square";
 			return "aspect-square grid gap-0.5 grid-cols-[auto_auto] grid-rows-3 [&>:nth-child(1)]:row-span-3";
 
+		// case 5 or 5+
 		default:
 			var { numberSquare, numberHorizontal, numberVertical } =
 				calculateNumberOfScales(dimensions.slice(2, 6));
@@ -86,7 +87,6 @@ const genClassLayout = async (medias) => {
 				[&>:nth-child(3)]:row-span-2 
 				[&>:nth-child(4)]:row-span-2 
 				[&>:nth-child(5)]:row-span-2`;
-			// case 5 or 5+
 			return `
 			aspect-square grid gap-0.5 grid-cols-6 grid-rows-[auto_auto] 
 			[&>:nth-child(1)]:col-span-3
@@ -97,9 +97,16 @@ const genClassLayout = async (medias) => {
 	}
 };
 
-export default function GenerateMediaLayout({ medias }) {
+export default function GenerateMediaLayout({
+	medias,
+	allowCarousel = false,
+	mediaCallback = () => {},
+	store,
+	blockEvent,
+}) {
+	// handle lấy post nếu là repost
+	const isPost = medias.length === 1 && medias[0].type === "post";
 	const [post, setPost] = useState(null);
-	const [classLayout, setClassLayout] = useState(null);
 
 	const handleGetPost = async (postId) => {
 		const user = ownerAccountStore.getState().user;
@@ -108,46 +115,57 @@ export default function GenerateMediaLayout({ medias }) {
 		setPost(resp.data);
 	};
 
-	const isPost = medias.length === 1 && medias[0].type === "post";
-
 	useEffect(() => {
 		isPost && handleGetPost(medias[0].src);
 	}, []);
 
+	// navigate về post gốc nếu là repost
 	const navigate = useNavigate();
 	const handleToOriginPost = () => {
 		navigate(`/post?id=${post.id}`);
 	};
 
-	const { showPopup } = usePopupStore();
+	// handle carousel khi mở comment modal
+	allowCarousel = allowCarousel && medias.length > 1;
+	const [api, setApi] = useState();
+	const [current, setCurrent] = useState(0);
 
-	const showCarousel = () => {
-		showPopup(null, <ModalCarouel medias={medias} />);
-	};
+	useEffect(() => {
+		if (!api || isPost || !allowCarousel) {
+			return;
+		}
+		setCurrent(api.selectedScrollSnap() + 1);
+
+		api.on("select", () => {
+			setCurrent(api.selectedScrollSnap() + 1);
+		});
+	}, [api]);
+
+	// sinh class tailwind tự động theo số lượng và tỉ lệ của media
+	const [classLayout, setClassLayout] = useState(null);
 
 	useEffect(() => {
 		const layout = async () => {
 			setClassLayout(await genClassLayout(medias));
 		};
-		layout();
+		!allowCarousel && layout();
 	}, [medias]);
 
 	return (
 		medias.length > 0 && (
 			<div
+				onClick={() => !allowCarousel && mediaCallback()}
 				className={cn(
 					"relative transition",
-					!isPost ? cn("border-y border-x-0", classLayout) : "border-b"
+					!isPost && !allowCarousel
+						? cn("border-y border-x-0", classLayout)
+						: "border-b"
 				)}
 			>
 				{!isPost &&
 					classLayout &&
 					medias.slice(0, 5).map((media, index) => (
-						<div
-							key={index}
-							className="relative overflow-hidden size-full"
-							onClick={() => medias.length > 1 && showCarousel()}
-						>
+						<div key={index} className="relative overflow-hidden size-full">
 							{media.type === "image" && (
 								<img
 									src={media.src}
@@ -172,14 +190,46 @@ export default function GenerateMediaLayout({ medias }) {
 						</div>
 					))}
 
+				{!isPost && allowCarousel && (
+					<div className="relative border-t border-x-0">
+						<Carousel setApi={setApi} className="w-[80%] mx-auto ">
+							<CarouselContent className="max-h-[70vh]">
+								{medias.map((media, index) => (
+									<CarouselItem key={index} className="pl-3">
+										{media.type === "image" && (
+											<img
+												src={media.src}
+												alt="Bài đăng"
+												className="size-full object-contain"
+											/>
+										)}
+
+										{media.type === "video" && (
+											<div className="size-full object-contain grid place-content-center">
+												<video src={media.src} controls className="" />
+											</div>
+										)}
+									</CarouselItem>
+								))}
+							</CarouselContent>
+							<CarouselPrevious className="sm:inline-flex hidden" />
+							<CarouselNext className="sm:inline-flex hidden" />
+						</Carousel>
+						<div className="fs-xs px-2 bg-background shadow-lg border rounded-full  absolute bottom-2 right-2">
+							{current} / {medias.length}
+						</div>
+					</div>
+				)}
+
 				{post && (
 					<div onClick={handleToOriginPost}>
 						<Post
 							post={post}
 							isChildren={true}
 							showReact={false}
-							className="border-t cursor-pointer rounded-lg overflow-hidden"
+							className="border-t rounded-lg overflow-hidden pointer-events-none"
 							isShared={true}
+							store={store}
 						/>
 					</div>
 				)}

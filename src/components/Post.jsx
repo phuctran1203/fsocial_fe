@@ -28,39 +28,21 @@ import { RepostPostIcon } from "./Icon";
 import { SharePostIcon } from "./Icon";
 import { cn } from "@/lib/utils";
 import { Ellipsis, MessageSquareWarning, Pen } from "lucide-react";
-import { regexImage, regexVideo } from "@/config/regex";
+import { processMedias } from "@/utils/processMedia";
 
 export default function Post({
 	post,
+	setPost,
 	isChildren,
 	showReact = true,
 	className = "",
 	store,
 	isShared = false,
+	allowCarousel = false,
 }) {
 	const { showPopup } = usePopupStore();
-
 	const [popoverOpen, setPopoverOpen] = useState(false);
-
 	const user = ownerAccountStore.getState().user;
-
-	const processMedias = () => {
-		if (post.content.media) {
-			return post.content.media.map((media) => {
-				let type;
-				if (regexImage.test(media)) type = "image";
-				else if (regexVideo.test(media)) type = "video";
-				return {
-					src: media,
-					type,
-				};
-			});
-		}
-		if (post.originPostId) {
-			return [{ src: post.originPostId, type: "post" }];
-		}
-		return [];
-	};
 
 	const showCommentPopup = () => {
 		showPopup(
@@ -95,16 +77,23 @@ export default function Post({
 	};
 
 	const likes = post.countLikes;
-
 	const liked = post.like;
-
 	const updatePost = store ? store((state) => state.updatePost) : () => {};
 
 	const handleLike = async () => {
+		// set in UI comment modal
+		if (setPost)
+			setPost((prev) => ({
+				...prev,
+				like: !liked,
+				countLikes: liked ? likes - 1 : likes + 1,
+			}));
+		// update in store
 		updatePost(post.id, {
 			like: !liked,
 			countLikes: liked ? likes - 1 : likes + 1,
 		});
+		// call api
 		likePost(post.id);
 	};
 
@@ -180,12 +169,18 @@ export default function Post({
 				{/* post content */}
 				<div
 					className={cn("px-5 mb-1.5", isShared && "px-7")}
-					dangerouslySetInnerHTML={{ __html: post.content.htmltext }}
+					dangerouslySetInnerHTML={{ __html: post.content?.htmltext }}
 				/>
-				{/* assets post */}
-				<div>
-					<GenerateMediaLayout medias={processMedias()} />
-				</div>
+				{/* post medias */}
+				<GenerateMediaLayout
+					medias={processMedias(post)}
+					allowCarousel={allowCarousel}
+					// không mở comment popup nếu là bài repost khi "click vào media"
+					mediaCallback={() => {
+						if (!post.originPostId) showCommentPopup();
+					}}
+					store={store}
+				/>
 			</div>
 
 			{showReact && (
