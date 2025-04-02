@@ -52,7 +52,7 @@ export default function Follow() {
 					w-full mx-auto
 					lg:max-w-[540px]
 					md:space-y-4 md:pb-0
-					sm:mt-0
+					sm:mt-2
 					space-y-1.5 pb-12"
 				>
 					<RenderPosts

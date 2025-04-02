@@ -30,7 +30,7 @@ export default function DeletePostModal({ id, store }) {
 	};
 
 	return (
-		<div className="sm:w-[500px] w-[90vw]">
+		<div className="pt-10 sm:w-[500px] w-[90vw]">
 			<div className="flex justify-center my-4">
 				<img
 					src="./decor/delete_post_decor.svg"

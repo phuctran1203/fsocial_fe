@@ -21,7 +21,9 @@ export const usePopupStore = create((set) => ({
 	heading: null,
 	isOpen: false,
 	children: null,
+
 	showPopup: (heading, children) => set({ isOpen: true, heading, children }),
+
 	hidePopup: () => {
 		set({ isOpen: false });
 		setTimeout(() => {

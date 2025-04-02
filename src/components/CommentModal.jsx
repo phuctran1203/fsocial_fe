@@ -23,6 +23,7 @@ import { HeartPostIcon } from "./Icon";
 import { usePopupStore } from "@/store/popupStore";
 import Button from "./Button";
 import { Send } from "lucide-react";
+import { getPost } from "@/api/postsApi";
 
 function RenderComment({ ...props }) {
 	const { comment, selectCommentToReply, handleShowReplyComment, replies } =
@@ -133,21 +134,41 @@ function RenderComment({ ...props }) {
 
 export default function CommentModal({ id, store }) {
 	const user = ownerAccountStore((state) => state.user);
-
 	const textbox = useRef(null);
-
 	const { posts, updatePost } = store();
 
-	const post = posts?.find((p) => p.id == id);
+	// chuẩn bị data
+	const [post, setPost] = useState(null);
+
+	const handleGetPost = async () => {
+		const found = posts?.find((p) => p.id == id);
+		if (found) {
+			setPost(found);
+			getComment(id);
+			return;
+		}
+		const resp = await getPost(user.userId, id);
+		if (!resp || resp.statusCode !== 200) return;
+		setPost(resp.data);
+		getComment(id);
+	};
 
 	const [comments, setComments] = useState([]);
 
+	const getComment = async (id) => {
+		const respGetComment = await getComments(id);
+		if (!respGetComment || respGetComment.statusCode !== 207) return;
+		setComments(respGetComment.data.reverse());
+	};
+
+	useEffect(() => {
+		handleGetPost();
+	}, []);
+
+	// Handle gửi comment
 	const [submitCmtClicked, setSubmitCmtClicked] = useState(false);
-
 	const [selectReply, setSelectReply] = useState({});
-
 	const [commentsReply, setCommentsReply] = useState([]);
-
 	const [trigger, setTrigger] = useState(false); // trigger tự động focus texbox sau khi đã gửi comment
 
 	const selectCommentToReply = (selectedComment) => {
@@ -267,6 +288,7 @@ export default function CommentModal({ id, store }) {
 		setSubmitCmtClicked(false);
 	};
 
+	// Hiển thị các reply comment
 	const handleShowReplyComment = async (commentId) => {
 		const resp = await getRepliesComment(commentId);
 		if (!resp || resp.statusCode !== 200) {
@@ -291,38 +313,31 @@ export default function CommentModal({ id, store }) {
 		}
 	};
 
-	const getComment = async () => {
-		const respGetComment = await getComments(post.id);
-		if (!respGetComment || respGetComment.statusCode !== 207) return;
-		setComments(respGetComment.data.reverse());
-	};
-
-	useEffect(() => {
-		getComment();
-	}, []);
-
 	return (
-		<div className="relative flex-grow flex flex-col sm:w-[560px] w-screen sm:h-[90dvh] h-[100dvh]">
+		<div className="relative pt-10 flex flex-col sm:w-[540px] w-screen sm:h-[95dvh] h-[100dvh]">
 			<div className="overflow-y-auto scrollable-div flex-grow flex flex-col">
-				<Post
-					post={post}
-					isChildren={true}
-					className="border-b "
-					store={store}
-				/>
+				{post && (
+					<Post
+						post={post}
+						setPost={setPost}
+						isChildren={true}
+						className="border-b "
+						store={store}
+						allowCarousel={true}
+					/>
+				)}
 
 				<div className="space-y-3 pt-3 pb-14 px-5 flex-grow">
-					{comments.length > 0 ? (
-						comments.map((comment, index) => (
-							<RenderComment
-								key={index}
-								comment={comment}
-								selectCommentToReply={selectCommentToReply}
-								handleShowReplyComment={handleShowReplyComment}
-								replies={commentsReply.find((item) => item.id === comment.id)}
-							/>
-						))
-					) : (
+					{comments.map((comment, index) => (
+						<RenderComment
+							key={index}
+							comment={comment}
+							selectCommentToReply={selectCommentToReply}
+							handleShowReplyComment={handleShowReplyComment}
+							replies={commentsReply.find((item) => item.id === comment.id)}
+						/>
+					))}
+					{comments.length === 0 && (
 						<p>Hãy là người đầu tiên bình luận bài viết này</p>
 					)}
 				</div>

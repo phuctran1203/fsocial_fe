@@ -133,3 +133,9 @@ export function dateTimeToMessageTime(time) {
 		previousTime.getMonth() + 1
 	)}/${previousTime.getFullYear()}`;
 }
+
+export function dateClassToISO8601(date) {
+	return `${date.getFullYear()}-${addPadStart(
+		date.getMonth() + 1
+	)}-${addPadStart(date.getDate())}`;
+}
