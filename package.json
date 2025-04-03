@@ -1,6 +1,7 @@
 {
   "name": "fsocial",
   "private": true,
+  "homepage": "https://fsocial.id.vn",
   "version": "0.0.0",
   "type": "module",
   "scripts": {
