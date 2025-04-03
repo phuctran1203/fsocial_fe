@@ -27,8 +27,15 @@ export default function MessageListMessages({
 }) {
 	const user = ownerAccountStore((state) => state.user);
 	const theme = themeStore((state) => state.theme);
-	const { messages, setMessages, sendMessage, conversation, setConversation } =
-		useMessageStore();
+	const {
+		ready,
+		setReady,
+		messages,
+		setMessages,
+		sendMessage,
+		conversation,
+		setConversation,
+	} = useMessageStore();
 	const [indexMsgShow, setIndexMsgShow] = useState(-1);
 
 	const showTimeLabel = (index) => {
@@ -49,6 +56,7 @@ export default function MessageListMessages({
 			setReady(false);
 			return;
 		}
+
 		// tìm tin nhắn mới nhất người gửi đã gửi
 		for (let i = messages.length - 1; i >= 0; i--) {
 			if (messages[i].receiverId !== conversation.receiverId) {
@@ -66,12 +74,11 @@ export default function MessageListMessages({
 	const containerMessagesRef = useRef(null);
 	const oldConverId = useRef("");
 	const observer = useRef();
-	const [ready, setReady] = useState(false);
+	// const [ready, setReady] = useState(false);
 
 	const callBackAPI = (entries) => {
 		if (entries[0].isIntersecting) {
 			observer.current.unobserve(entries[0].target);
-			console.log("scroll đến element thứ 1, trigger call API lấy message cũ");
 		}
 	};
 	const handleScrollMessages = () => {
@@ -89,6 +96,7 @@ export default function MessageListMessages({
 				containerMessagesRef.current.scrollTo({
 					top: containerMessagesRef.current.scrollHeight,
 				});
+				setReady(true);
 				oldConverId.current = conversation.id;
 				// hủy observer cũ
 				if (observer.current) observer.current.disconnect();
@@ -101,7 +109,6 @@ export default function MessageListMessages({
 				observer.current.observe(containerMessagesRef.current.childNodes[1]);
 
 				// set ready hiển thị message
-				if (!ready) setReady(true);
 			}, 100);
 		}
 	};

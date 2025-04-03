@@ -11,7 +11,7 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout repo
+      - name: Checkout source repo
         uses: actions/checkout@v4
 
       - name: Setup Node.js
@@ -32,21 +32,27 @@ jobs:
           token: ${{ secrets.PAT }}
           path: target-repo
 
-      - name: Copy build files
+      - name: Copy build files and keep CNAME
         run: |
           cd target-repo
 
-          # Tạo môi trường Git
-          git config --global user.name "github-actions[bot]"
-          git config --global user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          # Nếu CNAME tồn tại, sao lưu nó
+          if [ -f CNAME ]; then cp CNAME /tmp/CNAME; fi
 
-          # Xóa hết các file cũ và copy build files vào target repo
-          rm -rf *
+          # Xóa tất cả file cũ nhưng giữ lại .git
+          find . -mindepth 1 ! -regex '^./.git\(/.*\)?' -delete
+
+          # Copy các file mới từ dist vào target repo
           cp -r ../dist/* .
+
+          # Khôi phục CNAME nếu có
+          if [ -f /tmp/CNAME ]; then mv /tmp/CNAME CNAME; fi
 
       - name: Commit and push changes
         run: |
           cd target-repo
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add .
-          git commit -m "Deploy production build"
+          git commit -m "Deploy production build" || echo "No changes to commit"
           git push origin main

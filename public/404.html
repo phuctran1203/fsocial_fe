@@ -22,7 +22,7 @@
 			// https://username.github.io/repo-name/one/two?a=b&c=d#qwe becomes
 			// https://username.github.io/repo-name/?/one/two&a=b~and~c=d#qwe
 			// Otherwise, leave pathSegmentsToKeep as 0.
-			var pathSegmentsToKeep = 1; // Phuc changed it to 1 and it works
+			var pathSegmentsToKeep = 0; // phần segment muốn giữ lại
 
 			var l = window.location;
 			l.replace(
@@ -35,7 +35,12 @@
 						.slice(0, 1 + pathSegmentsToKeep)
 						.join("/") +
 					"/?/" +
-					l.pathname.slice(1).split("/").slice(pathSegmentsToKeep).join("/").replace(/&/g, "~and~") +
+					l.pathname
+						.slice(1)
+						.split("/")
+						.slice(pathSegmentsToKeep)
+						.join("/")
+						.replace(/&/g, "~and~") +
 					(l.search ? "&" + l.search.slice(1).replace(/&/g, "~and~") : "") +
 					l.hash
 			);
