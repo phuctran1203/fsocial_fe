@@ -3,11 +3,14 @@ import { Client } from "@stomp/stompjs";
 import { ownerAccountStore } from "./ownerAccountStore";
 
 const useMessageStore = create((set, get) => ({
+	ready: false,
 	messages: null,
 	conversation: null,
 	stompClientMessage: null,
 	subscription: null,
 	newMessage: null,
+
+	setReady: (ready) => set({ ready }),
 
 	setMessages: (messages) => set({ messages }),
 
@@ -71,6 +74,7 @@ const useMessageStore = create((set, get) => ({
 		stompClientMessage.deactivate().then(() => {
 			console.log("🚫 Disconnected message socket server");
 			set({
+				ready: false,
 				messages: null,
 				conversation: null,
 				stompClientMessage: null,

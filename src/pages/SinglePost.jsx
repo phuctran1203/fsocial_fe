@@ -42,7 +42,11 @@ export default function SinglePost() {
 							space-y-1.5 pb-12"
 				>
 					{posts?.length > 0 && queryParams.get("id") === posts?.at(0).id && (
-						<Post post={posts.at(0)} store={useSinglePostStore} />
+						<Post
+							post={posts.at(0)}
+							className="mt-2 sm:rounded shadow-y"
+							store={useSinglePostStore}
+						/>
 					)}
 
 					{posts?.length === 0 && (

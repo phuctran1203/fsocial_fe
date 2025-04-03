@@ -13,7 +13,7 @@ export default function MessageHandleCreateConversation({
 	setContentActive,
 	conversations,
 }) {
-	const { setMessages, setConversation } = useMessageStore();
+	const { setReady, setMessages, setConversation } = useMessageStore();
 	const [showScrollFriends, setShowScrollFriends] = useState(false);
 	const [friendsList, setFriendsList] = useState(null);
 	const timeoutSearchRef = useRef(null);
@@ -42,6 +42,7 @@ export default function MessageHandleCreateConversation({
 			return;
 		}
 		// Clear message của người khác nếu có
+		setReady(true);
 		setMessages([]);
 		console.log("Friend được chọn để tạo hội thoại mới: ", friend);
 		const userId = friend.userId;
