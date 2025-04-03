@@ -17,14 +17,15 @@
 							return s.replace(/~and~/g, "&");
 						})
 						.join("?");
+
 					// Thay thế URL nếu cần thiết
-					if (!l.pathname.includes("/?/")) {
-						window.history.replaceState(
-							null,
-							null,
-							l.pathname.slice(0, -1) + decoded + l.hash
-						);
-					}
+					// if (!l.pathname.includes("/?/")) {
+					window.history.replaceState(
+						null,
+						null,
+						l.pathname.slice(0, -1) + decoded + l.hash
+					);
+					// }
 				}
 			})(window.location);
 		</script>
