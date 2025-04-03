@@ -35,10 +35,20 @@
 						.slice(0, 1 + pathSegmentsToKeep)
 						.join("/") +
 					"/?/" +
-					l.pathname.slice(1).split("/").slice(pathSegmentsToKeep).join("/").replace(/&/g, "~and~") +
+					l.pathname
+						.slice(1)
+						.split("/")
+						.slice(pathSegmentsToKeep)
+						.join("/")
+						.replace(/&/g, "~and~") +
 					(l.search ? "&" + l.search.slice(1).replace(/&/g, "~and~") : "") +
 					l.hash
 			);
+
+			// Đảm bảo không thêm '/?' nếu nó đã tồn tại
+			if (!newUrl.includes("/?/")) {
+				l.replace(newUrl);
+			}
 		</script>
 	</head>
 	<body></body>

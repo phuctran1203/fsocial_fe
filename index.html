@@ -5,6 +5,11 @@
 		<link rel="icon" type="image/svg+xml" href="/logo/FSocial_logo.svg" />
 		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
 		<title>FSocial</title>
+		<meta
+			name="description"
+			content="Kết nối với bạn bè của bạn trên FSocial"
+		/>
+
 		<!-- Start Single Page Apps for GitHub Pages -->
 		<script type="text/javascript">
 			(function (l) {
@@ -16,7 +21,11 @@
 							return s.replace(/~and~/g, "&");
 						})
 						.join("?");
-					window.history.replaceState(null, null, l.pathname.slice(0, -1) + decoded + l.hash);
+					window.history.replaceState(
+						null,
+						null,
+						l.pathname.slice(0, -1) + decoded + l.hash
+					);
 				}
 			})(window.location);
 		</script>
