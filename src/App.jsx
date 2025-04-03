@@ -47,7 +47,7 @@ function App() {
 	}, [theme]);
 
 	return (
-		<BrowserRouter>
+		<BrowserRouter basename="/">
 			<Routes>
 				<Route element={<GuestRoute />}>
 					<Route path="/login" element={<Login />} />
