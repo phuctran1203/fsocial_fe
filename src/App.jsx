@@ -47,7 +47,7 @@ function App() {
 	}, [theme]);
 
 	return (
-		<BrowserRouter basename={import.meta.env.BASE_URL}>
+		<BrowserRouter>
 			<Routes>
 				<Route element={<GuestRoute />}>
 					<Route path="/login" element={<Login />} />
