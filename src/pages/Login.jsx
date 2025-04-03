@@ -56,6 +56,7 @@ export default function Login() {
 				result?.message ||
 					"Có lỗi xảy ra trong quá trình login, FSocial sẽ sớm khắc phục"
 			);
+			return;
 		}
 
 		// save token and refresh token
