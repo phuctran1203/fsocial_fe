@@ -64,7 +64,7 @@ const AdminProfile = () => {
 	return (
 		<div className="relative overflow-hidden bg-background shadow border rounded-lg flex-grow p-10">
 			<LogoNoBG
-				className="absolute left-0 bottom-0 translate-y-1/3 -rotate-12 size-56"
+				className="absolute left-0 bottom-0 translate-y-1/2 -rotate-12 size-56"
 				fill="fill-gray-3light"
 			/>
 			{/* Tiêu đề */}
