@@ -43,11 +43,6 @@
 					.replace(/&/g, "~and~") +
 				(l.search ? "&" + l.search.slice(1).replace(/&/g, "~and~") : "") +
 				l.hash;
-
-			// Đảm bảo không thêm '/?' nếu nó đã tồn tại
-			if (!newUrl.includes("/?/")) {
-				window.location.replace(newUrl);
-			}
 		</script>
 	</head>
 	<body></body>
