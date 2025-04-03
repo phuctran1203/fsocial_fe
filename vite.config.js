@@ -16,7 +16,6 @@ export default defineConfig({
 			"@": path.resolve(__dirname, "src"),
 		},
 	},
-	base: "/fsocial_fe/",
 	server: {
 		host: "0.0.0.0", // Lắng nghe trên tất cả các địa chỉ IP
 		port: 3000,
