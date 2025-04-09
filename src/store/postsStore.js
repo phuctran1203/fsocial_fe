@@ -37,12 +37,9 @@ class PostsStore {
     );
   };
   // thêm nhiều post vào cuối, tự động kiểm soát số post tối đa
-  appendPosts = (posts, maxPosts = 20) => {
+  appendPosts = (posts) => {
     this.set((state) => {
       let newPosts = [...state.posts, ...posts];
-      if (newPosts.length >= maxPosts) {
-        newPosts = newPosts.slice(posts.length);
-      }
       return { posts: newPosts };
     });
   };
@@ -53,22 +50,6 @@ class PostsStore {
     this.set((state) => ({
       posts: state.posts.filter((post) => post.id !== id),
     }));
-  // IntersectionObserver posts
-  smartObserver = (targetElement, action) => {
-    this.disconnectObserver();
-    this.observer = new IntersectionObserver((entries) => {
-      if (entries[0].isIntersecting) {
-        console.log("get more post");
-        this.observer.unobserve(entries[0].target);
-        action();
-      }
-    });
-    this.observer.observe(targetElement);
-  };
-  // force disconnect observer
-  disconnectObserver = () => {
-    if (this.observer) this.observer.disconnect();
-  };
 }
 
 export const useHomePostsStore = create((set, get) => {
@@ -91,11 +72,6 @@ export const useHomePostsStore = create((set, get) => {
     findPost: (id) => store.findPost(id, get),
 
     deletePost: store.deletePost,
-
-    smartObserver: (targetElement, action) =>
-      store.smartObserver(targetElement, action),
-
-    disconnectObserver: store.disconnectObserver,
   };
 });
 
@@ -119,11 +95,6 @@ export const useFollowPostsStore = create((set, get) => {
     findPost: (id) => store.findPost(id, get),
 
     deletePost: store.deletePost,
-
-    smartObserver: (targetElement, action) =>
-      store.smartObserver(targetElement, action),
-
-    disconnectObserver: store.disconnectObserver,
   };
 });
 
@@ -147,11 +118,6 @@ export const useSearchPostsStore = create((set, get) => {
     findPost: (id) => store.findPost(id, get),
 
     deletePost: store.deletePost,
-
-    smartObserver: (targetElement, action) =>
-      store.smartObserver(targetElement, action),
-
-    disconnectObserver: store.disconnectObserver,
   };
 });
 
@@ -175,11 +141,6 @@ export const useProfilePostsStore = create((set, get) => {
     findPost: (id) => store.findPost(id, get),
 
     deletePost: store.deletePost,
-
-    smartObserver: (targetElement, action) =>
-      store.smartObserver(targetElement, action),
-
-    disconnectObserver: store.disconnectObserver,
   };
 });
 
