@@ -48,7 +48,7 @@ export default function Home() {
         )}
       >
         <RenderPosts
-          className="sm:rounded shadow-y my-2 md:my-4"
+          className="sm:rounded shadow-y border-x border-y-0 my-2 md:my-4"
           posts={posts}
           store={useHomePostsStore}
           fetchPosts={fetchPosts}
