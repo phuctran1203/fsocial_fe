@@ -2,6 +2,7 @@ import React from "react";
 import { Navigate, Outlet } from "react-router-dom";
 
 export default function AdminRoute() {
-	const isAdmin = true;
-	return isAdmin ? <Outlet /> : <Navigate to="/" />;
+  const user = ownerAccountStore((state) => state.user);
+  const isAdmin = user.role === "ADMIN";
+  return isAdmin ? <Outlet /> : <Navigate to="/" />;
 }

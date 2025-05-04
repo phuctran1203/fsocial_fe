@@ -16,47 +16,51 @@ import useNotificationsStore from "@/store/notificationStore";
 import cleanupStore from "@/utils/cleanupStore";
 
 export default function UserLayout() {
-	const { setUser } = ownerAccountStore();
-	const { refreshToken } = useValidRefreshTokenStore();
-	const { connectNotificationWebSocket } = useNotificationsStore();
-	const { connectMessageWebSocket } = useMessageStore();
+  const { setUser } = ownerAccountStore();
+  const { refreshToken } = useValidRefreshTokenStore();
+  const { connectNotificationWebSocket } = useNotificationsStore();
+  const { connectMessageWebSocket } = useMessageStore();
 
-	const getUserDetail = async () => {
-		const resp = await getOwnerProfile();
-		if (!resp) return;
-		const accessToken = getCookie("access-token");
-		if (!accessToken) {
-			console.log("User layout: không có accessToken trong cookie");
-			return;
-		}
-		let userId = jwtDecode(accessToken).sub;
-		console.log("lấy được userId: ", userId);
+  const getUserDetail = async () => {
+    const resp = await getOwnerProfile();
+    if (!resp) return;
+    const accessToken = getCookie("access-token");
+    if (!accessToken) {
+      console.log("User layout: không có accessToken trong cookie");
+      return;
+    }
+    const jwtDecoded = jwtDecode(accessToken);
+    const userId = jwtDecoded.sub;
+    const role = jwtDecoded.scope;
+    console.log("decode jwt: ", jwtDecode(accessToken));
+    console.log("lấy được userId: ", userId);
+    console.log("lấy được role: ", role);
 
-		setUser({ userId, ...resp.data });
-		connectNotificationWebSocket(userId);
-		connectMessageWebSocket(userId);
-	};
+    setUser({ userId, role, ...resp.data });
+    connectNotificationWebSocket(userId);
+    connectMessageWebSocket(userId);
+  };
 
-	useEffect(() => {
-		getUserDetail();
-		return () => {
-			cleanupStore();
-		};
-	}, []);
+  useEffect(() => {
+    getUserDetail();
+    return () => {
+      cleanupStore();
+    };
+  }, []);
 
-	return (
-		<>
-			{/* nav top appear in mobile */}
-			<>
-				<main className="sm:flex relative h-[100dvh]">
-					<Header />
-					<Nav />
-					{refreshToken ? <Outlet /> : <ExpiredDialog />}
-					<Notification />
-				</main>
-				<Popup />
-				<Toaster position="top-center" />
-			</>
-		</>
-	);
+  return (
+    <>
+      {/* nav top appear in mobile */}
+      <>
+        <main className="sm:flex relative h-[100dvh]">
+          <Header />
+          <Nav />
+          {refreshToken ? <Outlet /> : <ExpiredDialog />}
+          <Notification />
+        </main>
+        <Popup />
+        <Toaster position="top-center" />
+      </>
+    </>
+  );
 }

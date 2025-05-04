@@ -26,10 +26,10 @@ export default function Home() {
         setIsEndPosts(true);
         return;
       }
-      const shuffle = resp.data.sort(() => Math.random() - 0.5);
-      console.log("shuffle is: ", shuffle);
+      // const shuffle = resp.data.sort(() => Math.random() - 0.5);
+      // console.log("shuffle is: ", shuffle);
 
-      appendPosts(shuffle);
+      appendPosts(resp.data);
     }
   };
 
