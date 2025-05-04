@@ -38,7 +38,7 @@ function RenderComment({ ...props }) {
   const user = ownerAccountStore((state) => state.user);
   const hidePopup = usePopupStore((state) => state.hidePopup);
 
-  const [like, setLike] = useState(false);
+  const [like, setLike] = useState(comment.like);
 
   const [countLikes, setCountLikes] = useState(comment.countLikes);
 
