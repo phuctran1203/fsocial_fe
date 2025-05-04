@@ -9,7 +9,6 @@ import { useForm } from "react-hook-form";
 import { Eye, EyeOff, UserRoundIcon } from "lucide-react";
 import { useValidRefreshTokenStore } from "@/store/validRefreshTokenStore";
 import { useGoogleLogin } from "@react-oauth/google";
-import { jwtDecode } from "jwt-decode";
 import { getUserDOBByGoogle, getUserInfoByGoole } from "@/api/googleApi";
 import { toast } from "sonner";
 
@@ -174,12 +173,13 @@ export default function Login() {
           <div>
             <Link
               to="/forgot-password"
-              className="order-1s underline fs-sm font-semibold"
+              className="order-1 underline fs-sm font-semibold"
             >
               Quên mật khẩu?
             </Link>
           </div>
         </div>
+
         <div className="mb-4">
           {!submitClicked && <p className="text-red-600">{loginErr}</p>}
           <Button className={`btn-primary py-3`} onClick={handleSubmitLogin}>

@@ -535,8 +535,10 @@ export default function Profile() {
                 {isOwner && (
                   <div className="pt-0.5 snap-start mx-auto md:space-y-4 space-y-1.5 md:pb-0 overflow-y-auto w-full max-h-full scrollable-div">
                     <RenderPosts
-                      className="sm:rounded border-x shadow-y"
+                      className="sm:rounded shadow-y border-x my-2 md:my-4"
+                      posts={postsUser}
                       store={useProfilePostsStore}
+                      fetchPosts={fetchPostsUser}
                     />
                   </div>
                 )}

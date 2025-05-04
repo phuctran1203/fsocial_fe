@@ -10,7 +10,7 @@ export default function RenderPosts({
 }) {
   return (
     <Virtuoso
-      style={{ height: "100%" }}
+      style={{ height: "100vh" }}
       className="scrollable-div"
       components={{
         Footer: () =>
@@ -32,7 +32,7 @@ export default function RenderPosts({
             </div>
           )),
       }}
-      increaseViewportBy={{ top: 5000, bottom: 500 }}
+      increaseViewportBy={{ top: 2000, bottom: 0 }}
       data={posts}
       itemContent={(_, post) => (
         <Post post={post} className={className} store={store} />

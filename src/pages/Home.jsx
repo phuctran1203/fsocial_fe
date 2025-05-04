@@ -26,10 +26,10 @@ export default function Home() {
         setIsEndPosts(true);
         return;
       }
-      const shuffle = resp.data.sort(() => Math.random() - 0.5);
-      console.log("shuffle is: ", shuffle);
+      // const shuffle = resp.data.sort(() => Math.random() - 0.5);
+      // console.log("shuffle is: ", shuffle);
 
-      appendPosts(shuffle);
+      appendPosts(resp.data);
     }
   };
 
@@ -48,7 +48,7 @@ export default function Home() {
         )}
       >
         <RenderPosts
-          className="sm:rounded shadow-y my-2 md:my-4"
+          className="sm:rounded shadow-y border-x border-y-0 my-2 md:my-4"
           posts={posts}
           store={useHomePostsStore}
           fetchPosts={fetchPosts}
